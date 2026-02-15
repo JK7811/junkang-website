@@ -1,425 +1,106 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jkang</title>
-  <meta name="description" content="Jkang · Futuristic personal site" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jkang Digital Pack</title>
   <style>
-    :root{
-      --bg:#050507;
-      --text:#F6F7FB;
-      --muted:#A7AAB5;
-      --line:rgba(255,255,255,.10);
-      --card:rgba(255,255,255,.05);
-      --card2:rgba(255,255,255,.02);
-      --shadow: 0 26px 80px rgba(0,0,0,.55);
-      --radius:22px;
-    }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
     body{
       margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      color:var(--text);
-      background: radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.10), transparent 60%), var(--bg);
-      overflow-x:hidden;
-    }
-    a{ color:inherit; text-decoration:none; }
-
-    canvas#stars{
-      position:fixed; inset:0;
-      width:100%; height:100%;
-      z-index:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
+      background:#050507;
+      color:white;
+      text-align:center;
     }
 
-    .cursor-glow{
-      position:fixed;
-      width:520px; height:520px;
-      border-radius:50%;
-      background: radial-gradient(circle at center,
-        rgba(120, 200, 255, .18) 0%,
-        rgba(180, 120, 255, .12) 25%,
-        rgba(255,255,255,0) 60%);
-      transform: translate(-50%, -50%);
-      pointer-events:none;
-      filter: blur(2px);
-      z-index:1;
-      opacity:.9;
-      mix-blend-mode: screen;
+    .container{
+      max-width:900px;
+      margin:auto;
+      padding:60px 20px;
     }
 
-    .wrap{
-      position:relative;
-      z-index:2;
-      max-width:980px;
-      margin:0 auto;
-      padding:22px 16px 90px;
-    }
-
-    .nav{
-      position:sticky; top:0;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:12px 0;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(to bottom, rgba(5,5,7,.88), rgba(5,5,7,.35));
-      border-bottom:1px solid var(--line);
-      z-index:5;
-    }
-    .brand{
-      font-weight:900;
-      letter-spacing:.24em;
-      font-size:13px;
-      text-transform:uppercase;
-    }
-    .links{ display:flex; gap:10px; font-size:13px; color:var(--muted); }
-    .links a{
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid transparent;
-      transition:.2s ease;
-    }
-    .links a:hover{
-      border-color:var(--line);
-      color:var(--text);
-      transform: translateY(-1px);
-    }
-
-    .hero{ padding:58px 0 10px; }
-    .kicker{
-      color:var(--muted);
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      font-size:12px;
-    }
     h1{
-      margin:12px 0 10px;
-      font-size:64px;
-      line-height:1.02;
-      letter-spacing:.04em;
-      text-shadow: 0 0 28px rgba(120,200,255,.18);
-    }
-    .sub{
-      max-width:720px;
-      color:var(--muted);
-      font-size:16px;
-      line-height:1.85;
+      font-size:48px;
+      margin-bottom:10px;
     }
 
-    .cta{ display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+    .price{
+      font-size:26px;
+      margin:20px 0;
+      opacity:0.8;
+    }
+
     .btn{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:12px 16px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      box-shadow: 0 10px 30px rgba(0,0,0,.28);
-      font-size:14px;
-      transition:.2s ease;
-      position:relative;
-      overflow:hidden;
+      display:inline-block;
+      padding:14px 28px;
+      background:white;
+      color:black;
+      text-decoration:none;
+      border-radius:12px;
+      font-weight:bold;
+      margin-top:20px;
+      transition:0.2s;
     }
-    .btn::after{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(220px 120px at var(--mx,50%) var(--my,50%),
-        rgba(120,200,255,.18),
-        rgba(180,120,255,.12),
-        transparent 60%);
-      opacity:0;
-      transition:.2s ease;
-      pointer-events:none;
-    }
-    .btn:hover::after{ opacity:1; }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06); }
-    .btn.primary{
-      background: rgba(255,255,255,.92);
-      color:#000;
-      border-color:transparent;
-    }
-    .btn.primary:hover{ background:#fff; }
 
-    .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:14px;
-      margin-top:26px;
+    .btn:hover{
+      transform:translateY(-2px);
     }
-    @media(min-width:860px){ .grid{ grid-template-columns: 1.1fr .9fr; } }
+
+    .section{
+      margin-top:60px;
+      text-align:left;
+    }
 
     .card{
-      background: linear-gradient(to bottom, var(--card), var(--card2));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:var(--shadow);
-      position:relative;
-      overflow:hidden;
+      background:rgba(255,255,255,0.05);
+      padding:20px;
+      border-radius:16px;
+      margin-top:20px;
     }
-    .card::before{
-      content:"";
-      position:absolute; inset:-1px;
-      background: linear-gradient(135deg,
-        rgba(120,200,255,.18),
-        rgba(180,120,255,.14),
-        rgba(255,255,255,0));
-      opacity:.25;
-      pointer-events:none;
-    }
-    .card h2{
-      margin:0 0 10px;
-      font-size:13px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color: rgba(255,255,255,.9);
-      position:relative;
-    }
-    .card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.85;
-      font-size:14px;
-      position:relative;
-    }
-    .pillrow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; position:relative;}
-    .pill{
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
-      background:rgba(255,255,255,.02);
-      backdrop-filter: blur(8px);
-    }
-    .sep{ height:1px; background:var(--line); margin:14px 0; position:relative; }
 
     footer{
-      margin-top:26px;
-      color:var(--muted);
-      font-size:12px;
-      display:flex;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:10px;
-      opacity:.9;
+      margin-top:60px;
+      opacity:0.6;
+      font-size:14px;
     }
-
-    /* Scroll reveal */
-    .reveal{
-      opacity:0;
-      transform: translateY(14px);
-      transition: .7s ease;
-      will-change: transform, opacity;
-    }
-    .reveal.show{
-      opacity:1;
-      transform: translateY(0);
-    }
-
-    /* WhatsApp floating button */
-    .wa-fab{
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      z-index:9;
-      border-radius:999px;
-      padding:12px 14px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 18px 40px rgba(0,0,0,.45);
-      display:flex;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-      transition: .2s ease;
-    }
-    .wa-fab:hover{ transform: translateY(-2px); background: rgba(255,255,255,.10); }
-    .wa-dot{
-      width:10px; height:10px; border-radius:50%;
-      background: rgba(120,255,180,.9);
-      box-shadow: 0 0 18px rgba(120,255,180,.45);
-    }
-    .wa-text{ font-size:13px; color: var(--text); }
-    .wa-sub{ font-size:11px; color: var(--muted); margin-top:2px; }
   </style>
 </head>
 
 <body>
-  <canvas id="stars"></canvas>
-  <div class="cursor-glow" id="glow"></div>
+  <div class="container">
 
-  <!-- WhatsApp floating button -->
-  <div class="wa-fab" id="waBtn" title="WhatsApp">
-    <div class="wa-dot"></div>
-    <div>
-      <div class="wa-text">WhatsApp</div>
-      <div class="wa-sub">Chat with me</div>
-    </div>
-  </div>
+    <h1>Jkang Digital Pack</h1>
+    <p>Premium Digital Resources for Builders & Creators</p>
 
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">Jkang</div>
-      <div class="links">
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="https://instagram.com/jknlk_" target="_blank" rel="noopener">Instagram</a>
+    <div class="price">SGD 29 · One-Time Payment</div>
+
+    <!-- 把下面链接换成你的 Stripe Payment Link -->
+    <a class="btn" href="https://buy.stripe.com/fZu6oIc6V4zrdAk8kB9fW01" target="_blank">
+      Buy Now
+    </a>
+
+    <div class="section">
+      <h2>What You Get</h2>
+      <div class="card">
+        ✔ Premium Templates<br><br>
+        ✔ Editable Digital Files<br><br>
+        ✔ Lifetime Access<br><br>
+        ✔ Free Future Updates
       </div>
     </div>
 
-    <section class="hero">
-      <div class="kicker reveal">Futuristic Personal Brand</div>
-      <h1 class="reveal">Jkang</h1>
-      <div class="sub reveal">
-        简洁、科技、未来感。你之后要加作品集、简历、服务与报价、甚至做成品牌官网，都可以继续扩展。
+    <div class="section">
+      <h2>Why This Pack?</h2>
+      <div class="card">
+        Designed for speed, clarity and execution.<br><br>
+        Build faster. Launch smarter. Look premium.
       </div>
+    </div>
 
-      <div class="cta reveal">
-        <a class="btn primary" href="mailto:junkang1999@live.com?subject=Hello%20Jkang">Email me</a>
-        <a class="btn" href="https://instagram.com/jknlk_" target="_blank" rel="noopener">IG: @jknlk_</a>
-        <a class="btn" href="#contact">Contact</a>
-      </div>
+    <footer>
+      © 2025 Jkang · Digital Product
+    </footer>
 
-      <div class="grid" style="margin-top:22px">
-        <div class="card reveal" id="about">
-          <h2>About</h2>
-          <p>
-            你好，我是 <b style="color:var(--text)">Jkang</b>。<br/>
-            我喜欢把想法变成可以落地的东西：更快、更稳、更有质感。<br/>
-            （你给我一句定位，我可以帮你写成更高级的中英版本。）
-          </p>
-          <div class="pillrow">
-            <div class="pill">Minimal</div>
-            <div class="pill">Future</div>
-            <div class="pill">Execution</div>
-            <div class="pill">Brand</div>
-          </div>
-        </div>
-
-        <div class="card reveal">
-          <h2>Now</h2>
-          <p>目前状态（可随时改）：</p>
-          <div class="sep"></div>
-          <p>• Building a premium online presence</p>
-          <p>• Keeping systems simple & effective</p>
-          <p>• Open to collaborations</p>
-        </div>
-      </div>
-
-      <!-- Projects 暂时隐藏（你说先空着） -->
-
-      <div class="card reveal" id="contact" style="margin-top:14px">
-        <h2>Contact</h2>
-        <p>最快联系：Email / Instagram / WhatsApp。</p>
-        <div class="cta" style="margin-top:14px">
-          <a class="btn primary" href="mailto:junkang1999@live.com?subject=Hello%20Jkang">Send Email</a>
-          <a class="btn" href="https://instagram.com/jknlk_" target="_blank" rel="noopener">Open Instagram</a>
-          <a class="btn" id="waInline" href="#" onclick="return false;">WhatsApp</a>
-        </div>
-        <div style="margin-top:10px; font-size:12px; color:var(--muted)">
-          想加“简历下载 / 作品集页面 / 表单自动收件”，我也可以帮你接上。
-        </div>
-      </div>
-
-      <footer class="reveal">
-        <div>© <span id="y"></span> Jkang</div>
-        <div>Built on Vercel · Futuristic UI</div>
-      </footer>
-    </section>
   </div>
-
-  <script>
-    // ======= CONFIG (你只要改这里的 WhatsApp 号码) =======
-    // 格式：国家码+号码，不要 + 号，不要空格
-    // 例如：+65 8888 7777 -> "6588887777"
-    const WHATSAPP_NUMBER = "6594450736";
-    const WHATSAPP_TEXT = "Hi Jkang, I saw your website.";
-
-    // year
-    document.getElementById("y").textContent = new Date().getFullYear();
-
-    // cursor glow follow + button glow
-    const glow = document.getElementById("glow");
-    window.addEventListener("mousemove", (e) => {
-      glow.style.left = e.clientX + "px";
-      glow.style.top  = e.clientY + "px";
-      document.documentElement.style.setProperty("--mx", e.clientX + "px");
-      document.documentElement.style.setProperty("--my", e.clientY + "px");
-    }, { passive:true });
-
-    // WhatsApp links
-    function openWhatsApp(){
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
-      window.open(url, "_blank", "noopener");
-    }
-    document.getElementById("waBtn").addEventListener("click", openWhatsApp);
-    document.getElementById("waInline").addEventListener("click", openWhatsApp);
-
-    // Stars canvas
-    const c = document.getElementById("stars");
-    const ctx = c.getContext("2d");
-    let w, h, dpr;
-
-    function resize(){
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      w = c.width = Math.floor(innerWidth * dpr);
-      h = c.height = Math.floor(innerHeight * dpr);
-      c.style.width = innerWidth + "px";
-      c.style.height = innerHeight + "px";
-    }
-    resize();
-    addEventListener("resize", resize);
-
-    function starCount(){
-      return Math.floor((innerWidth * innerHeight) / 18000) + 80;
-    }
-    let stars = [];
-    function initStars(){
-      const n = starCount();
-      stars = Array.from({length:n}).map(() => ({
-        x: Math.random()*w,
-        y: Math.random()*h,
-        r: (Math.random()*1.6 + .2) * dpr,
-        v: (Math.random()*0.35 + 0.05) * dpr,
-        a: Math.random()*0.7 + 0.15
-      }));
-    }
-    initStars();
-
-    function tick(){
-      ctx.clearRect(0,0,w,h);
-
-      // subtle vignette
-      const g = ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*0.6);
-      g.addColorStop(0, "rgba(255,255,255,0.02)");
-      g.addColorStop(1, "rgba(0,0,0,0.0)");
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,w,h);
-
-      for(const s of stars){
-        s.y += s.v;
-        if(s.y > h + 10){ s.y = -10; s.x = Math.random()*w; }
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(180,220,255,${s.a})`;
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-        ctx.fill();
-      }
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    // Scroll reveal (IntersectionObserver)
-    const reveals = Array.from(document.querySelectorAll(".reveal"));
-    const io = new IntersectionObserver((entries) => {
-      for(const e of entries){
-        if(e.isIntersecting){
-          e.target.classList.add("show");
-          io.unobserve(e.target);
-        }
-      }
-    }, { threshold: 0.12 });
-    reveals.forEach(el => io.observe(el));
-  </script>
 </body>
 </html>
