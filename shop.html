@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jkang Digital Pack · SGD 29</title>
+  <meta name="description" content="Jkang Digital Pack · Premium digital resources · SGD 29" />
+  <style>
+    :root{
+      --bg:#050507;
+      --text:#F6F7FB;
+      --muted:#A7AAB5;
+      --line:rgba(255,255,255,.10);
+      --card:rgba(255,255,255,.05);
+      --card2:rgba(255,255,255,.02);
+      --shadow: 0 26px 80px rgba(0,0,0,.55);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      background:
+        radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(700px 420px at 90% 80%, rgba(180,120,255,.10), transparent 60%),
+        var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:980px; margin:0 auto; padding:26px 16px 92px}
+    .top{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:12px 0; border-bottom:1px solid var(--line);
+      position:sticky; top:0; backdrop-filter: blur(14px);
+      background: linear-gradient(to bottom, rgba(5,5,7,.88), rgba(5,5,7,.35));
+      z-index:10;
+    }
+    .brand{font-weight:900; letter-spacing:.22em; font-size:13px; text-transform:uppercase}
+    .nav{display:flex; gap:10px; font-size:13px; color:var(--muted)}
+    .nav a{padding:8px 10px; border-radius:999px; border:1px solid transparent; transition:.2s}
+    .nav a:hover{border-color:var(--line); color:var(--text); transform: translateY(-1px)}
+    .hero{padding:44px 0 18px}
+    h1{margin:10px 0 8px; font-size:52px; letter-spacing:.02em; line-height:1.05}
+    .sub{max-width:740px; color:var(--muted); line-height:1.85}
+    .priceRow{margin-top:16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+    .price{
+      padding:10px 12px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.03);
+      color:rgba(255,255,255,.9);
+      font-size:14px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 16px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      box-shadow: 0 10px 30px rgba(0,0,0,.28);
+      transition:.2s; font-size:14px;
+    }
+    .btn:hover{transform: translateY(-1px); background:rgba(255,255,255,.06)}
+    .btn.primary{background:rgba(255,255,255,.92); color:#000; border-color:transparent; font-weight:700}
+    .btn.primary:hover{background:#fff}
+    .grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:22px}
+    @media(min-width:860px){ .grid{grid-template-columns:1.05fr .95fr} }
+    .card{
+      background: linear-gradient(to bottom, var(--card), var(--card2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .card h2{margin:0 0 10px; font-size:13px; letter-spacing:.14em; text-transform:uppercase}
+    .card p{margin:0; color:var(--muted); line-height:1.85; font-size:14px}
+    ul{margin:10px 0 0; padding-left:18px; color:var(--muted); line-height:1.85}
+    li{margin:6px 0}
+    .trust{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+    .pill{
+      padding:8px 10px; border:1px solid var(--line);
+      border-radius:999px; font-size:12px; color:var(--muted);
+      background:rgba(255,255,255,.02);
+    }
+    .faq{margin-top:14px}
+    .faq details{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+      background:rgba(255,255,255,.02);
+      margin-top:10px;
+    }
+    .faq summary{cursor:pointer; color:rgba(255,255,255,.9); font-size:14px}
+    .faq p{margin:10px 0 0; font-size:13px}
+    footer{
+      margin-top:26px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+      opacity:.9;
+    }
+    .stickyBuy{
+      position:fixed; left:0; right:0; bottom:0;
+      padding:12px 16px;
+      background: linear-gradient(to top, rgba(5,5,7,.92), rgba(5,5,7,.35));
+      border-top:1px solid var(--line);
+      backdrop-filter: blur(12px);
+      z-index:20;
+    }
+    .stickyInner{max-width:980px; margin:0 auto; display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;}
+    .stickyText{font-size:13px; color:var(--muted)}
+    .stickyText b{color:var(--text)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">Jkang</div>
+      <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="https://instagram.com/jknlk_" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div style="color:var(--muted); letter-spacing:.18em; text-transform:uppercase; font-size:12px;">Digital Product</div>
+      <h1>Jkang Digital Pack</h1>
+      <div class="sub">
+        一套「高级、可直接套用」的数字资源包，帮你更快做出<strong style="color:var(--text)">更有质感</strong>的内容/页面/品牌呈现。
+        买一次，直接用。
+      </div>
+
+      <div class="priceRow">
+        <div class="price">SGD 29 · One-time payment</div>
+        <a class="btn primary" href="https://buy.stripe.com/fZu6oIc6V4zrdAk8kB9fW01" target="_blank" rel="noopener">Buy Now</a>
+        <a class="btn" href="mailto:junkang1999@live.com?subject=Question%20about%20Jkang%20Digital%20Pack">Ask a question</a>
+      </div>
+
+      <div class="trust">
+        <div class="pill">Instant access</div>
+        <div class="pill">Editable files</div>
+        <div class="pill">Lifetime use</div>
+        <div class="pill">Email receipt</div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>What’s inside</h2>
+          <p>你之后把真实内容给我，我再把这块写得更像“专业产品说明”。</p>
+          <ul>
+            <li>Premium templates（可编辑模板）</li>
+            <li>Copywriting blocks（高转化文案模块）</li>
+            <li>Brand mini-kit（基础品牌视觉指引）</li>
+            <li>Bonus resources（加赠资源）</li>
+          </ul>
+          <div class="trust">
+            <div class="pill">For creators</div>
+            <div class="pill">For founders</div>
+            <div class="pill">For builders</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Why it works</h2>
+          <ul>
+            <li>结构已经帮你设计好：你只要套用</li>
+            <li>整体风格更「高级」：减少廉价感</li>
+            <li>省时间：少走弯路，直接上手</li>
+          </ul>
+
+          <div style="margin-top:14px; color:var(--muted); font-size:13px; line-height:1.8">
+            <b style="color:var(--text)">Best use:</b> 做个人主页、作品集、销售页、品牌介绍页。
+          </div>
+        </div>
+      </div>
+
+      <div class="card faq">
+        <h2>FAQ</h2>
+
+        <details>
+          <summary>付款后怎么拿到文件？</summary>
+          <p>你可以设置：付款成功页面提供下载链接，或在Stripe收据/邮件里放下载链接（最简单）。</p>
+        </details>
+
+        <details>
+          <summary>可以用 GrabPay / PayLater 吗？</summary>
+          <p>如果你的Stripe账户启用了GrabPay，结账页会出现对应选项。PayLater是否出现取决于Grab/Stripe的资格与风控。</p>
+        </details>
+
+        <details>
+          <summary>可以买了以后退吗？</summary>
+          <p>数字产品一般不提供退款（可写：如重复购买/无法下载可联系处理）。我也可以帮你加“退款政策”文字。</p>
+        </details>
+      </div>
+
+      <footer>
+        <div>© <span id="y"></span> Jkang</div>
+        <div>Jkang Digital Pack · SGD 29</div>
+      </footer>
+    </section>
+  </div>
+
+  <div class="stickyBuy">
+    <div class="stickyInner">
+      <div class="stickyText"><b>Jkang Digital Pack</b> · SGD 29 · One-time</div>
+      <a class="btn primary" href="https://buy.stripe.com/fZu6oIc6V4zrdAk8kB9fW01" target="_blank" rel="noopener">Buy Now</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
