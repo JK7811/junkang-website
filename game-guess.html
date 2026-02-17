@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guess · Jkang</title>
+<style>
+  :root{--bg:#050507;--text:#F6F7FB;--muted:#A7AAB5;--line:rgba(255,255,255,.12);--r:22px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;background:var(--bg);color:var(--text)}
+  .wrap{max-width:680px;margin:0 auto;padding:18px 14px 50px}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  a{color:inherit;text-decoration:none}
+  .card{margin-top:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:var(--r);padding:16px}
+  h1{margin:0;font-size:28px}
+  p{margin:8px 0;color:var(--muted);line-height:1.7}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  input{
+    flex:1;min-width:140px;
+    padding:12px 12px;border-radius:14px;border:1px solid var(--line);
+    background:rgba(255,255,255,.02);color:var(--text);font-size:16px;
+  }
+  button{
+    padding:12px 14px;border-radius:14px;border:1px solid var(--line);
+    background:rgba(255,255,255,.06);color:var(--text);font-weight:900;
+  }
+  .msg{margin-top:12px;font-size:15px}
+  .pill{display:inline-block;margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.02)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div style="font-weight:900;letter-spacing:.18em;text-transform:uppercase;font-size:12px">Guess</div>
+    <div style="color:#A7AAB5;font-size:13px"><a href="games.html">Back</a></div>
+  </div>
+
+  <div class="card">
+    <h1>🎯 猜数字 1–100</h1>
+    <p>输入一个数字，看提示（太大/太小），猜中为止。</p>
+
+    <div class="row">
+      <input id="n" type="number" placeholder="输入 1-100" min="1" max="100">
+      <button id="go">Guess</button>
+      <button id="new">New</button>
+    </div>
+
+    <div class="pill">Tries: <span id="tries">0</span></div>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+
+<script>
+  let ans = 1 + Math.floor(Math.random()*100);
+  let tries = 0;
+  const n = document.getElementById('n');
+  const msg = document.getElementById('msg');
+  const triesEl = document.getElementById('tries');
+
+  function setMessage(text){ msg.textContent = text; }
+  function reset(){
+    ans = 1 + Math.floor(Math.random()*100);
+    tries = 0; triesEl.textContent = tries;
+    n.value = "";
+    setMessage("新的一局开始。");
+  }
+
+  document.getElementById('go').addEventListener('click', ()=>{
+    const v = Number(n.value);
+    if(!v || v<1 || v>100){ setMessage("请输入 1-100 的数字"); return; }
+    tries++; triesEl.textContent = tries;
+    if(v===ans) setMessage(`✅ 你猜中了！答案是 ${ans}（用了 ${tries} 次）`);
+    else if(v<ans) setMessage("太小了 ⬆️");
+    else setMessage("太大了 ⬇️");
+  });
+
+  document.getElementById('new').addEventListener('click', reset);
+  reset();
+</script>
+</body>
+</html>
