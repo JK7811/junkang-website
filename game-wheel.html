@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spin Wheel · Jkang</title>
+<style>
+  :root{--bg:#050507;--text:#F6F7FB;--muted:#A7AAB5;--line:rgba(255,255,255,.12);--r:22px}
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
+    background:
+      radial-gradient(900px 500px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
+      radial-gradient(700px 420px at 90% 80%, rgba(180,120,255,.12), transparent 60%),
+      var(--bg);
+    color:var(--text);
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 14px 80px}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .brand{font-weight:900;letter-spacing:.18em;text-transform:uppercase;font-size:12px}
+  .card{
+    margin-top:16px;border:1px solid var(--line);border-radius:var(--r);
+    background:linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    padding:16px;
+  }
+  h1{margin:0;font-size:28px}
+  p{margin:8px 0;color:var(--muted);line-height:1.75}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{
+    padding:12px 14px;border-radius:14px;border:1px solid var(--line);
+    background:rgba(255,255,255,.06);color:var(--text);font-weight:900;
+  }
+  button.primary{background:rgba(255,255,255,.92);color:#000;border-color:transparent}
+  button:active{transform:scale(.98)}
+  .hud{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .pill{padding:8px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.02)}
+  canvas{margin-top:14px;width:100%;max-width:420px;aspect-ratio:1/1;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .center{display:flex;justify-content:center}
+  .result{margin-top:12px;border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(255,255,255,.02);color:rgba(255,255,255,.9)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Spin Wheel</div>
+    <div style="color:#A7AAB5;font-size:13px"><a href="games.html">Back</a></div>
+  </div>
+
+  <div class="card">
+    <h1>🎡 幸运转盘（纯娱乐）</h1>
+    <p>点 Spin 转起来！可以连抽。结果会记录在本机。</p>
+
+    <div class="hud">
+      <div class="pill">Spins: <span id="spins">0</span></div>
+      <div class="pill">Best: <span id="best">—</span></div>
+    </div>
+
+    <div class="center">
+      <div style="position:relative;display:inline-block;">
+        <canvas id="cv" width="420" height="420"></canvas>
+        <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:28px">▼</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="primary" id="spin">Spin</button>
+      <button id="spin5">Spin x5</button>
+      <button id="reset">Reset</button>
+    </div>
+
+    <div class="result" id="res">结果：—</div>
+  </div>
+</div>
+
+<script>
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const spinsEl=document.getElementById('spins');
+  const bestEl=document.getElementById('best');
+  const resEl=document.getElementById('res');
+
+  const prizes = [
+    {name:"+1 Luck", w:26},
+    {name:"Small Win", w:20},
+    {name:"Nice Try", w:18},
+    {name:"Big Win", w:12},
+    {name:"Epic!", w:8},
+    {name:"JACKPOT", w:3},
+    {name:"Again", w:13}
+  ];
+
+  let spins=Number(localStorage.getItem('wheel_spins')||0);
+  let best=localStorage.getItem('wheel_best')||"—";
+  spinsEl.textContent=spins; bestEl.textContent=best;
+
+  let angle=0, spinning=false;
+
+  function draw(){
+    const n=prizes.length;
+    const r=cv.width/2;
+    ctx.clearRect(0,0,cv.width,cv.height);
+
+    // outer glow
+    const g = ctx.createRadialGradient(r,r,10,r,r,r);
+    g.addColorStop(0,"rgba(255,255,255,.16)");
+    g.addColorStop(1,"rgba(255,255,255,.02)");
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.arc(r,r,r,0,Math.PI*2); ctx.fill();
+
+    for(let i=0;i<n;i++){
+      const start = angle + (i*2*Math.PI/n);
+      const end   = angle + ((i+1)*2*Math.PI/n);
+
+      ctx.beginPath();
+      ctx.moveTo(r,r);
+      ctx.arc(r,r,r-6,start,end);
+      ctx.closePath();
+
+      ctx.fillStyle = i%2===0 ? "rgba(255,255,255,.06)" : "rgba(180,120,255,.10)";
+      ctx.fill();
+
+      ctx.strokeStyle="rgba(255,255,255,.12)";
+      ctx.lineWidth=2; ctx.stroke();
+
+      // text
+      ctx.save();
+      ctx.translate(r,r);
+      ctx.rotate((start+end)/2);
+      ctx.textAlign="right";
+      ctx.fillStyle="rgba(255,255,255,.85)";
+      ctx.font="bold 16px Arial";
+      ctx.fillText(prizes[i].name, r-26, 6);
+      ctx.restore();
+    }
+
+    // center button
+    ctx.beginPath();
+    ctx.arc(r,r,56,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,.10)";
+    ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.18)";
+    ctx.stroke();
+
+    ctx.fillStyle="rgba(255,255,255,.9)";
+    ctx.font="900 18px Arial";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("SPIN", r, r);
+  }
+
+  function pickPrize(finalAngle){
+    // pointer at top ( -90deg )
+    const n=prizes.length;
+    const a = ( (Math.PI*2) - (finalAngle - (-Math.PI/2)) ) % (Math.PI*2);
+    const idx = Math.floor(a / (2*Math.PI/n)) % n;
+    return prizes[idx].name;
+  }
+
+  function spinOnce(){
+    if(spinning) return;
+    spinning=true;
+    const turns = 5 + Math.random()*3; // 5-8 turns
+    const target = angle + turns*2*Math.PI + (Math.random()*2*Math.PI);
+    const start = performance.now();
+    const dur = 1400 + Math.random()*700;
+
+    function easeOut(t){ return 1 - Math.pow(1-t,3); }
+
+    function anim(now){
+      const t=Math.min(1,(now-start)/dur);
+      angle = angle + (target-angle)*easeOut(t);
+      draw();
+      if(t<1) requestAnimationFrame(anim);
+      else{
+        spinning=false;
+        spins++;
+        const prize = pickPrize(angle);
+        resEl.textContent = "结果：" + prize;
+        // best logic
+        if(best==="—" || prize==="JACKPOT" || (prize==="Epic!" && best!=="JACKPOT")) best=prize;
+        spinsEl.textContent=spins; bestEl.textContent=best;
+        localStorage.setItem('wheel_spins',spins);
+        localStorage.setItem('wheel_best',best);
+      }
+    }
+    requestAnimationFrame(anim);
+  }
+
+  document.getElementById('spin').addEventListener('click', spinOnce);
+  document.getElementById('spin5').addEventListener('click', async ()=>{
+    for(let i=0;i<5;i++){
+      await new Promise(r=>{
+        const wait=()=>{ if(!spinning){ spinOnce(); } if(!spinning) setTimeout(r,1800); else setTimeout(wait,50); };
+        wait();
+      });
+    }
+  });
+  document.getElementById('reset').addEventListener('click', ()=>{
+    spins=0; best="—";
+    localStorage.setItem('wheel_spins',0);
+    localStorage.setItem('wheel_best',"—");
+    spinsEl.textContent=0; bestEl.textContent="—"; resEl.textContent="结果：—";
+  });
+
+  draw();
+</script>
+</body>
+</html>
