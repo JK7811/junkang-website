@@ -326,7 +326,7 @@
      * 你只要改这两行
      *********************/
     const SUPABASE_URL = "https://zrulbxnqtliyxycfjgks.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_4kcgAmTjO0pFPCxqyZ-1gw_vOuUx8SP";
+    const SUPABASE_ANON_KEY = "4kcgAmTjO0pFPCxqyZ-1gw_vOuUx8SP";
 
     // 充值跳转（你现在先用这个，后续做自动加币）
     const TOPUP_URL = "https://buy.stripe.com/fZu6oIc6V4zrdAk8kB9fW01";
@@ -372,7 +372,9 @@
 
     async function initSupabase(){
       // hard guard: if user forgot to paste keys -> show clear message
-      if(!SUPABASE_URL.includes("supabase.co") || SUPABASE_ANON_KEY.includes("sb_publishable_4kcgAmTjO0pFPCxqyZ-1gw_vOuUx8SP")){
+      if(!SUPABASE_URL || !SUPABASE_ANON_KEY){
+  $("loginMsg").textContent = "⚠️ 还没填 SUPABASE_URL / SUPABASE_ANON_KEY";
+  selfCheckLine("自检失败：未填 URL/KEY。");)){
         $("loginMsg").textContent =
           "⚠️ 你还没把 Supabase URL / Key 填进 index.html。\n" +
           "回 GitHub 编辑 index.html，把两行粘贴进去再刷新。";
@@ -510,45 +512,45 @@
     /*********************
      * Login flow (重点：必有反应 + 必报错)
      *********************/
-    async function sendLoginLink(){
-      const email = $("email").value.trim();
-      if(!email){
-        $("loginMsg").textContent = "请输入邮箱";
-        return;
-      }
+ async function sendLoginLink(){
+  const email = $("email").value.trim();
+  if(!email){
+    $("loginMsg").textContent = "请输入邮箱";
+    return;
+  }
+  if(!supabase){
+    $("loginMsg").textContent = "❌ Supabase 还没初始化成功（检查 URL/KEY）。";
+    return;
+  }
 
-      $("otpBtn").disabled = true;
-      $("loginMsg").textContent = "发送中…（请稍等 1-2 秒）";
+  $("otpBtn").disabled = true;
+  $("loginMsg").textContent = "发送中…";
 
-      try{
-        // ✅ 关键：redirect 用 origin，必须在 Redirect URLs 允许
-        const redirectTo = window.location.origin;
+  try{
+    const redirectTo = window.location.origin; // 必须在 Redirect URLs 允许
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: redirectTo }
+    });
 
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: redirectTo }
-        });
+    if(error) throw error;
 
-        if(error) throw error;
-
-        $("loginMsg").textContent =
-          "✅ 已发送登录邮件。\n" +
-          "请去邮箱打开登录链接，会自动回到本网站完成登录。\n" +
-          "（如果没收到：检查垃圾邮件 / 或等 1 分钟再试）";
-        toast("已发送登录邮件");
-      }catch(e){
-        console.log(e);
-        $("loginMsg").textContent =
-          "❌ 发送失败：\n" + (e?.message || String(e)) + "\n\n" +
-          "你已设置好 Site/Redirect，若还失败：\n" +
-          "1) Supabase Authentication → Providers → Email 是否启用\n" +
-          "2) 是否被 rate limit（等 1 分钟再试）\n" +
-          "3) Console 是否有 CORS/Fetch 报错";
-        toast("发送失败（看登录框提示）");
-      }finally{
-        $("otpBtn").disabled = false;
-      }
-    }
+    $("loginMsg").textContent =
+      "✅ 已发送登录邮件！\n" +
+      "去邮箱点链接，会回到这个网站自动登录。\n" +
+      "（没有收到：看垃圾邮件，或等 1 分钟再试）";
+  }catch(e){
+    console.log("OTP ERROR:", e);
+    $("loginMsg").textContent =
+      "❌ 发送失败：\n" + (e?.message || String(e)) + "\n\n" +
+      "常见原因：\n" +
+      "1) 用错 key（必须是 anon public，通常是 eyJ...）\n" +
+      "2) Email provider 没开\n" +
+      "3) Redirect URL 不匹配\n";
+  }finally{
+    $("otpBtn").disabled = false;
+  }
+}
 
     function demoGuest(){
       isGuest = true;
