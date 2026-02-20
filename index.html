@@ -3,82 +3,1226 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JKang Game - Login</title>
+  <title>JKang Neon Arena</title>
+  <meta name="description" content="JKang Neon Arena · A/B/C/D modes" />
   <style>
-    body{margin:0;font-family:Arial,sans-serif;background:#0b0b12;color:#fff;display:flex;min-height:100vh;align-items:center;justify-content:center}
-    .card{width:min(520px,92vw);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:18px;box-shadow:0 25px 70px rgba(0,0,0,.55)}
-    h1{margin:0 0 8px;font-size:22px;letter-spacing:.08em}
-    p{margin:0 0 14px;color:rgba(255,255,255,.7);line-height:1.6}
-    input{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:#fff;outline:none}
-    button{margin-top:12px;width:100%;padding:12px 12px;border-radius:12px;border:0;background:#fff;color:#000;font-weight:800;cursor:pointer}
-    button:active{transform:scale(.99)}
-    .msg{margin-top:10px;font-size:13px;color:rgba(255,255,255,.85);white-space:pre-wrap}
-    .tag{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.75);font-size:12px;margin-bottom:10px}
-    .small{margin-top:10px;color:rgba(255,255,255,.55);font-size:12px}
-    a{color:#9ad0ff}
+    :root{
+      --bg:#070716;
+      --text:#F6F7FF;
+      --muted:rgba(255,255,255,.68);
+      --line:rgba(255,255,255,.12);
+      --p1:rgba(124,200,255,.18);
+      --p2:rgba(180,120,255,.15);
+      --good:#7CFFB5;
+      --warn:#FFD27C;
+      --danger:#FF6D8B;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.03);
+      --shadow:0 32px 100px rgba(0,0,0,.55);
+      --r:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 50% 0%, rgba(124,200,255,.14), transparent 60%),
+        radial-gradient(900px 520px at 80% 80%, rgba(180,120,255,.10), transparent 60%),
+        var(--bg);
+      overflow:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    canvas#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+    canvas#game{position:fixed;inset:0;width:100%;height:100%;z-index:1; display:none}
+
+    .wrap{position:relative;z-index:2;height:100%;display:flex;align-items:center;justify-content:center;padding:14px}
+    .shell{
+      width:min(1100px,94vw);
+      border-radius:28px;
+      border:1px solid var(--line);
+      background:linear-gradient(to bottom, var(--card), var(--card2));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .shell::before{
+      content:"";position:absolute;inset:-2px;
+      background:linear-gradient(135deg, rgba(124,200,255,.20), rgba(180,120,255,.16), transparent 72%);
+      opacity:.35;pointer-events:none;
+    }
+    .topbar{
+      position:relative;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 16px;border-bottom:1px solid var(--line);
+      backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(7,7,22,.78), rgba(7,7,22,.25));
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      font-weight:900;letter-spacing:.22em;text-transform:uppercase;font-size:13px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.2));
+      box-shadow:0 0 24px rgba(124,200,255,.45);
+    }
+    .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      padding:8px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      font-size:12px;color:var(--muted);
+      display:flex;gap:8px;align-items:center;
+      user-select:none;
+    }
+    .pill b{color:var(--text)}
+    .btn{
+      padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);cursor:pointer;font-weight:800;font-size:13px;
+      transition:.18s ease; user-select:none;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.09)}
+    .btn.primary{background:#fff;color:#000;border-color:transparent}
+    .btn.primary:hover{background:#fff}
+    .btn.danger{border-color:rgba(255,109,139,.35); background:rgba(255,109,139,.10)}
+    .btn.good{border-color:rgba(124,255,181,.35); background:rgba(124,255,181,.10)}
+    .btn.small{padding:8px 10px;border-radius:12px;font-size:12px}
+
+    .content{position:relative;padding:16px}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:900px){.grid{grid-template-columns:1.35fr .65fr}}
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      background:rgba(0,0,0,.22);
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .panel h2{margin:0 0 6px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.78)}
+    .panel p{margin:0;color:var(--muted);line-height:1.75;font-size:13px}
+    .sep{height:1px;background:var(--line);margin:12px 0}
+
+    .modes{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    @media(min-width:700px){.modes{grid-template-columns:1fr 1fr}}
+
+    .mode{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.07), rgba(255,255,255,.02));
+      padding:12px;
+      cursor:pointer;
+      transition:.18s ease;
+      position:relative;
+      overflow:hidden;
+      min-height:96px;
+    }
+    .mode::after{
+      content:"";position:absolute;inset:-2px;
+      background: radial-gradient(340px 170px at var(--mx,50%) var(--my,50%),
+        rgba(124,200,255,.18), rgba(180,120,255,.12), transparent 60%);
+      opacity:0;transition:.18s ease;pointer-events:none;
+    }
+    .mode:hover::after{opacity:1}
+    .mode:hover{transform:translateY(-2px)}
+    .mode .t{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .badge{
+      font-weight:900;font-size:12px;letter-spacing:.18em;
+      padding:6px 10px;border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid var(--line);
+    }
+    .mode h3{margin:10px 0 6px;font-size:18px}
+    .mode small{color:var(--muted);line-height:1.5;display:block}
+
+    /* login overlay */
+    .overlay{
+      position:fixed;inset:0;z-index:5;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(5,6,16,.74);
+      backdrop-filter: blur(12px);
+    }
+    .loginBox{
+      width:min(560px,92vw);
+      border:1px solid var(--line);
+      border-radius:28px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .loginBox::before{
+      content:"";position:absolute;inset:-2px;
+      background:
+        radial-gradient(520px 240px at 20% 20%, rgba(124,200,255,.20), transparent 60%),
+        radial-gradient(520px 240px at 80% 80%, rgba(180,120,255,.16), transparent 60%);
+      opacity:.85;pointer-events:none;
+    }
+    .loginInner{position:relative}
+    .title{margin:0 0 6px;font-size:20px;letter-spacing:.14em}
+    .sub{margin:0 0 14px;color:var(--muted);line-height:1.7;font-size:13px}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.20);
+      color:var(--text);
+      outline:none;
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .msg{margin-top:10px;color:rgba(255,255,255,.86);font-size:13px;white-space:pre-wrap}
+    .tiny{margin-top:10px;color:rgba(255,255,255,.55);font-size:12px;line-height:1.6}
+    .tiny b{color:rgba(255,255,255,.88)}
+
+    /* mode view */
+    .hud{
+      position:fixed;left:14px;right:14px;bottom:14px;z-index:4;
+      border:1px solid var(--line);
+      border-radius:26px;
+      background:rgba(0,0,0,.34);
+      backdrop-filter: blur(10px);
+      padding:12px;
+      display:none;
+    }
+    .hudTop{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+    .hudTitle{font-weight:900;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:rgba(255,255,255,.82)}
+    .hudDesc{color:rgba(255,255,255,.68);font-size:12px;line-height:1.5;margin-top:4px}
+    .hudBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+
+    /* impact flash */
+    .flash{
+      position:fixed;inset:0;z-index:3;
+      pointer-events:none;
+      background:radial-gradient(800px 400px at 50% 50%, rgba(255,255,255,.10), transparent 60%);
+      opacity:0;
+      transition:.12s ease;
+    }
+    .flash.on{opacity:1}
+
+    @keyframes shake{
+      0%,100%{transform:translate(0,0)}
+      20%{transform:translate(-2px,1px)}
+      40%{transform:translate(2px,-1px)}
+      60%{transform:translate(-1px,-2px)}
+      80%{transform:translate(1px,2px)}
+    }
+    .shake{animation:shake .18s linear 1}
+
+    .toast{
+      position:fixed;top:14px;left:50%;transform:translateX(-50%);
+      z-index:6;
+      padding:10px 12px;border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      color:rgba(255,255,255,.86);
+      font-size:12px;
+      opacity:0;pointer-events:none;
+      transition:.2s ease;
+      max-width:min(92vw,680px);
+      white-space:pre-wrap;
+      text-align:center;
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="tag">Step 1 · Email OTP Login</div>
-    <h1>LOGIN → ENTER GAME</h1>
-    <p>输入邮箱，点击发送登录链接。成功后 Supabase Users 会出现你的邮箱。</p>
-    <input id="email" type="email" placeholder="you@example.com" />
-    <button id="otpBtn">Send Login Link</button>
-    <div class="msg" id="msg"></div>
-    <div class="small" id="debug"></div>
+  <canvas id="fx"></canvas>
+  <canvas id="game"></canvas>
+  <div class="flash" id="flash"></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- Login Overlay -->
+  <div class="overlay" id="login">
+    <div class="loginBox">
+      <div class="loginInner">
+        <h1 class="title">LOGIN → ENTER ARENA</h1>
+        <p class="sub">
+          这是 <b>娱乐型</b> 游戏站：金币/钻石仅用于游戏玩法，<b>不提供提现</b>。<br/>
+          用 Email OTP 登录后直接进入动画游戏大厅。
+        </p>
+        <input id="email" type="email" placeholder="you@example.com" />
+        <div class="row">
+          <button class="btn primary" id="otpBtn">Send Login Link</button>
+          <button class="btn" id="demoBtn">Demo（Guest）</button>
+        </div>
+        <div class="msg" id="loginMsg"></div>
+        <div class="tiny">
+          如果你没收到邮件：去 Supabase → Authentication → URL Configuration 检查<br/>
+          <b>Site URL</b>=你的域名，<b>Redirect URLs</b>=<b>https://你的域名/*</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div class="wrap">
+    <div class="shell" id="app">
+      <div class="topbar">
+        <div class="brand"><span class="dot"></span> JKANG NEON ARENA</div>
+        <div class="right">
+          <div class="pill">Account: <b id="acct">Guest</b></div>
+          <div class="pill">Coins: <b id="coins">0</b></div>
+          <div class="pill">Gems: <b id="gems">0</b></div>
+          <div class="pill">Weapon Lv: <b id="wlv">1</b></div>
+          <button class="btn good" id="topupBtn">Recharge</button>
+          <button class="btn danger" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+
+      <div class="content" id="lobby">
+        <div class="grid">
+          <div class="panel">
+            <h2>Lobby</h2>
+            <p>登录后：A/B/C/D 都能玩。你要的“劲爆动画”，我用 Canvas 实时渲染：爆炸、粒子、闪光、抖屏。</p>
+            <div class="sep"></div>
+
+            <div class="modes">
+              <div class="mode" data-mode="A">
+                <div class="t"><div class="badge">A</div><div class="badge" style="opacity:.75">Duel</div></div>
+                <h3>对战 Arena</h3>
+                <small>横版对打 · AI 敌人 · 技能爆炸 + 抖屏</small>
+              </div>
+
+              <div class="mode" data-mode="B">
+                <div class="t"><div class="badge">B</div><div class="badge" style="opacity:.75">AFK</div></div>
+                <h3>挂机 Dungeon</h3>
+                <small>自动打怪 · 掉金币动画 · 持续收益</small>
+              </div>
+
+              <div class="mode" data-mode="C">
+                <div class="t"><div class="badge">C</div><div class="badge" style="opacity:.75">Forge</div></div>
+                <h3>武器强化</h3>
+                <small>升级武器 · 提升伤害 · 消耗金币</small>
+              </div>
+
+              <div class="mode" data-mode="D">
+                <div class="t"><div class="badge">D</div><div class="badge" style="opacity:.75">Rank</div></div>
+                <h3>排行榜</h3>
+                <small>查看金币榜（Supabase wallets）</small>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+            <p style="color:rgba(255,255,255,.62);font-size:12px;line-height:1.7">
+              充值说明：此页面的 Recharge 只是跳转支付链接。要做到“支付成功自动加币”，需要 Stripe Webhook（后续我带你做）。
+            </p>
+          </div>
+
+          <div class="panel">
+            <h2>Status</h2>
+            <p id="status">加载中…</p>
+            <div class="sep"></div>
+            <p style="font-size:12px;color:rgba(255,255,255,.62);line-height:1.7">
+              Tips：若你想“后台可控”，后续我们会加一个 Admin 入口（仅你账号可见），用于发币/改数值/封禁。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud" id="hud">
+    <div class="hudTop">
+      <div>
+        <div class="hudTitle" id="hudTitle">MODE</div>
+        <div class="hudDesc" id="hudDesc">…</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <button class="btn small" id="backBtn">Back to Lobby</button>
+        <button class="btn small" id="actionBtn">Action</button>
+      </div>
+    </div>
+    <div class="hudBtns" id="hudBtns"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // 1) 填你的 Supabase
-    const SUPABASE_URL = "https://zrulbxnqtliyxycfjgks.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_4kcgAmTjO0pFPCxqyZ-1gw_vOuUx8SP";
+    /*********************
+     * CONFIG (EDIT THESE)
+     *********************/
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
+    // 充值按钮跳转链接（你可换成自己的 Stripe checkout）
+    const STRIPE_TOPUP_URL = "https://buy.stripe.com/REPLACE_ME";
+
+    /*********************
+     * HELPERS
+     *********************/
     const $ = (id)=>document.getElementById(id);
-    const show = (t)=>{ $("msg").textContent = t; };
-    const dbg  = (t)=>{ $("debug").textContent = t; };
+    const toastEl = $("toast");
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(toastEl._t);
+      toastEl._t = setTimeout(()=>toastEl.classList.remove("show"), 2200);
+    }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      // 确认 JS 一定跑
-      dbg("JS loaded ✅");
+    function fmt(n){ return Number(n||0).toLocaleString(); }
+    function now(){ return Date.now(); }
 
-      // 创建 client
-      let supabase;
-      try{
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }catch(e){
-        show("❌ Supabase 初始化失败：\n" + (e?.message || e));
+    function setStatus(t){ $("status").textContent = t; }
+
+    // mouse glow for cards
+    window.addEventListener("mousemove",(e)=>{
+      document.documentElement.style.setProperty("--mx", e.clientX+"px");
+      document.documentElement.style.setProperty("--my", e.clientY+"px");
+    }, {passive:true});
+
+    /*********************
+     * SUPABASE
+     *********************/
+    let supabase = null;
+    let sessionUser = null;
+    let isGuest = false;
+
+    let wallet = { coins:0, gems:0 };
+    let weapon = { weapon_level:1, weapon_power:10 };
+
+    function setUIUser(emailOrName){
+      $("acct").textContent = emailOrName || "Guest";
+    }
+    function setUIStats(){
+      $("coins").textContent = fmt(wallet.coins);
+      $("gems").textContent = fmt(wallet.gems);
+      $("wlv").textContent = String(weapon.weapon_level||1);
+    }
+
+    async function initPlayerRows(userId){
+      // create default rows if missing (upsert with defaults)
+      await supabase.from("wallets").upsert({ user_id: userId }, { onConflict: "user_id" });
+      await supabase.from("weapons").upsert({ user_id: userId }, { onConflict: "user_id" });
+    }
+
+    async function loadPlayerState(){
+      if(isGuest){
+        // guest uses localStorage
+        const s = JSON.parse(localStorage.getItem("jkang_guest")||"{}");
+        wallet.coins = s.coins ?? 120;
+        wallet.gems  = s.gems  ?? 0;
+        weapon.weapon_level = s.wlv ?? 1;
+        weapon.weapon_power = s.wp  ?? (10 + (weapon.weapon_level-1)*3);
+        setUIStats();
+        setStatus("Guest 模式：数据保存在本机（localStorage）。");
+        return;
+      }
+      const userId = sessionUser.id;
+      await initPlayerRows(userId);
+
+      const { data: w, error: we } = await supabase.from("wallets").select("coins,gems").eq("user_id", userId).single();
+      if(we){ toast("读取钱包失败"); console.log(we); }
+      wallet.coins = w?.coins ?? 0;
+      wallet.gems  = w?.gems  ?? 0;
+
+      const { data: wp, error: wpe } = await supabase.from("weapons").select("weapon_level,weapon_power").eq("user_id", userId).single();
+      if(wpe){ toast("读取武器失败"); console.log(wpe); }
+      weapon.weapon_level = wp?.weapon_level ?? 1;
+      weapon.weapon_power = wp?.weapon_power ?? (10 + (weapon.weapon_level-1)*3);
+
+      setUIStats();
+      setStatus("已登录：数据来自 Supabase（wallets / weapons）。");
+    }
+
+    async function saveGuest(){
+      localStorage.setItem("jkang_guest", JSON.stringify({
+        coins: wallet.coins, gems: wallet.gems,
+        wlv: weapon.weapon_level, wp: weapon.weapon_power
+      }));
+    }
+
+    async function addCoins(amount, mode, detail={}){
+      amount = Math.max(0, Math.floor(amount));
+      wallet.coins += amount;
+      setUIStats();
+
+      if(isGuest){
+        await saveGuest();
+        return;
+      }
+      const userId = sessionUser.id;
+      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", userId);
+      await supabase.from("game_logs").insert({ user_id:userId, mode, detail });
+    }
+
+    async function spendCoins(amount){
+      amount = Math.max(0, Math.floor(amount));
+      if(wallet.coins < amount) return false;
+      wallet.coins -= amount;
+      setUIStats();
+
+      if(isGuest){
+        await saveGuest();
+        return true;
+      }
+      const userId = sessionUser.id;
+      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", userId);
+      return true;
+    }
+
+    async function upgradeWeapon(){
+      // cost grows with level
+      const lvl = weapon.weapon_level || 1;
+      const cost = Math.floor(80 + (lvl-1)*60);
+      if(!(await spendCoins(cost))){
+        toast("金币不足，去挂机/对战赚金币，或 Recharge。");
+        return;
+      }
+      weapon.weapon_level = lvl + 1;
+      weapon.weapon_power = Math.floor(10 + (weapon.weapon_level-1)*4);
+
+      setUIStats();
+      toast(`武器升级成功！Lv ${weapon.weapon_level}`);
+
+      if(isGuest){
+        await saveGuest();
+        return;
+      }
+      const userId = sessionUser.id;
+      await supabase.from("weapons").update({
+        weapon_level: weapon.weapon_level,
+        weapon_power: weapon.weapon_power,
+        upgraded_at: new Date().toISOString()
+      }).eq("user_id", userId);
+      await supabase.from("game_logs").insert({
+        user_id:userId, mode:"C",
+        detail:{ action:"upgrade", level: weapon.weapon_level, power: weapon.weapon_power }
+      });
+    }
+
+    /*********************
+     * GAME ENGINE (CANVAS)
+     *********************/
+    const fx = $("fx"), fctx = fx.getContext("2d");
+    const g = $("game"), ctx = g.getContext("2d");
+    const flash = $("flash");
+
+    let W=0,H=0,DPR=1;
+    function resize(){
+      DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
+      W = fx.width = g.width = Math.floor(innerWidth*DPR);
+      H = fx.height = g.height = Math.floor(innerHeight*DPR);
+      fx.style.width = g.style.width = innerWidth+"px";
+      fx.style.height= g.style.height= innerHeight+"px";
+    }
+    addEventListener("resize", resize);
+    resize();
+
+    // background particles
+    const P = [];
+    function seedParticles(){
+      P.length = 0;
+      const n = Math.floor((innerWidth*innerHeight)/15000) + 80;
+      for(let i=0;i<n;i++){
+        P.push({
+          x: Math.random()*W,
+          y: Math.random()*H,
+          r: (Math.random()*1.8+.3)*DPR,
+          vx:(Math.random()-.5)*0.12*DPR,
+          vy:(Math.random()-.2)*0.35*DPR,
+          a: Math.random()*0.7+0.15
+        });
+      }
+    }
+    seedParticles();
+
+    function drawFX(t){
+      fctx.clearRect(0,0,W,H);
+      // soft vignette
+      const grd = fctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.55);
+      grd.addColorStop(0,"rgba(255,255,255,0.03)");
+      grd.addColorStop(1,"rgba(0,0,0,0)");
+      fctx.fillStyle = grd;
+      fctx.fillRect(0,0,W,H);
+
+      for(const p of P){
+        p.x += p.vx; p.y += p.vy;
+        if(p.y > H+10){ p.y = -10; p.x=Math.random()*W; }
+        if(p.x < -10) p.x = W+10;
+        if(p.x > W+10) p.x = -10;
+
+        fctx.beginPath();
+        fctx.fillStyle = `rgba(180,220,255,${p.a})`;
+        fctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        fctx.fill();
+      }
+    }
+
+    // simple effects pool
+    const FXE = []; // explosions
+    function boom(x,y, power=1){
+      flash.classList.add("on");
+      setTimeout(()=>flash.classList.remove("on"), 80);
+
+      document.body.classList.remove("shake");
+      void document.body.offsetWidth;
+      document.body.classList.add("shake");
+
+      const n = Math.floor(18 + power*12);
+      for(let i=0;i<n;i++){
+        FXE.push({
+          x,y,
+          vx:(Math.random()-.5)*(3.5+power*2)*DPR,
+          vy:(Math.random()-.5)*(3.5+power*2)*DPR,
+          life: 34+Math.random()*20,
+          r:(Math.random()*2.2+1.2)*DPR,
+          hue: (Math.random()<0.5)? 200 : 285
+        });
+      }
+    }
+
+    function drawExplosions(){
+      for(let i=FXE.length-1;i>=0;i--){
+        const e = FXE[i];
+        e.life -= 1;
+        e.x += e.vx;
+        e.y += e.vy;
+        e.vx *= 0.98; e.vy *= 0.98;
+        e.vy += 0.04*DPR;
+        const a = Math.max(0, Math.min(1, e.life/40));
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${e.hue}, 95%, 70%, ${a})`;
+        ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+        ctx.fill();
+        if(e.life<=0) FXE.splice(i,1);
+      }
+    }
+
+    // game state
+    let mode = "LOBBY";
+    let running = false;
+    let last = 0;
+
+    // A: duel
+    const duel = {
+      player:{ x:0, y:0, hp:100, cd:0 },
+      enemy: { x:0, y:0, hp:100, cd:0 },
+      proj: []
+    };
+
+    // B: afk
+    const afk = {
+      mobHP: 80,
+      mobMax: 80,
+      tick:0,
+      drops: []
+    };
+
+    // D: leaderboard cache
+    let board = [];
+
+    function enterMode(m){
+      mode = m;
+      $("hud").style.display = "block";
+      g.style.display = "block";
+
+      if(m==="A"){
+        $("hudTitle").textContent = "A · DUEL ARENA";
+        $("hudDesc").textContent = "点 Attack 发射能量弹，对战 AI。爆炸抖屏，赢了奖励金币。";
+        $("actionBtn").textContent = "Attack";
+        $("hudBtns").innerHTML = `
+          <button class="btn small" id="skillBtn">Skill Blast</button>
+          <button class="btn small" id="healBtn">Heal</button>
+        `;
+        initDuel();
+        hookDuelButtons();
+      }
+      if(m==="B"){
+        $("hudTitle").textContent = "B · AFK DUNGEON";
+        $("hudDesc").textContent = "自动攻击怪物，爆金币动画。点 Boost 10 秒加速。";
+        $("actionBtn").textContent = "Boost";
+        $("hudBtns").innerHTML = `
+          <button class="btn small" id="claimBtn">Claim +50</button>
+        `;
+        initAFK();
+        hookAFKButtons();
+      }
+      if(m==="C"){
+        $("hudTitle").textContent = "C · FORGE";
+        $("hudDesc").textContent = "强化武器：消耗金币提升伤害。";
+        $("actionBtn").textContent = "Upgrade";
+        $("hudBtns").innerHTML = `
+          <button class="btn small" id="powerBtn">Show Power</button>
+        `;
+        initForge();
+        hookForgeButtons();
+      }
+      if(m==="D"){
+        $("hudTitle").textContent = "D · LEADERBOARD";
+        $("hudDesc").textContent = "显示金币榜（公开读取 wallets）。";
+        $("actionBtn").textContent = "Refresh";
+        $("hudBtns").innerHTML = `
+          <button class="btn small" id="meBtn">My Rank</button>
+        `;
+        initRank();
+        hookRankButtons();
+      }
+      toast(`进入模式 ${m}`);
+    }
+
+    function backToLobby(){
+      mode = "LOBBY";
+      $("hud").style.display = "none";
+      g.style.display = "none";
+      ctx.clearRect(0,0,W,H);
+      toast("返回大厅");
+    }
+
+    // ---------- Mode A: Duel ----------
+    function initDuel(){
+      duel.player = { x: W*0.22, y: H*0.62, hp:100, cd:0 };
+      duel.enemy  = { x: W*0.78, y: H*0.62, hp:100, cd:0 };
+      duel.proj = [];
+    }
+
+    function shoot(from, to, dmg, hue=200){
+      const dx = to.x-from.x, dy = to.y-from.y;
+      const len = Math.max(1, Math.hypot(dx,dy));
+      duel.proj.push({
+        x: from.x, y: from.y,
+        vx: dx/len * (7.5*DPR),
+        vy: dy/len * (7.5*DPR),
+        r: 6*DPR, hue,
+        dmg
+      });
+    }
+
+    function hookDuelButtons(){
+      const skillBtn = $("skillBtn");
+      const healBtn  = $("healBtn");
+      if(skillBtn) skillBtn.onclick = ()=>{ if(mode!=="A")return;
+        if(duel.player.cd>0){ toast("技能冷却"); return; }
+        duel.player.cd = 140;
+        boom(duel.enemy.x, duel.enemy.y-40*DPR, 1.4);
+        duel.enemy.hp -= Math.floor(12 + weapon.weapon_power*0.55);
+        toast("Skill Blast!");
+      };
+      if(healBtn) healBtn.onclick = ()=>{ if(mode!=="A")return;
+        duel.player.hp = Math.min(100, duel.player.hp + 18);
+        toast("Heal +18");
+      };
+    }
+
+    // ---------- Mode B: AFK ----------
+    let boostUntil = 0;
+    function initAFK(){
+      afk.mobMax = Math.floor(70 + weapon.weapon_level*14);
+      afk.mobHP = afk.mobMax;
+      afk.tick = 0;
+      afk.drops = [];
+      boostUntil = 0;
+    }
+    function hookAFKButtons(){
+      const claimBtn = $("claimBtn");
+      if(claimBtn) claimBtn.onclick = async ()=>{ if(mode!=="B")return;
+        await addCoins(50, "B", {action:"claim"});
+        toast("+50 coins");
+      };
+    }
+
+    // ---------- Mode C: Forge ----------
+    function initForge(){}
+    function hookForgeButtons(){
+      const powerBtn = $("powerBtn");
+      if(powerBtn) powerBtn.onclick = ()=>toast(`Weapon Power = ${weapon.weapon_power}`);
+    }
+
+    // ---------- Mode D: Rank ----------
+    async function initRank(){
+      board = [];
+      await refreshBoard();
+    }
+    async function refreshBoard(){
+      if(isGuest){
+        board = [{ email:"Guest", coins: wallet.coins }];
+        return;
+      }
+      const { data, error } = await supabase
+        .from("wallets")
+        .select("user_id,coins")
+        .order("coins", { ascending:false })
+        .limit(10);
+
+      if(error){
+        toast("读取排行榜失败（检查 RLS policy）");
+        console.log(error);
+        board = [];
         return;
       }
 
-      $("otpBtn").addEventListener("click", async () => {
-        try{
-          const email = $("email").value.trim();
-          if(!email){ show("请输入邮箱"); alert("请输入邮箱"); return; }
+      // Map to displayable names (email) - we cannot read auth.users email via anon key.
+      // So we display masked uid.
+      board = (data||[]).map((r, i)=>({
+        rank: i+1,
+        uid: String(r.user_id).slice(0,8)+"…",
+        coins: r.coins
+      }));
+    }
+    function hookRankButtons(){
+      const meBtn = $("meBtn");
+      if(meBtn) meBtn.onclick = ()=> {
+        if(isGuest){ toast("Guest 没有排行"); return; }
+        toast("目前榜单显示 UID（anon key 无法读取邮箱）");
+      };
+    }
 
-          show("Sending...");
-          const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: {
-              emailRedirectTo: window.location.origin
-            }
-          });
+    // ACTION button per mode
+    async function onAction(){
+      if(mode==="A"){
+        // attack
+        if(duel.player.cd>0){ toast("攻击冷却"); return; }
+        duel.player.cd = 22;
+        const dmg = Math.floor(6 + weapon.weapon_power*0.45);
+        shoot(duel.player, duel.enemy, dmg, 200);
+      }
+      if(mode==="B"){
+        boostUntil = now() + 10000;
+        toast("Boost x2 speed (10s)");
+      }
+      if(mode==="C"){
+        await upgradeWeapon();
+      }
+      if(mode==="D"){
+        await refreshBoard();
+        toast("排行榜已刷新");
+      }
+    }
 
-          if(error){
-            show("❌ 发送失败：\n" + error.message);
-            alert("发送失败：" + error.message);
-            return;
-          }
+    // render per mode
+    function drawGame(dt){
+      ctx.clearRect(0,0,W,H);
 
-          show("✅ 已发送登录邮件。\n去邮箱点击链接完成登录。");
-          alert("已发送登录邮件，请查收邮箱");
-        }catch(e){
-          show("❌ JS 异常：\n" + (e?.message || e));
-          alert("JS 异常：" + (e?.message || e));
+      // floor glow
+      const floorY = H*0.72;
+      const grd = ctx.createLinearGradient(0,floorY,0,H);
+      grd.addColorStop(0,"rgba(124,200,255,0.08)");
+      grd.addColorStop(1,"rgba(0,0,0,0)");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0,floorY,W,H-floorY);
+
+      if(mode==="A") stepDuel(dt);
+      if(mode==="B") stepAFK(dt);
+      if(mode==="C") drawForge();
+      if(mode==="D") drawRank();
+
+      drawExplosions();
+    }
+
+    function drawHPBar(x,y,w,h,pct,color){
+      ctx.fillStyle="rgba(255,255,255,0.10)";
+      ctx.fillRect(x,y,w,h);
+      ctx.fillStyle=color;
+      ctx.fillRect(x,y,w*Math.max(0,Math.min(1,pct)),h);
+      ctx.strokeStyle="rgba(255,255,255,0.18)";
+      ctx.strokeRect(x,y,w,h);
+    }
+
+    async function winDuel(){
+      const reward = Math.floor(40 + weapon.weapon_level*10);
+      await addCoins(reward, "A", {result:"win", reward});
+      toast(`WIN! +${reward} coins`);
+      initDuel();
+    }
+    function loseDuel(){
+      toast("你输了…再来！");
+      initDuel();
+    }
+
+    function stepDuel(dt){
+      // cooldowns
+      duel.player.cd = Math.max(0, duel.player.cd - dt*0.06);
+      duel.enemy.cd  = Math.max(0, duel.enemy.cd  - dt*0.06);
+
+      // enemy AI shoot
+      if(duel.enemy.cd<=0){
+        duel.enemy.cd = 38 + Math.random()*18;
+        const dmg = Math.floor(5 + weapon.weapon_level*1.2);
+        shoot(duel.enemy, duel.player, dmg, 285);
+      }
+
+      // update projectiles
+      for(let i=duel.proj.length-1;i>=0;i--){
+        const p = duel.proj[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // draw
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${p.hue},95%,70%,0.95)`;
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+
+        // collision
+        const hitP = Math.hypot(p.x-duel.player.x, p.y-duel.player.y) < (18*DPR);
+        const hitE = Math.hypot(p.x-duel.enemy.x,  p.y-duel.enemy.y)  < (18*DPR);
+
+        if(hitP){
+          boom(p.x,p.y,0.9);
+          duel.player.hp -= p.dmg;
+          duel.proj.splice(i,1);
+          if(duel.player.hp<=0) loseDuel();
+          continue;
         }
+        if(hitE){
+          boom(p.x,p.y,0.9);
+          duel.enemy.hp -= p.dmg;
+          duel.proj.splice(i,1);
+          if(duel.enemy.hp<=0) winDuel();
+          continue;
+        }
+
+        // offscreen
+        if(p.x<-50||p.x>W+50||p.y<-50||p.y>H+50){
+          duel.proj.splice(i,1);
+        }
+      }
+
+      // characters (simple neon blobs)
+      const py = duel.player.y, ey = duel.enemy.y;
+      drawFighter(duel.player.x, py, 200);
+      drawFighter(duel.enemy.x,  ey,  285);
+
+      // HUD stats
+      drawHPBar(W*0.18, H*0.10, W*0.26, 10*DPR, duel.player.hp/100, "rgba(124,255,181,0.85)");
+      drawHPBar(W*0.56, H*0.10, W*0.26, 10*DPR, duel.enemy.hp/100,  "rgba(255,109,139,0.85)");
+      ctx.fillStyle="rgba(255,255,255,.75)";
+      ctx.font = `${12*DPR}px Arial`;
+      ctx.fillText("YOU", W*0.18, H*0.10 - 6*DPR);
+      ctx.fillText("ENEMY", W*0.56, H*0.10 - 6*DPR);
+    }
+
+    function drawFighter(x,y,hue){
+      // glow body
+      const r = 18*DPR;
+      const g1 = ctx.createRadialGradient(x,y,0,x,y,60*DPR);
+      g1.addColorStop(0, `hsla(${hue},95%,70%,0.30)`);
+      g1.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g1;
+      ctx.beginPath(); ctx.arc(x,y,60*DPR,0,Math.PI*2); ctx.fill();
+
+      ctx.fillStyle = `hsla(${hue},95%,72%,0.95)`;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+
+      // eyes
+      ctx.fillStyle="rgba(0,0,0,0.55)";
+      ctx.beginPath(); ctx.arc(x-6*DPR,y-2*DPR,3*DPR,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x+6*DPR,y-2*DPR,3*DPR,0,Math.PI*2); ctx.fill();
+    }
+
+    async function stepAFK(dt){
+      const speed = (now()<boostUntil) ? 2 : 1;
+      afk.tick += dt*0.001*speed;
+
+      // auto hit
+      if(afk.tick >= 0.22){
+        afk.tick = 0;
+        const dmg = Math.floor(3 + weapon.weapon_power*0.22);
+        afk.mobHP -= dmg;
+
+        // hit spark
+        boom(W*0.66, H*0.48, 0.55);
+
+        if(afk.mobHP<=0){
+          // drop coins
+          const drop = Math.floor(8 + weapon.weapon_level*3);
+          afk.mobHP = afk.mobMax;
+          // coin drop animation
+          for(let i=0;i<6;i++){
+            afk.drops.push({
+              x: W*0.66 + (Math.random()-.5)*60*DPR,
+              y: H*0.48 + (Math.random()-.5)*30*DPR,
+              vy: - (Math.random()*2.5 + 2.2)*DPR,
+              vx: (Math.random()-.5)*1.8*DPR,
+              life: 60+Math.random()*20,
+              val: Math.max(1, Math.floor(drop/6))
+            });
+          }
+          await addCoins(drop, "B", {drop});
+          toast(`+${drop} coins`);
+        }
+      }
+
+      // draw mob
+      drawMob(W*0.66, H*0.48);
+      // draw player avatar
+      drawFighter(W*0.32, H*0.60, 200);
+
+      // mob hp
+      drawHPBar(W*0.52, H*0.18, W*0.36, 10*DPR, afk.mobHP/afk.mobMax, "rgba(255,210,124,0.85)");
+      ctx.fillStyle="rgba(255,255,255,.75)";
+      ctx.font = `${12*DPR}px Arial`;
+      ctx.fillText("MOB", W*0.52, H*0.18 - 6*DPR);
+
+      // drops
+      for(let i=afk.drops.length-1;i>=0;i--){
+        const d = afk.drops[i];
+        d.life -= 1;
+        d.x += d.vx;
+        d.y += d.vy;
+        d.vy += 0.10*DPR;
+        const a = Math.max(0, Math.min(1, d.life/60));
+        ctx.fillStyle = `rgba(255,210,124,${a})`;
+        ctx.beginPath(); ctx.arc(d.x,d.y,5*DPR,0,Math.PI*2); ctx.fill();
+        if(d.life<=0) afk.drops.splice(i,1);
+      }
+
+      // boost indicator
+      if(now()<boostUntil){
+        ctx.fillStyle="rgba(124,255,181,.75)";
+        ctx.font = `${12*DPR}px Arial`;
+        ctx.fillText("BOOST x2", W*0.06, H*0.16);
+      }
+    }
+
+    function drawMob(x,y){
+      const hue=40;
+      const g1 = ctx.createRadialGradient(x,y,0,x,y,80*DPR);
+      g1.addColorStop(0, `hsla(${hue},95%,65%,0.25)`);
+      g1.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(x,y,80*DPR,0,Math.PI*2); ctx.fill();
+
+      ctx.fillStyle=`hsla(${hue},95%,62%,0.92)`;
+      ctx.beginPath(); ctx.arc(x,y,28*DPR,0,Math.PI*2); ctx.fill();
+
+      // spikes
+      ctx.strokeStyle=`hsla(${hue},95%,72%,0.75)`;
+      ctx.lineWidth=2*DPR;
+      for(let i=0;i<10;i++){
+        const a = i/10*Math.PI*2;
+        const x1=x+Math.cos(a)*28*DPR, y1=y+Math.sin(a)*28*DPR;
+        const x2=x+Math.cos(a)*40*DPR, y2=y+Math.sin(a)*40*DPR;
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      }
+    }
+
+    function drawForge(){
+      // neon forge UI drawn on canvas
+      ctx.fillStyle="rgba(255,255,255,.80)";
+      ctx.font = `${18*DPR}px Arial`;
+      ctx.fillText("FORGE", W*0.08, H*0.22);
+
+      ctx.fillStyle="rgba(255,255,255,.65)";
+      ctx.font = `${12*DPR}px Arial`;
+      ctx.fillText(`Weapon Lv: ${weapon.weapon_level}  |  Power: ${weapon.weapon_power}`, W*0.08, H*0.27);
+
+      const cost = Math.floor(80 + (weapon.weapon_level-1)*60);
+      ctx.fillStyle="rgba(255,255,255,.62)";
+      ctx.fillText(`Upgrade Cost: ${cost} coins`, W*0.08, H*0.31);
+
+      // sword glow
+      const x=W*0.52, y=H*0.52;
+      const g1=ctx.createRadialGradient(x,y,0,x,y,180*DPR);
+      g1.addColorStop(0,"rgba(124,200,255,.18)");
+      g1.addColorStop(1,"rgba(0,0,0,0)");
+      ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(x,y,180*DPR,0,Math.PI*2); ctx.fill();
+
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(Math.sin(now()*0.001)*0.08);
+      ctx.fillStyle="rgba(255,255,255,.92)";
+      ctx.fillRect(-6*DPR,-90*DPR,12*DPR,150*DPR);
+      ctx.fillStyle="rgba(180,120,255,.95)";
+      ctx.fillRect(-28*DPR,40*DPR,56*DPR,10*DPR);
+      ctx.restore();
+
+      ctx.fillStyle="rgba(255,255,255,.58)";
+      ctx.font = `${12*DPR}px Arial`;
+      ctx.fillText("点击下方 Upgrade 进行强化", W*0.08, H*0.36);
+    }
+
+    function drawRank(){
+      ctx.fillStyle="rgba(255,255,255,.80)";
+      ctx.font = `${18*DPR}px Arial`;
+      ctx.fillText("LEADERBOARD (Top 10)", W*0.08, H*0.20);
+
+      ctx.fillStyle="rgba(255,255,255,.62)";
+      ctx.font = `${12*DPR}px Arial`;
+      ctx.fillText("说明：anon key 无法读取邮箱，所以榜单显示 UID 前8位。", W*0.08, H*0.24);
+
+      const x=W*0.08, y=H*0.30;
+      const rowH = 24*DPR;
+      ctx.font = `${12*DPR}px Arial`;
+
+      if(!board.length){
+        ctx.fillStyle="rgba(255,255,255,.62)";
+        ctx.fillText("暂无数据 / 读取失败。点 Refresh。", x, y);
+        return;
+      }
+
+      for(let i=0;i<board.length;i++){
+        const r = board[i];
+        const yy = y + i*rowH;
+        ctx.fillStyle = "rgba(255,255,255,.12)";
+        ctx.fillRect(x, yy-14*DPR, W*0.58, 18*DPR);
+
+        ctx.fillStyle="rgba(255,255,255,.78)";
+        ctx.fillText(`#${i+1}`, x+8*DPR, yy);
+        ctx.fillStyle="rgba(124,200,255,.78)";
+        ctx.fillText(`${r.uid||r.email}`, x+60*DPR, yy);
+        ctx.fillStyle="rgba(255,210,124,.85)";
+        ctx.fillText(`${fmt(r.coins)} coins`, x+320*DPR, yy);
+      }
+    }
+
+    function loop(t){
+      const dt = Math.min(50, t-last); last = t;
+      drawFX(t);
+      if(mode!=="LOBBY"){
+        drawGame(dt);
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    /*********************
+     * APP FLOW
+     *********************/
+    function showLogin(msg=""){
+      $("login").style.display="flex";
+      $("loginMsg").textContent = msg;
+    }
+    function hideLogin(){
+      $("login").style.display="none";
+    }
+
+    function enableAppLoggedIn(email){
+      hideLogin();
+      setUIUser(email);
+      $("logoutBtn").style.display="inline-block";
+      $("topupBtn").style.display="inline-block";
+      setStatus("已登录，准备进入大厅…");
+    }
+
+    function enableAppGuest(){
+      hideLogin();
+      isGuest = true;
+      sessionUser = null;
+      setUIUser("Guest");
+      $("logoutBtn").style.display="none";
+      $("topupBtn").style.display="inline-block";
+      setStatus("Guest 模式：可试玩（数据保存在本机）。");
+    }
+
+    async function logout(){
+      if(isGuest){
+        isGuest = false;
+        showLogin("已退出 Guest。");
+        backToLobby();
+        return;
+      }
+      await supabase.auth.signOut();
+      showLogin("已退出登录。");
+      backToLobby();
+    }
+
+    // UI binds
+    $("logoutBtn").addEventListener("click", logout);
+    $("topupBtn").addEventListener("click", ()=>{
+      if(!STRIPE_TOPUP_URL || STRIPE_TOPUP_URL.includes("REPLACE_ME")){
+        toast("先把 STRIPE_TOPUP_URL 换成你的付款链接");
+        return;
+      }
+      window.open(STRIPE_TOPUP_URL, "_blank", "noopener");
+    });
+
+    $("backBtn").addEventListener("click", backToLobby);
+    $("actionBtn").addEventListener("click", onAction);
+
+    document.querySelectorAll(".mode").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        if($("login").style.display!=="none"){
+          toast("请先登录或选 Demo");
+          return;
+        }
+        enterMode(el.dataset.mode);
       });
     });
-  </script>
+
+    // login buttons
+    $("demoBtn").addEventListener("click", async ()=>{
+      enableAppGuest();
+      await loadPlayerState();
+      toast("Guest 已进入大厅");
+    });
+
+    $("otpBtn").addEventListener("click", async ()=>{
+      try{
+        const email = $("email").value.trim();
+        if(!email){
+        $("loginMsg").textContent = "请输入邮箱";
+        return;
+      }
+
+      $("loginMsg").textContent = "Sending...";
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin }
+      });
+
+      if(error){
+        $("loginMsg").textContent = "❌ 发送失败：\n" + error.message;
+        return;
+      }
+
+      $("loginMsg").textContent =
+        "✅ 已发送登录邮件，请去邮箱点击链接完成登录。\n" +
+        "如果收不到：检查 Supabase → Auth → URL Configuration";
+    }catch(e){
+      $("loginMsg").textContent = "JS 异常：" + (e?.message || e);
+    }
+  });
+
+  /*********************
+   * BOOT
+   *********************/
+  window.addEventListener("DOMContentLoaded", async ()=>{
+    // 1) init supabase
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 2) existing session?
+    const { data: { session } } = await supabase.auth.getSession();
+    if(session?.user){
+      isGuest = false;
+      sessionUser = session.user;
+      enableAppLoggedIn(session.user.email || "Player");
+      await loadPlayerState();
+      toast("登录态已恢复 ✅");
+    }else{
+      showLogin("");
+      setStatus("请先登录（或 Demo Guest）");
+    }
+
+    // 3) auth state changes
+    supabase.auth.onAuthStateChange(async (event, session)=>{
+      if(session?.user){
+        isGuest = false;
+        sessionUser = session.user;
+        enableAppLoggedIn(session.user.email || "Player");
+        await loadPlayerState();
+        toast("登录成功 ✅ 进入大厅");
+      }else{
+        // logged out
+        showLogin("已退出登录。");
+        setUIUser("Guest");
+        setStatus("请先登录（或 Demo Guest）");
+      }
+    });
+  });
+
+  /*********************
+   * SAFETY: prevent page scroll interfering on mobile
+   *********************/
+  window.addEventListener("touchmove", (e)=>{
+    // allow scrolling inside overlay content if needed
+  }, {passive:true});
+</script>
+
 </body>
 </html>
