@@ -11,8 +11,6 @@
       --text:#F6F7FF;
       --muted:rgba(255,255,255,.68);
       --line:rgba(255,255,255,.12);
-      --p1:rgba(124,200,255,.18);
-      --p2:rgba(180,120,255,.15);
       --good:#7CFFB5;
       --warn:#FFD27C;
       --danger:#FF6D8B;
@@ -35,7 +33,7 @@
     }
     a{color:inherit;text-decoration:none}
     canvas#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0}
-    canvas#game{position:fixed;inset:0;width:100%;height:100%;z-index:1; display:none}
+    canvas#game{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:none}
 
     .wrap{position:relative;z-index:2;height:100%;display:flex;align-items:center;justify-content:center;padding:14px}
     .shell{
@@ -58,10 +56,12 @@
       padding:14px 16px;border-bottom:1px solid var(--line);
       backdrop-filter: blur(12px);
       background: linear-gradient(to bottom, rgba(7,7,22,.78), rgba(7,7,22,.25));
+      gap:10px;
     }
     .brand{
       display:flex;align-items:center;gap:10px;
       font-weight:900;letter-spacing:.22em;text-transform:uppercase;font-size:13px;
+      white-space:nowrap;
     }
     .dot{
       width:10px;height:10px;border-radius:50%;
@@ -80,12 +80,11 @@
     .btn{
       padding:10px 12px;border-radius:14px;border:1px solid var(--line);
       background:rgba(255,255,255,.06);
-      color:var(--text);cursor:pointer;font-weight:800;font-size:13px;
+      color:var(--text);cursor:pointer;font-weight:900;font-size:13px;
       transition:.18s ease; user-select:none;
     }
     .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.09)}
     .btn.primary{background:#fff;color:#000;border-color:transparent}
-    .btn.primary:hover{background:#fff}
     .btn.danger{border-color:rgba(255,109,139,.35); background:rgba(255,109,139,.10)}
     .btn.good{border-color:rgba(124,255,181,.35); background:rgba(124,255,181,.10)}
     .btn.small{padding:8px 10px;border-radius:12px;font-size:12px}
@@ -138,7 +137,6 @@
     .mode h3{margin:10px 0 6px;font-size:18px}
     .mode small{color:var(--muted);line-height:1.5;display:block}
 
-    /* login overlay */
     .overlay{
       position:fixed;inset:0;z-index:5;
       display:flex;align-items:center;justify-content:center;
@@ -179,7 +177,6 @@
     .tiny{margin-top:10px;color:rgba(255,255,255,.55);font-size:12px;line-height:1.6}
     .tiny b{color:rgba(255,255,255,.88)}
 
-    /* mode view */
     .hud{
       position:fixed;left:14px;right:14px;bottom:14px;z-index:4;
       border:1px solid var(--line);
@@ -194,7 +191,6 @@
     .hudDesc{color:rgba(255,255,255,.68);font-size:12px;line-height:1.5;margin-top:4px}
     .hudBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 
-    /* impact flash */
     .flash{
       position:fixed;inset:0;z-index:3;
       pointer-events:none;
@@ -203,7 +199,6 @@
       transition:.12s ease;
     }
     .flash.on{opacity:1}
-
     @keyframes shake{
       0%,100%{transform:translate(0,0)}
       20%{transform:translate(-2px,1px)}
@@ -212,7 +207,6 @@
       80%{transform:translate(1px,2px)}
     }
     .shake{animation:shake .18s linear 1}
-
     .toast{
       position:fixed;top:14px;left:50%;transform:translateX(-50%);
       z-index:6;
@@ -228,7 +222,7 @@
       white-space:pre-wrap;
       text-align:center;
     }
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.show{opacity:1}
   </style>
 </head>
 
@@ -238,14 +232,13 @@
   <div class="flash" id="flash"></div>
   <div class="toast" id="toast"></div>
 
-  <!-- Login Overlay -->
   <div class="overlay" id="login">
     <div class="loginBox">
       <div class="loginInner">
         <h1 class="title">LOGIN → ENTER ARENA</h1>
         <p class="sub">
-          这是 <b>娱乐型</b> 游戏站：金币/钻石仅用于游戏玩法，<b>不提供提现</b>。<br/>
-          用 Email OTP 登录后直接进入动画游戏大厅。
+          这是 <b>娱乐型</b> 游戏站：金币/宝石仅用于游戏玩法，<b>不提供提现</b>。<br/>
+          Email OTP 登录后直接进入动画游戏大厅。
         </p>
         <input id="email" type="email" placeholder="you@example.com" />
         <div class="row">
@@ -254,14 +247,13 @@
         </div>
         <div class="msg" id="loginMsg"></div>
         <div class="tiny">
-          如果你没收到邮件：去 Supabase → Authentication → URL Configuration 检查<br/>
+          如果你没收到邮件：Supabase → Authentication → URL Configuration<br/>
           <b>Site URL</b>=你的域名，<b>Redirect URLs</b>=<b>https://你的域名/*</b>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- App -->
   <div class="wrap">
     <div class="shell" id="app">
       <div class="topbar">
@@ -280,12 +272,12 @@
         <div class="grid">
           <div class="panel">
             <h2>Lobby</h2>
-            <p>登录后：A/B/C/D 都能玩。你要的“劲爆动画”，我用 Canvas 实时渲染：爆炸、粒子、闪光、抖屏。</p>
+            <p>进入就是动画：爆炸、粒子、闪光、抖屏。A/B/C/D 都能玩。</p>
             <div class="sep"></div>
 
             <div class="modes">
               <div class="mode" data-mode="A">
-                <div class="t"><div class="badge">A</div><div class="badge" style="opacity:.75">Duel</div></div>
+                <div class="t"><div class="badge">A</div><div class="badge" style="opacity:.75">DUEL</div></div>
                 <h3>对战 Arena</h3>
                 <small>横版对打 · AI 敌人 · 技能爆炸 + 抖屏</small>
               </div>
@@ -297,21 +289,21 @@
               </div>
 
               <div class="mode" data-mode="C">
-                <div class="t"><div class="badge">C</div><div class="badge" style="opacity:.75">Forge</div></div>
+                <div class="t"><div class="badge">C</div><div class="badge" style="opacity:.75">FORGE</div></div>
                 <h3>武器强化</h3>
                 <small>升级武器 · 提升伤害 · 消耗金币</small>
               </div>
 
               <div class="mode" data-mode="D">
-                <div class="t"><div class="badge">D</div><div class="badge" style="opacity:.75">Rank</div></div>
+                <div class="t"><div class="badge">D</div><div class="badge" style="opacity:.75">RANK</div></div>
                 <h3>排行榜</h3>
-                <small>查看金币榜（Supabase wallets）</small>
+                <small>读取 wallets 金币榜（公开只读）</small>
               </div>
             </div>
 
             <div class="sep"></div>
             <p style="color:rgba(255,255,255,.62);font-size:12px;line-height:1.7">
-              充值说明：此页面的 Recharge 只是跳转支付链接。要做到“支付成功自动加币”，需要 Stripe Webhook（后续我带你做）。
+              充值说明：Recharge 只是跳转支付链接。要做到“支付成功自动加币”，需要 Stripe Webhook（之后我一步一步带你做）。
             </p>
           </div>
 
@@ -320,7 +312,7 @@
             <p id="status">加载中…</p>
             <div class="sep"></div>
             <p style="font-size:12px;color:rgba(255,255,255,.62);line-height:1.7">
-              Tips：若你想“后台可控”，后续我们会加一个 Admin 入口（仅你账号可见），用于发币/改数值/封禁。
+              若你想“后台可控”：下一步加 Admin 面板（仅你账号可见）来发币/改数值/封禁。
             </p>
           </div>
         </div>
@@ -328,7 +320,6 @@
     </div>
   </div>
 
-  <!-- HUD -->
   <div class="hud" id="hud">
     <div class="hudTop">
       <div>
@@ -346,17 +337,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     /*********************
-     * CONFIG (EDIT THESE)
+     * ✅ 你只改这三项
      *********************/
     const SUPABASE_URL = "https://zrulbxnqtliyxycfjgks.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_4kcgAmTjO0pFPCxqyZ-1gw_vOuUx8SP";
-
-    // 充值按钮跳转链接（你可换成自己的 Stripe checkout）
     const STRIPE_TOPUP_URL = "https://buy.stripe.com/REPLACE_ME";
 
-    /*********************
-     * HELPERS
-     *********************/
+    /*********************/
     const $ = (id)=>document.getElementById(id);
     const toastEl = $("toast");
     function toast(msg){
@@ -365,13 +352,9 @@
       clearTimeout(toastEl._t);
       toastEl._t = setTimeout(()=>toastEl.classList.remove("show"), 2200);
     }
-
     function fmt(n){ return Number(n||0).toLocaleString(); }
-    function now(){ return Date.now(); }
-
     function setStatus(t){ $("status").textContent = t; }
 
-    // mouse glow for cards
     window.addEventListener("mousemove",(e)=>{
       document.documentElement.style.setProperty("--mx", e.clientX+"px");
       document.documentElement.style.setProperty("--my", e.clientY+"px");
@@ -387,45 +370,42 @@
     let wallet = { coins:0, gems:0 };
     let weapon = { weapon_level:1, weapon_power:10 };
 
-    function setUIUser(emailOrName){
-      $("acct").textContent = emailOrName || "Guest";
-    }
+    function setUIUser(name){ $("acct").textContent = name || "Guest"; }
     function setUIStats(){
       $("coins").textContent = fmt(wallet.coins);
-      $("gems").textContent = fmt(wallet.gems);
-      $("wlv").textContent = String(weapon.weapon_level||1);
+      $("gems").textContent  = fmt(wallet.gems);
+      $("wlv").textContent   = String(weapon.weapon_level||1);
     }
 
     async function initPlayerRows(userId){
-      // create default rows if missing (upsert with defaults)
       await supabase.from("wallets").upsert({ user_id: userId }, { onConflict: "user_id" });
       await supabase.from("weapons").upsert({ user_id: userId }, { onConflict: "user_id" });
     }
 
     async function loadPlayerState(){
       if(isGuest){
-        // guest uses localStorage
         const s = JSON.parse(localStorage.getItem("jkang_guest")||"{}");
         wallet.coins = s.coins ?? 120;
         wallet.gems  = s.gems  ?? 0;
         weapon.weapon_level = s.wlv ?? 1;
-        weapon.weapon_power = s.wp  ?? (10 + (weapon.weapon_level-1)*3);
+        weapon.weapon_power = s.wp  ?? (10 + (weapon.weapon_level-1)*4);
         setUIStats();
         setStatus("Guest 模式：数据保存在本机（localStorage）。");
         return;
       }
+
       const userId = sessionUser.id;
       await initPlayerRows(userId);
 
       const { data: w, error: we } = await supabase.from("wallets").select("coins,gems").eq("user_id", userId).single();
-      if(we){ toast("读取钱包失败"); console.log(we); }
+      if(we){ console.log(we); toast("读取钱包失败"); }
       wallet.coins = w?.coins ?? 0;
       wallet.gems  = w?.gems  ?? 0;
 
       const { data: wp, error: wpe } = await supabase.from("weapons").select("weapon_level,weapon_power").eq("user_id", userId).single();
-      if(wpe){ toast("读取武器失败"); console.log(wpe); }
+      if(wpe){ console.log(wpe); toast("读取武器失败"); }
       weapon.weapon_level = wp?.weapon_level ?? 1;
-      weapon.weapon_power = wp?.weapon_power ?? (10 + (weapon.weapon_level-1)*3);
+      weapon.weapon_power = wp?.weapon_power ?? (10 + (weapon.weapon_level-1)*4);
 
       setUIStats();
       setStatus("已登录：数据来自 Supabase（wallets / weapons）。");
@@ -438,6 +418,11 @@
       }));
     }
 
+    async function log(mode, detail){
+      if(isGuest) return;
+      await supabase.from("game_logs").insert({ user_id: sessionUser.id, mode, detail });
+    }
+
     async function addCoins(amount, mode, detail={}){
       amount = Math.max(0, Math.floor(amount));
       wallet.coins += amount;
@@ -447,9 +432,8 @@
         await saveGuest();
         return;
       }
-      const userId = sessionUser.id;
-      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", userId);
-      await supabase.from("game_logs").insert({ user_id:userId, mode, detail });
+      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", sessionUser.id);
+      await log(mode, detail);
     }
 
     async function spendCoins(amount){
@@ -458,84 +442,68 @@
       wallet.coins -= amount;
       setUIStats();
 
-      if(isGuest){
-        await saveGuest();
-        return true;
-      }
-      const userId = sessionUser.id;
-      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", userId);
+      if(isGuest){ await saveGuest(); return true; }
+      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", sessionUser.id);
       return true;
     }
 
     async function upgradeWeapon(){
-      // cost grows with level
       const lvl = weapon.weapon_level || 1;
       const cost = Math.floor(80 + (lvl-1)*60);
       if(!(await spendCoins(cost))){
-        toast("金币不足，去挂机/对战赚金币，或 Recharge。");
+        toast("金币不足：去挂机/对战赚金币，或 Recharge。");
         return;
       }
       weapon.weapon_level = lvl + 1;
       weapon.weapon_power = Math.floor(10 + (weapon.weapon_level-1)*4);
-
       setUIStats();
-      toast(`武器升级成功！Lv ${weapon.weapon_level}`);
+      toast(`升级成功！Weapon Lv ${weapon.weapon_level}`);
 
-      if(isGuest){
-        await saveGuest();
-        return;
-      }
-      const userId = sessionUser.id;
+      if(isGuest){ await saveGuest(); return; }
       await supabase.from("weapons").update({
         weapon_level: weapon.weapon_level,
         weapon_power: weapon.weapon_power,
         upgraded_at: new Date().toISOString()
-      }).eq("user_id", userId);
-      await supabase.from("game_logs").insert({
-        user_id:userId, mode:"C",
-        detail:{ action:"upgrade", level: weapon.weapon_level, power: weapon.weapon_power }
-      });
+      }).eq("user_id", sessionUser.id);
+      await log("C", { action:"upgrade", level: weapon.weapon_level, power: weapon.weapon_power, cost });
     }
 
     /*********************
-     * GAME ENGINE (CANVAS)
+     * CANVAS FX + GAME
      *********************/
     const fx = $("fx"), fctx = fx.getContext("2d");
-    const g = $("game"), ctx = g.getContext("2d");
+    const g  = $("game"), ctx = g.getContext("2d");
     const flash = $("flash");
 
     let W=0,H=0,DPR=1;
     function resize(){
       DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
       W = fx.width = g.width = Math.floor(innerWidth*DPR);
-      H = fx.height = g.height = Math.floor(innerHeight*DPR);
+      H = fx.height= g.height= Math.floor(innerHeight*DPR);
       fx.style.width = g.style.width = innerWidth+"px";
       fx.style.height= g.style.height= innerHeight+"px";
     }
-    addEventListener("resize", resize);
-    resize();
+    addEventListener("resize", resize); resize();
 
-    // background particles
-    const P = [];
+    const P=[];
     function seedParticles(){
-      P.length = 0;
-      const n = Math.floor((innerWidth*innerHeight)/15000) + 80;
+      P.length=0;
+      const n = Math.floor((innerWidth*innerHeight)/15000)+90;
       for(let i=0;i<n;i++){
         P.push({
-          x: Math.random()*W,
-          y: Math.random()*H,
-          r: (Math.random()*1.8+.3)*DPR,
-          vx:(Math.random()-.5)*0.12*DPR,
-          vy:(Math.random()-.2)*0.35*DPR,
-          a: Math.random()*0.7+0.15
+          x:Math.random()*W, y:Math.random()*H,
+          r:(Math.random()*1.8+.3)*DPR,
+          vx:(Math.random()-.5)*0.14*DPR,
+          vy:(Math.random()-.2)*0.42*DPR,
+          a:Math.random()*0.7+0.15,
+          h:(Math.random()<0.5?200:285)
         });
       }
     }
     seedParticles();
 
-    function drawFX(t){
+    function drawFX(){
       fctx.clearRect(0,0,W,H);
-      // soft vignette
       const grd = fctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.55);
       grd.addColorStop(0,"rgba(255,255,255,0.03)");
       grd.addColorStop(1,"rgba(0,0,0,0)");
@@ -544,49 +512,44 @@
 
       for(const p of P){
         p.x += p.vx; p.y += p.vy;
-        if(p.y > H+10){ p.y = -10; p.x=Math.random()*W; }
+        if(p.y > H+10){ p.y=-10; p.x=Math.random()*W; }
         if(p.x < -10) p.x = W+10;
         if(p.x > W+10) p.x = -10;
-
         fctx.beginPath();
-        fctx.fillStyle = `rgba(180,220,255,${p.a})`;
+        fctx.fillStyle = `hsla(${p.h}, 95%, 70%, ${p.a})`;
         fctx.arc(p.x,p.y,p.r,0,Math.PI*2);
         fctx.fill();
       }
     }
 
-    // simple effects pool
-    const FXE = []; // explosions
-    function boom(x,y, power=1){
+    const FXE=[];
+    function boom(x,y,power=1){
       flash.classList.add("on");
       setTimeout(()=>flash.classList.remove("on"), 80);
-
       document.body.classList.remove("shake");
       void document.body.offsetWidth;
       document.body.classList.add("shake");
 
-      const n = Math.floor(18 + power*12);
+      const n = Math.floor(22 + power*16);
       for(let i=0;i<n;i++){
         FXE.push({
           x,y,
-          vx:(Math.random()-.5)*(3.5+power*2)*DPR,
-          vy:(Math.random()-.5)*(3.5+power*2)*DPR,
-          life: 34+Math.random()*20,
-          r:(Math.random()*2.2+1.2)*DPR,
+          vx:(Math.random()-.5)*(3.8+power*2.2)*DPR,
+          vy:(Math.random()-.5)*(3.8+power*2.2)*DPR,
+          life: 34+Math.random()*22,
+          r:(Math.random()*2.4+1.2)*DPR,
           hue: (Math.random()<0.5)? 200 : 285
         });
       }
     }
-
     function drawExplosions(){
       for(let i=FXE.length-1;i>=0;i--){
-        const e = FXE[i];
+        const e=FXE[i];
         e.life -= 1;
-        e.x += e.vx;
-        e.y += e.vy;
+        e.x += e.vx; e.y += e.vy;
         e.vx *= 0.98; e.vy *= 0.98;
-        e.vy += 0.04*DPR;
-        const a = Math.max(0, Math.min(1, e.life/40));
+        e.vy += 0.05*DPR;
+        const a = Math.max(0, Math.min(1, e.life/42));
         ctx.beginPath();
         ctx.fillStyle = `hsla(${e.hue}, 95%, 70%, ${a})`;
         ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
@@ -595,634 +558,451 @@
       }
     }
 
-    // game state
+    function neonRect(x,y,w,h,alpha=1){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "rgba(0,0,0,.25)";
+      ctx.fillRect(x,y,w,h);
+      ctx.strokeStyle = "rgba(255,255,255,.18)";
+      ctx.strokeRect(x,y,w,h);
+      ctx.restore();
+    }
+
+    // Modes
     let mode = "LOBBY";
     let running = false;
-    let last = 0;
 
-    // A: duel
+    // A: Duel (简化对打：左右移动 + 释放技能打 AI)
     const duel = {
-      player:{ x:0, y:0, hp:100, cd:0 },
-      enemy: { x:0, y:0, hp:100, cd:0 },
-      proj: []
+      player:{ x:0, y:0, vx:0, hp:100 },
+      enemy:{ x:0, y:0, vx:0, hp:100 },
+      bullets:[],
+      cooldown:0,
+      coinsEarned:0
     };
 
-    // B: afk
+    // B: AFK (自动刷怪 + 掉金币动画)
     const afk = {
-      mobHP: 80,
-      mobMax: 80,
+      t:0,
       tick:0,
-      drops: []
+      coinsEarned:0
     };
 
-    // D: leaderboard cache
-    let board = [];
+    // input
+    const keys = {};
+    addEventListener("keydown",(e)=>{ keys[e.key.toLowerCase()] = true; });
+    addEventListener("keyup",(e)=>{ keys[e.key.toLowerCase()] = false; });
 
-    function enterMode(m){
+    function startMode(m){
       mode = m;
       $("hud").style.display = "block";
-      g.style.display = "block";
+      $("game").style.display = "block";
+      $("lobby").style.display = "none";
+      running = true;
 
       if(m==="A"){
-        $("hudTitle").textContent = "A · DUEL ARENA";
-        $("hudDesc").textContent = "点 Attack 发射能量弹，对战 AI。爆炸抖屏，赢了奖励金币。";
-        $("actionBtn").textContent = "Attack";
-        $("hudBtns").innerHTML = `
-          <button class="btn small" id="skillBtn">Skill Blast</button>
-          <button class="btn small" id="healBtn">Heal</button>
-        `;
-        initDuel();
-        hookDuelButtons();
+        $("hudTitle").textContent="MODE A · DUEL";
+        $("hudDesc").textContent="WASD/方向键移动，空格释放技能。击败 AI 掉金币。";
+        $("actionBtn").textContent="Skill (Space)";
+        duel.player = { x:W*0.30, y:H*0.60, vx:0, hp:100 };
+        duel.enemy  = { x:W*0.70, y:H*0.60, vx:0, hp:100 };
+        duel.bullets = [];
+        duel.cooldown=0;
+        duel.coinsEarned=0;
+        toast("进入对战！");
       }
+
       if(m==="B"){
-        $("hudTitle").textContent = "B · AFK DUNGEON";
-        $("hudDesc").textContent = "自动攻击怪物，爆金币动画。点 Boost 10 秒加速。";
-        $("actionBtn").textContent = "Boost";
-        $("hudBtns").innerHTML = `
-          <button class="btn small" id="claimBtn">Claim +50</button>
-        `;
-        initAFK();
-        hookAFKButtons();
+        $("hudTitle").textContent="MODE B · AFK";
+        $("hudDesc").textContent="自动刷怪，每几秒掉金币。你可以挂机看动画。";
+        $("actionBtn").textContent="Boost";
+        afk.t=0; afk.tick=0; afk.coinsEarned=0;
+        toast("进入挂机！");
       }
+
       if(m==="C"){
-        $("hudTitle").textContent = "C · FORGE";
-        $("hudDesc").textContent = "强化武器：消耗金币提升伤害。";
-        $("actionBtn").textContent = "Upgrade";
-        $("hudBtns").innerHTML = `
-          <button class="btn small" id="powerBtn">Show Power</button>
-        `;
-        initForge();
-        hookForgeButtons();
+        $("hudTitle").textContent="MODE C · FORGE";
+        $("hudDesc").textContent="消耗金币强化武器，提高伤害与收益。";
+        $("actionBtn").textContent="Upgrade";
+        toast("进入锻造！");
       }
+
       if(m==="D"){
-        $("hudTitle").textContent = "D · LEADERBOARD";
-        $("hudDesc").textContent = "显示金币榜（公开读取 wallets）。";
-        $("actionBtn").textContent = "Refresh";
-        $("hudBtns").innerHTML = `
-          <button class="btn small" id="meBtn">My Rank</button>
-        `;
-        initRank();
-        hookRankButtons();
+        $("hudTitle").textContent="MODE D · RANK";
+        $("hudDesc").textContent="读取 wallets 金币排行榜（公开只读）。";
+        $("actionBtn").textContent="Refresh";
+        toast("进入排行榜！");
+        renderRank();
       }
-      toast(`进入模式 ${m}`);
     }
 
     function backToLobby(){
-      mode = "LOBBY";
-      $("hud").style.display = "none";
-      g.style.display = "none";
+      mode="LOBBY";
+      running=false;
+      $("hud").style.display="none";
+      $("game").style.display="none";
+      $("lobby").style.display="block";
       ctx.clearRect(0,0,W,H);
-      toast("返回大厅");
+      toast("回到大厅");
     }
 
-    // ---------- Mode A: Duel ----------
-    function initDuel(){
-      duel.player = { x: W*0.22, y: H*0.62, hp:100, cd:0 };
-      duel.enemy  = { x: W*0.78, y: H*0.62, hp:100, cd:0 };
-      duel.proj = [];
-    }
+    $("backBtn").addEventListener("click", backToLobby);
 
-    function shoot(from, to, dmg, hue=200){
-      const dx = to.x-from.x, dy = to.y-from.y;
-      const len = Math.max(1, Math.hypot(dx,dy));
-      duel.proj.push({
-        x: from.x, y: from.y,
-        vx: dx/len * (7.5*DPR),
-        vy: dy/len * (7.5*DPR),
-        r: 6*DPR, hue,
-        dmg
+    $("actionBtn").addEventListener("click", async ()=>{
+      if(mode==="A"){
+        fireSkill();
+      }else if(mode==="B"){
+        // boost：直接爆炸一下 + 奖励少量金币
+        boom(W*0.5, H*0.45, 1.1);
+        await addCoins(5, "B", { action:"boost" });
+        afk.coinsEarned += 5;
+        toast("+5 coins");
+      }else if(mode==="C"){
+        await upgradeWeapon();
+      }else if(mode==="D"){
+        await renderRank(true);
+      }
+    });
+
+    function fireSkill(){
+      if(duel.cooldown>0) return;
+      duel.cooldown = 26;
+      const dx = (duel.enemy.x - duel.player.x);
+      const dir = dx>=0 ? 1 : -1;
+      duel.bullets.push({
+        x: duel.player.x + dir*32*DPR,
+        y: duel.player.y - 12*DPR,
+        vx: dir*(8.5 + weapon.weapon_level*0.25)*DPR,
+        life: 90,
+        dmg: Math.floor(8 + weapon.weapon_level*2.2)
       });
+      boom(duel.player.x, duel.player.y-10*DPR, 0.75);
     }
 
-    function hookDuelButtons(){
-      const skillBtn = $("skillBtn");
-      const healBtn  = $("healBtn");
-      if(skillBtn) skillBtn.onclick = ()=>{ if(mode!=="A")return;
-        if(duel.player.cd>0){ toast("技能冷却"); return; }
-        duel.player.cd = 140;
-        boom(duel.enemy.x, duel.enemy.y-40*DPR, 1.4);
-        duel.enemy.hp -= Math.floor(12 + weapon.weapon_power*0.55);
-        toast("Skill Blast!");
-      };
-      if(healBtn) healBtn.onclick = ()=>{ if(mode!=="A")return;
-        duel.player.hp = Math.min(100, duel.player.hp + 18);
-        toast("Heal +18");
-      };
+    function updateDuel(){
+      // move
+      const left  = keys["a"] || keys["arrowleft"];
+      const right = keys["d"] || keys["arrowright"];
+      const up    = keys["w"] || keys["arrowup"];
+      const down  = keys["s"] || keys["arrowdown"];
+      const spc   = keys[" "] || keys["space"];
+
+      const speed = 4.2*DPR;
+      duel.player.vx = (right?1:0) - (left?1:0);
+      let vy = (down?1:0) - (up?1:0);
+      duel.player.x += duel.player.vx*speed;
+      duel.player.y += vy*speed;
+
+      duel.player.x = Math.max(60*DPR, Math.min(W-60*DPR, duel.player.x));
+      duel.player.y = Math.max(120*DPR, Math.min(H-90*DPR, duel.player.y));
+
+      if(spc) fireSkill();
+      if(duel.cooldown>0) duel.cooldown--;
+
+      // enemy AI
+      const targetX = duel.player.x + (Math.sin(Date.now()/500)*120*DPR);
+      duel.enemy.x += Math.sign(targetX - duel.enemy.x) * (2.6*DPR);
+      duel.enemy.y += Math.sin(Date.now()/420) * (0.8*DPR);
+
+      // bullets
+      for(let i=duel.bullets.length-1;i>=0;i--){
+        const b = duel.bullets[i];
+        b.life--;
+        b.x += b.vx;
+        // hit enemy
+        const dx = b.x - duel.enemy.x;
+        const dy = b.y - duel.enemy.y;
+        if(dx*dx+dy*dy < (48*DPR)*(48*DPR)){
+          duel.enemy.hp -= b.dmg;
+          boom(b.x,b.y,1.25);
+          duel.bullets.splice(i,1);
+          if(duel.enemy.hp<=0){
+            // respawn enemy + reward
+            duel.enemy.hp = 100 + weapon.weapon_level*8;
+            duel.enemy.x = W*(0.62 + Math.random()*0.28);
+            duel.enemy.y = H*(0.40 + Math.random()*0.30);
+            const reward = Math.floor(18 + weapon.weapon_level*4);
+            duel.coinsEarned += reward;
+            addCoins(reward, "A", { action:"kill", reward, wlv: weapon.weapon_level });
+            toast(`击败敌人 +${reward} coins`);
+            boom(duel.enemy.x, duel.enemy.y, 1.6);
+          }
+        }
+        if(b.life<=0 || b.x<-50 || b.x>W+50) duel.bullets.splice(i,1);
+      }
     }
 
-    // ---------- Mode B: AFK ----------
-    let boostUntil = 0;
-    function initAFK(){
-      afk.mobMax = Math.floor(70 + weapon.weapon_level*14);
-      afk.mobHP = afk.mobMax;
-      afk.tick = 0;
-      afk.drops = [];
-      boostUntil = 0;
-    }
-    function hookAFKButtons(){
-      const claimBtn = $("claimBtn");
-      if(claimBtn) claimBtn.onclick = async ()=>{ if(mode!=="B")return;
-        await addCoins(50, "B", {action:"claim"});
-        toast("+50 coins");
-      };
-    }
-
-    // ---------- Mode C: Forge ----------
-    function initForge(){}
-    function hookForgeButtons(){
-      const powerBtn = $("powerBtn");
-      if(powerBtn) powerBtn.onclick = ()=>toast(`Weapon Power = ${weapon.weapon_power}`);
+    function drawDuel(){
+      ctx.clearRect(0,0,W,H);
+      // arena floor
+      neonRect(70*DPR, 120*DPR, W-140*DPR, H-210*DPR, 1);
+      // player
+      drawFighter(duel.player.x, duel.player.y, 200, duel.player.hp/140);
+      // enemy
+      drawFighter(duel.enemy.x, duel.enemy.y, 285, duel.enemy.hp/160);
+      // bullets
+      for(const b of duel.bullets){
+        ctx.beginPath();
+        ctx.fillStyle="rgba(255,255,255,.9)";
+        ctx.arc(b.x,b.y,3.5*DPR,0,Math.PI*2);
+        ctx.fill();
+      }
+      drawExplosions();
+      drawHUDText(`Coins Earned: ${duel.coinsEarned}`);
     }
 
-    // ---------- Mode D: Rank ----------
-    async function initRank(){
-      board = [];
-      await refreshBoard();
+    function drawFighter(x,y,hue,hpPct){
+      // glow
+      ctx.save();
+      ctx.shadowColor = `hsla(${hue}, 95%, 70%, 0.9)`;
+      ctx.shadowBlur = 24*DPR;
+      ctx.fillStyle = `hsla(${hue}, 95%, 60%, 0.55)`;
+      ctx.beginPath();
+      ctx.arc(x,y,26*DPR,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      // core
+      ctx.fillStyle = `hsla(${hue}, 95%, 70%, 0.9)`;
+      ctx.beginPath();
+      ctx.arc(x,y,10*DPR,0,Math.PI*2);
+      ctx.fill();
+
+      // hp bar
+      const w = 90*DPR, h=10*DPR;
+      ctx.fillStyle="rgba(0,0,0,.35)";
+      ctx.fillRect(x-w/2,y-48*DPR,w,h);
+      ctx.fillStyle=`hsla(${hue},95%,70%,.9)`;
+      ctx.fillRect(x-w/2,y-48*DPR,Math.max(0,Math.min(1,hpPct))*w,h);
+      ctx.strokeStyle="rgba(255,255,255,.18)";
+      ctx.strokeRect(x-w/2,y-48*DPR,w,h);
     }
-    async function refreshBoard(){
+
+    function drawHUDText(t){
+      ctx.save();
+      ctx.font = `${12*DPR}px Arial`;
+      ctx.fillStyle = "rgba(255,255,255,.75)";
+      ctx.fillText(t, 24*DPR, 34*DPR);
+      ctx.restore();
+    }
+
+    function updateAFK(){
+      afk.t += 1;
+      // 每 120 帧（约2秒）奖励一次
+      if(afk.t % 120 === 0){
+        const reward = Math.floor(8 + weapon.weapon_level*2);
+        afk.coinsEarned += reward;
+        addCoins(reward, "B", { action:"tick", reward, wlv: weapon.weapon_level });
+        // 大爆炸动画
+        boom(W*(0.35+Math.random()*0.30), H*(0.35+Math.random()*0.30), 1.4);
+        toast(`挂机收益 +${reward} coins`);
+      }
+    }
+
+    function drawAFK(){
+      ctx.clearRect(0,0,W,H);
+      // dungeon frame
+      neonRect(70*DPR, 120*DPR, W-140*DPR, H-210*DPR, 1);
+      // animated portals
+      const t = Date.now()/500;
+      for(let i=0;i<5;i++){
+        const x = (W*(0.2+i*0.16));
+        const y = H*(0.55 + Math.sin(t+i)*0.08);
+        const hue = (i%2?200:285);
+        ctx.save();
+        ctx.shadowColor = `hsla(${hue},95%,70%,.9)`;
+        ctx.shadowBlur = 26*DPR;
+        ctx.strokeStyle = `hsla(${hue},95%,70%,.65)`;
+        ctx.lineWidth = 3*DPR;
+        ctx.beginPath();
+        ctx.arc(x,y,18*DPR + (Math.sin(t*2+i)*4*DPR),0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      drawExplosions();
+      drawHUDText(`AFK Coins Earned: ${afk.coinsEarned}`);
+    }
+
+    async function renderRank(showToast=false){
       if(isGuest){
-        board = [{ email:"Guest", coins: wallet.coins }];
+        setStatus("Guest 模式不读取排行榜。请登录后再看。");
+        if(showToast) toast("请登录后查看排行榜");
         return;
       }
       const { data, error } = await supabase
         .from("wallets")
-        .select("user_id,coins")
+        .select("user_id, coins")
         .order("coins", { ascending:false })
         .limit(10);
 
       if(error){
-        toast("读取排行榜失败（检查 RLS policy）");
         console.log(error);
-        board = [];
+        setStatus("排行榜读取失败：检查 wallets_public_read policy 是否存在。");
+        if(showToast) toast("排行榜失败");
         return;
       }
 
-      // Map to displayable names (email) - we cannot read auth.users email via anon key.
-      // So we display masked uid.
-      board = (data||[]).map((r, i)=>({
-        rank: i+1,
-        uid: String(r.user_id).slice(0,8)+"…",
-        coins: r.coins
-      }));
-    }
-    function hookRankButtons(){
-      const meBtn = $("meBtn");
-      if(meBtn) meBtn.onclick = ()=> {
-        if(isGuest){ toast("Guest 没有排行"); return; }
-        toast("目前榜单显示 UID（anon key 无法读取邮箱）");
-      };
+      const lines = data.map((r,i)=>`${String(i+1).padStart(2,"0")}  ·  ${r.user_id.slice(0,6)}…  ·  ${fmt(r.coins)} coins`);
+      setStatus("Top 10 Coins\n" + lines.join("\n"));
+      if(showToast) toast("排行榜已刷新");
     }
 
-    // ACTION button per mode
-    async function onAction(){
-      if(mode==="A"){
-        // attack
-        if(duel.player.cd>0){ toast("攻击冷却"); return; }
-        duel.player.cd = 22;
-        const dmg = Math.floor(6 + weapon.weapon_power*0.45);
-        shoot(duel.player, duel.enemy, dmg, 200);
-      }
-      if(mode==="B"){
-        boostUntil = now() + 10000;
-        toast("Boost x2 speed (10s)");
-      }
-      if(mode==="C"){
-        await upgradeWeapon();
-      }
-      if(mode==="D"){
-        await refreshBoard();
-        toast("排行榜已刷新");
-      }
+    function updateForge(){
+      // 纯展示：画一个锻造能量环
     }
-
-    // render per mode
-    function drawGame(dt){
-      ctx.clearRect(0,0,W,H);
-
-      // floor glow
-      const floorY = H*0.72;
-      const grd = ctx.createLinearGradient(0,floorY,0,H);
-      grd.addColorStop(0,"rgba(124,200,255,0.08)");
-      grd.addColorStop(1,"rgba(0,0,0,0)");
-      ctx.fillStyle = grd;
-      ctx.fillRect(0,floorY,W,H-floorY);
-
-      if(mode==="A") stepDuel(dt);
-      if(mode==="B") stepAFK(dt);
-      if(mode==="C") drawForge();
-      if(mode==="D") drawRank();
-
-      drawExplosions();
-    }
-
-    function drawHPBar(x,y,w,h,pct,color){
-      ctx.fillStyle="rgba(255,255,255,0.10)";
-      ctx.fillRect(x,y,w,h);
-      ctx.fillStyle=color;
-      ctx.fillRect(x,y,w*Math.max(0,Math.min(1,pct)),h);
-      ctx.strokeStyle="rgba(255,255,255,0.18)";
-      ctx.strokeRect(x,y,w,h);
-    }
-
-    async function winDuel(){
-      const reward = Math.floor(40 + weapon.weapon_level*10);
-      await addCoins(reward, "A", {result:"win", reward});
-      toast(`WIN! +${reward} coins`);
-      initDuel();
-    }
-    function loseDuel(){
-      toast("你输了…再来！");
-      initDuel();
-    }
-
-    function stepDuel(dt){
-      // cooldowns
-      duel.player.cd = Math.max(0, duel.player.cd - dt*0.06);
-      duel.enemy.cd  = Math.max(0, duel.enemy.cd  - dt*0.06);
-
-      // enemy AI shoot
-      if(duel.enemy.cd<=0){
-        duel.enemy.cd = 38 + Math.random()*18;
-        const dmg = Math.floor(5 + weapon.weapon_level*1.2);
-        shoot(duel.enemy, duel.player, dmg, 285);
-      }
-
-      // update projectiles
-      for(let i=duel.proj.length-1;i>=0;i--){
-        const p = duel.proj[i];
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // draw
-        ctx.beginPath();
-        ctx.fillStyle = `hsla(${p.hue},95%,70%,0.95)`;
-        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fill();
-
-        // collision
-        const hitP = Math.hypot(p.x-duel.player.x, p.y-duel.player.y) < (18*DPR);
-        const hitE = Math.hypot(p.x-duel.enemy.x,  p.y-duel.enemy.y)  < (18*DPR);
-
-        if(hitP){
-          boom(p.x,p.y,0.9);
-          duel.player.hp -= p.dmg;
-          duel.proj.splice(i,1);
-          if(duel.player.hp<=0) loseDuel();
-          continue;
-        }
-        if(hitE){
-          boom(p.x,p.y,0.9);
-          duel.enemy.hp -= p.dmg;
-          duel.proj.splice(i,1);
-          if(duel.enemy.hp<=0) winDuel();
-          continue;
-        }
-
-        // offscreen
-        if(p.x<-50||p.x>W+50||p.y<-50||p.y>H+50){
-          duel.proj.splice(i,1);
-        }
-      }
-
-      // characters (simple neon blobs)
-      const py = duel.player.y, ey = duel.enemy.y;
-      drawFighter(duel.player.x, py, 200);
-      drawFighter(duel.enemy.x,  ey,  285);
-
-      // HUD stats
-      drawHPBar(W*0.18, H*0.10, W*0.26, 10*DPR, duel.player.hp/100, "rgba(124,255,181,0.85)");
-      drawHPBar(W*0.56, H*0.10, W*0.26, 10*DPR, duel.enemy.hp/100,  "rgba(255,109,139,0.85)");
-      ctx.fillStyle="rgba(255,255,255,.75)";
-      ctx.font = `${12*DPR}px Arial`;
-      ctx.fillText("YOU", W*0.18, H*0.10 - 6*DPR);
-      ctx.fillText("ENEMY", W*0.56, H*0.10 - 6*DPR);
-    }
-
-    function drawFighter(x,y,hue){
-      // glow body
-      const r = 18*DPR;
-      const g1 = ctx.createRadialGradient(x,y,0,x,y,60*DPR);
-      g1.addColorStop(0, `hsla(${hue},95%,70%,0.30)`);
-      g1.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g1;
-      ctx.beginPath(); ctx.arc(x,y,60*DPR,0,Math.PI*2); ctx.fill();
-
-      ctx.fillStyle = `hsla(${hue},95%,72%,0.95)`;
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-
-      // eyes
-      ctx.fillStyle="rgba(0,0,0,0.55)";
-      ctx.beginPath(); ctx.arc(x-6*DPR,y-2*DPR,3*DPR,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x+6*DPR,y-2*DPR,3*DPR,0,Math.PI*2); ctx.fill();
-    }
-
-    async function stepAFK(dt){
-      const speed = (now()<boostUntil) ? 2 : 1;
-      afk.tick += dt*0.001*speed;
-
-      // auto hit
-      if(afk.tick >= 0.22){
-        afk.tick = 0;
-        const dmg = Math.floor(3 + weapon.weapon_power*0.22);
-        afk.mobHP -= dmg;
-
-        // hit spark
-        boom(W*0.66, H*0.48, 0.55);
-
-        if(afk.mobHP<=0){
-          // drop coins
-          const drop = Math.floor(8 + weapon.weapon_level*3);
-          afk.mobHP = afk.mobMax;
-          // coin drop animation
-          for(let i=0;i<6;i++){
-            afk.drops.push({
-              x: W*0.66 + (Math.random()-.5)*60*DPR,
-              y: H*0.48 + (Math.random()-.5)*30*DPR,
-              vy: - (Math.random()*2.5 + 2.2)*DPR,
-              vx: (Math.random()-.5)*1.8*DPR,
-              life: 60+Math.random()*20,
-              val: Math.max(1, Math.floor(drop/6))
-            });
-          }
-          await addCoins(drop, "B", {drop});
-          toast(`+${drop} coins`);
-        }
-      }
-
-      // draw mob
-      drawMob(W*0.66, H*0.48);
-      // draw player avatar
-      drawFighter(W*0.32, H*0.60, 200);
-
-      // mob hp
-      drawHPBar(W*0.52, H*0.18, W*0.36, 10*DPR, afk.mobHP/afk.mobMax, "rgba(255,210,124,0.85)");
-      ctx.fillStyle="rgba(255,255,255,.75)";
-      ctx.font = `${12*DPR}px Arial`;
-      ctx.fillText("MOB", W*0.52, H*0.18 - 6*DPR);
-
-      // drops
-      for(let i=afk.drops.length-1;i>=0;i--){
-        const d = afk.drops[i];
-        d.life -= 1;
-        d.x += d.vx;
-        d.y += d.vy;
-        d.vy += 0.10*DPR;
-        const a = Math.max(0, Math.min(1, d.life/60));
-        ctx.fillStyle = `rgba(255,210,124,${a})`;
-        ctx.beginPath(); ctx.arc(d.x,d.y,5*DPR,0,Math.PI*2); ctx.fill();
-        if(d.life<=0) afk.drops.splice(i,1);
-      }
-
-      // boost indicator
-      if(now()<boostUntil){
-        ctx.fillStyle="rgba(124,255,181,.75)";
-        ctx.font = `${12*DPR}px Arial`;
-        ctx.fillText("BOOST x2", W*0.06, H*0.16);
-      }
-    }
-
-    function drawMob(x,y){
-      const hue=40;
-      const g1 = ctx.createRadialGradient(x,y,0,x,y,80*DPR);
-      g1.addColorStop(0, `hsla(${hue},95%,65%,0.25)`);
-      g1.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(x,y,80*DPR,0,Math.PI*2); ctx.fill();
-
-      ctx.fillStyle=`hsla(${hue},95%,62%,0.92)`;
-      ctx.beginPath(); ctx.arc(x,y,28*DPR,0,Math.PI*2); ctx.fill();
-
-      // spikes
-      ctx.strokeStyle=`hsla(${hue},95%,72%,0.75)`;
-      ctx.lineWidth=2*DPR;
-      for(let i=0;i<10;i++){
-        const a = i/10*Math.PI*2;
-        const x1=x+Math.cos(a)*28*DPR, y1=y+Math.sin(a)*28*DPR;
-        const x2=x+Math.cos(a)*40*DPR, y2=y+Math.sin(a)*40*DPR;
-        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      }
-    }
-
     function drawForge(){
-      // neon forge UI drawn on canvas
-      ctx.fillStyle="rgba(255,255,255,.80)";
-      ctx.font = `${18*DPR}px Arial`;
-      ctx.fillText("FORGE", W*0.08, H*0.22);
-
-      ctx.fillStyle="rgba(255,255,255,.65)";
-      ctx.font = `${12*DPR}px Arial`;
-      ctx.fillText(`Weapon Lv: ${weapon.weapon_level}  |  Power: ${weapon.weapon_power}`, W*0.08, H*0.27);
-
-      const cost = Math.floor(80 + (weapon.weapon_level-1)*60);
-      ctx.fillStyle="rgba(255,255,255,.62)";
-      ctx.fillText(`Upgrade Cost: ${cost} coins`, W*0.08, H*0.31);
-
-      // sword glow
-      const x=W*0.52, y=H*0.52;
-      const g1=ctx.createRadialGradient(x,y,0,x,y,180*DPR);
-      g1.addColorStop(0,"rgba(124,200,255,.18)");
-      g1.addColorStop(1,"rgba(0,0,0,0)");
-      ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(x,y,180*DPR,0,Math.PI*2); ctx.fill();
-
+      ctx.clearRect(0,0,W,H);
+      neonRect(70*DPR, 120*DPR, W-140*DPR, H-210*DPR, 1);
+      const t = Date.now()/600;
+      const x=W/2, y=H/2;
+      for(let i=0;i<3;i++){
+        const hue = i%2?200:285;
+        ctx.save();
+        ctx.shadowColor = `hsla(${hue},95%,70%,.9)`;
+        ctx.shadowBlur = 30*DPR;
+        ctx.strokeStyle = `hsla(${hue},95%,70%,.55)`;
+        ctx.lineWidth = 4*DPR;
+        ctx.beginPath();
+        ctx.arc(x,y, 46*DPR + i*22*DPR + Math.sin(t+i)*6*DPR, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
       ctx.save();
-      ctx.translate(x,y);
-      ctx.rotate(Math.sin(now()*0.001)*0.08);
-      ctx.fillStyle="rgba(255,255,255,.92)";
-      ctx.fillRect(-6*DPR,-90*DPR,12*DPR,150*DPR);
-      ctx.fillStyle="rgba(180,120,255,.95)";
-      ctx.fillRect(-28*DPR,40*DPR,56*DPR,10*DPR);
+      ctx.font = `${16*DPR}px Arial`;
+      ctx.fillStyle="rgba(255,255,255,.78)";
+      ctx.fillText(`Upgrade Cost: ${fmt(Math.floor(80 + (weapon.weapon_level-1)*60))} coins`, x-120*DPR, y+90*DPR);
       ctx.restore();
-
-      ctx.fillStyle="rgba(255,255,255,.58)";
-      ctx.font = `${12*DPR}px Arial`;
-      ctx.fillText("点击下方 Upgrade 进行强化", W*0.08, H*0.36);
+      drawExplosions();
+      drawHUDText(`Weapon Lv: ${weapon.weapon_level}  Power: ${weapon.weapon_power}`);
     }
 
+    function updateRank(){}
     function drawRank(){
-      ctx.fillStyle="rgba(255,255,255,.80)";
-      ctx.font = `${18*DPR}px Arial`;
-      ctx.fillText("LEADERBOARD (Top 10)", W*0.08, H*0.20);
-
-      ctx.fillStyle="rgba(255,255,255,.62)";
-      ctx.font = `${12*DPR}px Arial`;
-      ctx.fillText("说明：anon key 无法读取邮箱，所以榜单显示 UID 前8位。", W*0.08, H*0.24);
-
-      const x=W*0.08, y=H*0.30;
-      const rowH = 24*DPR;
-      ctx.font = `${12*DPR}px Arial`;
-
-      if(!board.length){
-        ctx.fillStyle="rgba(255,255,255,.62)";
-        ctx.fillText("暂无数据 / 读取失败。点 Refresh。", x, y);
-        return;
-      }
-
-      for(let i=0;i<board.length;i++){
-        const r = board[i];
-        const yy = y + i*rowH;
-        ctx.fillStyle = "rgba(255,255,255,.12)";
-        ctx.fillRect(x, yy-14*DPR, W*0.58, 18*DPR);
-
-        ctx.fillStyle="rgba(255,255,255,.78)";
-        ctx.fillText(`#${i+1}`, x+8*DPR, yy);
-        ctx.fillStyle="rgba(124,200,255,.78)";
-        ctx.fillText(`${r.uid||r.email}`, x+60*DPR, yy);
-        ctx.fillStyle="rgba(255,210,124,.85)";
-        ctx.fillText(`${fmt(r.coins)} coins`, x+320*DPR, yy);
-      }
+      ctx.clearRect(0,0,W,H);
+      neonRect(70*DPR, 120*DPR, W-140*DPR, H-210*DPR, 1);
+      drawExplosions();
+      drawHUDText("Rank is shown in Status panel → right side");
     }
 
-    function loop(t){
-      const dt = Math.min(50, t-last); last = t;
-      drawFX(t);
-      if(mode!=="LOBBY"){
-        drawGame(dt);
-      }
+    function loop(){
       requestAnimationFrame(loop);
+      drawFX();
+
+      if(!running) return;
+
+      if(mode==="A"){ updateDuel(); drawDuel(); }
+      if(mode==="B"){ updateAFK(); drawAFK(); }
+      if(mode==="C"){ updateForge(); drawForge(); }
+      if(mode==="D"){ updateRank(); drawRank(); }
     }
-    requestAnimationFrame(loop);
+    loop();
 
     /*********************
-     * APP FLOW
+     * UI EVENTS
      *********************/
-    function showLogin(msg=""){
-      $("login").style.display="flex";
-      $("loginMsg").textContent = msg;
-    }
-    function hideLogin(){
-      $("login").style.display="none";
-    }
+    document.querySelectorAll(".mode").forEach(el=>{
+      el.addEventListener("click", ()=> startMode(el.dataset.mode));
+    });
 
-    function enableAppLoggedIn(email){
-      hideLogin();
-      setUIUser(email);
-      $("logoutBtn").style.display="inline-block";
-      $("topupBtn").style.display="inline-block";
-      setStatus("已登录，准备进入大厅…");
-    }
-
-    function enableAppGuest(){
-      hideLogin();
-      isGuest = true;
-      sessionUser = null;
-      setUIUser("Guest");
-      $("logoutBtn").style.display="none";
-      $("topupBtn").style.display="inline-block";
-      setStatus("Guest 模式：可试玩（数据保存在本机）。");
-    }
-
-    async function logout(){
-      if(isGuest){
-        isGuest = false;
-        showLogin("已退出 Guest。");
-        backToLobby();
-        return;
-      }
-      await supabase.auth.signOut();
-      showLogin("已退出登录。");
-      backToLobby();
-    }
-
-    // UI binds
-    $("logoutBtn").addEventListener("click", logout);
     $("topupBtn").addEventListener("click", ()=>{
-      if(!STRIPE_TOPUP_URL || STRIPE_TOPUP_URL.includes("REPLACE_ME")){
-        toast("先把 STRIPE_TOPUP_URL 换成你的付款链接");
-        return;
-      }
       window.open(STRIPE_TOPUP_URL, "_blank", "noopener");
     });
 
-    $("backBtn").addEventListener("click", backToLobby);
-    $("actionBtn").addEventListener("click", onAction);
-
-    document.querySelectorAll(".mode").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        if($("login").style.display!=="none"){
-          toast("请先登录或选 Demo");
-          return;
-        }
-        enterMode(el.dataset.mode);
-      });
+    $("logoutBtn").addEventListener("click", async ()=>{
+      if(isGuest){
+        isGuest=false;
+        backToLobby();
+        $("login").style.display="flex";
+        setUIUser("Guest");
+        wallet={coins:0,gems:0}; weapon={weapon_level:1,weapon_power:10}; setUIStats();
+        setStatus("已退出 Guest。");
+        return;
+      }
+      await supabase.auth.signOut();
+      sessionUser=null;
+      backToLobby();
+      $("login").style.display="flex";
+      setUIUser("Guest");
+      wallet={coins:0,gems:0}; weapon={weapon_level:1,weapon_power:10}; setUIStats();
+      setStatus("已退出登录。");
     });
 
-    // login buttons
     $("demoBtn").addEventListener("click", async ()=>{
-      enableAppGuest();
+      isGuest = true;
+      $("login").style.display="none";
+      setUIUser("Guest");
       await loadPlayerState();
-      toast("Guest 已进入大厅");
+      toast("Guest 模式进入");
     });
 
     $("otpBtn").addEventListener("click", async ()=>{
+      const email = $("email").value.trim();
+      if(!email){ $("loginMsg").textContent="请输入邮箱"; return; }
+      $("loginMsg").textContent="发送中…";
+
       try{
-        const email = $("email").value.trim();
-        if(!email){
-        $("loginMsg").textContent = "请输入邮箱";
-        return;
-      }
-
-      $("loginMsg").textContent = "Sending...";
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin }
-      });
-
-      if(error){
-        $("loginMsg").textContent = "❌ 发送失败：\n" + error.message;
-        return;
-      }
-
-      $("loginMsg").textContent =
-        "✅ 已发送登录邮件，请去邮箱点击链接完成登录。\n" +
-        "如果收不到：检查 Supabase → Auth → URL Configuration";
-    }catch(e){
-      $("loginMsg").textContent = "JS 异常：" + (e?.message || e);
-    }
-  });
-
-  /*********************
-   * BOOT
-   *********************/
-  window.addEventListener("DOMContentLoaded", async ()=>{
-    // 1) init supabase
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // 2) existing session?
-    const { data: { session } } = await supabase.auth.getSession();
-    if(session?.user){
-      isGuest = false;
-      sessionUser = session.user;
-      enableAppLoggedIn(session.user.email || "Player");
-      await loadPlayerState();
-      toast("登录态已恢复 ✅");
-    }else{
-      showLogin("");
-      setStatus("请先登录（或 Demo Guest）");
-    }
-
-    // 3) auth state changes
-    supabase.auth.onAuthStateChange(async (event, session)=>{
-      if(session?.user){
-        isGuest = false;
-        sessionUser = session.user;
-        enableAppLoggedIn(session.user.email || "Player");
-        await loadPlayerState();
-        toast("登录成功 ✅ 进入大厅");
-      }else{
-        // logged out
-        showLogin("已退出登录。");
-        setUIUser("Guest");
-        setStatus("请先登录（或 Demo Guest）");
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options:{
+            // 登录成功后回到你的网站（必须在 Redirect URLs 允许）
+            emailRedirectTo: window.location.origin + window.location.pathname
+          }
+        });
+        if(error){
+          console.log(error);
+          $("loginMsg").textContent = "发送失败：\n" + error.message;
+          return;
+        }
+        $("loginMsg").textContent = "已发送登录链接到邮箱。\n打开邮件点击链接即可进入游戏。";
+      }catch(e){
+        console.log(e);
+        $("loginMsg").textContent = "发送异常：" + String(e);
       }
     });
-  });
 
-  /*********************
-   * SAFETY: prevent page scroll interfering on mobile
-   *********************/
-  window.addEventListener("touchmove", (e)=>{
-    // allow scrolling inside overlay content if needed
-  }, {passive:true});
-</script>
+    /*********************
+     * INIT
+     *********************/
+    async function boot(){
+      // 防止你忘记填
+      if(!SUPABASE_URL.includes("http") || SUPABASE_ANON_KEY.includes("PASTE_")){
+        setStatus("请先在 index.html 填入 SUPABASE_URL 与 SUPABASE_ANON_KEY，然后重新部署。");
+        $("loginMsg").textContent = "⚠️ 你还没填 Supabase URL / ANON KEY。";
+        return;
+      }
 
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      setStatus("Supabase 已连接。等待登录…");
+
+      // 如果是从邮件跳回来的，会自动有 session
+      const { data } = await supabase.auth.getUser();
+      sessionUser = data?.user || null;
+
+      if(sessionUser){
+        $("login").style.display="none";
+        isGuest=false;
+        setUIUser(sessionUser.email || "Player");
+        await loadPlayerState();
+        toast("登录成功，进入大厅");
+      }else{
+        $("login").style.display="flex";
+        setUIUser("Guest");
+        setUIStats();
+        setStatus("请登录或使用 Guest Demo。");
+      }
+
+      supabase.auth.onAuthStateChange(async (event, session)=>{
+        if(event==="SIGNED_IN" && session?.user){
+          sessionUser = session.user;
+          isGuest=false;
+          $("login").style.display="none";
+          setUIUser(sessionUser.email || "Player");
+          await loadPlayerState();
+          toast("已登录");
+        }
+      });
+    }
+    boot();
+  </script>
 </body>
 </html>
