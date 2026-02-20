@@ -2,465 +2,633 @@
 <html lang="zh-Hans">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>JKang Neon Arena</title>
-  <meta name="description" content="Recharge · Fight · Upgrade · Weapons · Idle · Crazy FX" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Neon DDT Arena</title>
   <style>
-    :root{
-      --bg:#050507; --text:#F6F7FB; --muted:#A7AAB5; --line:rgba(255,255,255,.12);
-      --glass:rgba(255,255,255,.06); --glass2:rgba(255,255,255,.02);
-      --shadow:0 26px 90px rgba(0,0,0,.62); --radius:22px;
-      --gold:#FFD700; --good:#78ffb4; --bad:#ff6b6b;
+    html,body{height:100%;margin:0}
+    body{background:#050507;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+    canvas{position:fixed;inset:0;width:100%;height:100%}
+    #ui{position:fixed;inset:0;pointer-events:none}
+    .topbar{
+      position:fixed;left:12px;right:12px;top:12px;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.38);
+      backdrop-filter: blur(10px);
+      box-shadow:0 20px 70px rgba(0,0,0,.55);
+      pointer-events:auto;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; color:var(--text);
-      background:
-        radial-gradient(900px 520px at 18% 30%, rgba(255,215,130,.18), transparent 60%),
-        radial-gradient(900px 520px at 80% 72%, rgba(120,200,255,.14), transparent 60%),
-        radial-gradient(780px 480px at 62% 20%, rgba(180,120,255,.14), transparent 60%),
-        var(--bg);
-      overflow-x:hidden;
+    .brand{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.9);font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+    .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,130,1),rgba(255,215,130,.12));box-shadow:0 0 18px rgba(255,215,130,.35)}
+    .right{display:flex;gap:10px;align-items:center}
+    .pill{
+      color:rgba(255,255,255,.88);font-size:12px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      pointer-events:auto;
     }
-    a{color:inherit;text-decoration:none}
-    canvas#fx, canvas#arena{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; }
-    canvas#arena{ pointer-events:auto; z-index:1; }
-    .noise{ position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.10; mix-blend-mode:overlay;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+    .btn{
+      pointer-events:auto;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.92);
+      padding:10px 12px;border-radius:14px;
+      font-weight:900;cursor:pointer;
+      transition:.15s;
     }
-    .glow{ position:fixed; width:560px; height:560px; border-radius:50%; transform:translate(-50%,-50%);
-      background: radial-gradient(circle at center, rgba(255,215,130,.16) 0%, rgba(180,120,255,.12) 24%, rgba(120,200,255,.10) 46%, rgba(255,255,255,0) 62%);
-      filter: blur(2px); z-index:3; pointer-events:none; mix-blend-mode:screen;
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10)}
+    .btn.primary{background:rgba(255,255,255,.92);color:#000;border-color:transparent}
+    .btn.primary:hover{background:#fff}
+
+    /* Aim overlay (minimal text) */
+    .hint{
+      position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+      color:rgba(255,255,255,.85);font-size:12px;letter-spacing:.06em;
+      padding:10px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+      pointer-events:none;
+      opacity:.9;
     }
 
-    .ui{ position:relative; z-index:4; max-width:1120px; margin:0 auto; padding:16px 14px 80px; }
-    .nav{ position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between;
-      padding:12px 0; border-bottom:1px solid var(--line); backdrop-filter: blur(14px);
-      background: linear-gradient(to bottom, rgba(5,5,7,.90), rgba(5,5,7,.40));
+    /* Login overlay */
+    .overlay{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      background:radial-gradient(700px 500px at 50% 45%, rgba(255,215,130,.20), rgba(180,120,255,.12), rgba(0,0,0,.92) 70%);
+      backdrop-filter: blur(10px);
+      z-index:50;
     }
-    .brand{ display:flex; gap:10px; align-items:center; font-weight:1000; letter-spacing:.25em; text-transform:uppercase; font-size:13px; }
-    .dot{ width:10px; height:10px; border-radius:50%; background: radial-gradient(circle, rgba(255,215,130,1), rgba(255,215,130,.1)); box-shadow:0 0 18px rgba(255,215,130,.35); }
-    .links{ display:flex; gap:10px; color:var(--muted); font-size:13px; flex-wrap:wrap; align-items:center; }
-    .links a, .links button{ padding:8px 10px; border-radius:999px; border:1px solid transparent; background:transparent; color:inherit; cursor:pointer; }
-    .links a:hover, .links button:hover{ border-color:var(--line); color:var(--text); transform: translateY(-1px); background: rgba(255,255,255,.03); }
-
-    .card{ border:1px solid var(--line); border-radius:var(--radius); background: linear-gradient(to bottom, var(--glass), var(--glass2));
-      box-shadow:var(--shadow); overflow:hidden; position:relative;
+    .loginBox{
+      width:min(92vw,560px);
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      box-shadow:0 26px 90px rgba(0,0,0,.65);
+      padding:16px;position:relative;overflow:hidden;
     }
-    .card::before{ content:""; position:absolute; inset:-1px; background: linear-gradient(135deg, rgba(255,215,130,.18), rgba(180,120,255,.12), rgba(120,200,255,.10), rgba(255,255,255,0));
-      opacity:.22; pointer-events:none;
+    .loginBox::before{
+      content:"";position:absolute;inset:-2px;
+      background:conic-gradient(from 120deg, rgba(255,215,130,.0), rgba(255,215,130,.20), rgba(180,120,255,.18), rgba(120,200,255,.16), rgba(255,215,130,.0));
+      filter:blur(10px);opacity:.65;animation:spin 6s linear infinite;
+      pointer-events:none;
     }
-    .in{ position:relative; padding:16px; }
-    .kicker{ display:inline-flex; gap:10px; align-items:center; letter-spacing:.18em; text-transform:uppercase; font-size:12px; color:rgba(255,255,255,.85); }
-    .pulse{ width:10px; height:10px; border-radius:50%; background: rgba(120,255,180,.95); box-shadow:0 0 18px rgba(120,255,180,.45); animation:pulse 1.6s ease-in-out infinite; }
-    @keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.35);opacity:1}}
-    h1{ margin:10px 0 10px; font-size:56px; line-height:1.03;
-      background: linear-gradient(90deg,#fff,#FFD700,#FFB800,#B478FF,#7CC8FF);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      text-shadow:0 0 28px rgba(255,215,130,.10);
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .scanline{
+      position:absolute;left:-20%;right:-20%;height:3px;top:0;
+      background:linear-gradient(90deg, transparent, rgba(255,215,130,.85), rgba(120,200,255,.75), transparent);
+      filter:blur(1px);animation:scan 2.1s ease-in-out infinite;opacity:.85;pointer-events:none;
     }
-    .sub{ color:var(--muted); font-size:14px; line-height:1.9; }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center; }
-
-    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding:12px 14px; border-radius:14px; border:1px solid var(--line);
-      background: rgba(255,255,255,.06); box-shadow:0 12px 34px rgba(0,0,0,.35);
-      transition:.2s; font-weight:1000; cursor:pointer; user-select:none;
+    @keyframes scan{
+      0%{transform:translateY(0);opacity:.2}
+      45%{opacity:1}
+      100%{transform:translateY(520px);opacity:.2}
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
-    .btn.primary{ background: rgba(255,255,255,.92); color:#000; border-color:transparent; }
-    .btn.primary:hover{ background:#fff; }
-    .btn.danger{ border-color: rgba(255,120,120,.35); }
-
-    .statGrid{ display:grid; gap:10px; grid-template-columns:1fr 1fr; margin-top:14px; }
-    .stat{ border:1px solid rgba(255,255,255,.12); border-radius:18px; background: rgba(255,255,255,.04); padding:12px; }
-    .stat .t{ font-size:12px; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
-    .stat .v{ margin-top:8px; font-size:18px; font-weight:1000; }
-    .bar{ height:10px; border-radius:999px; background: rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.10); }
-    .bar > i{ display:block; height:100%; width:50%; background: linear-gradient(90deg, rgba(120,200,255,.85), rgba(180,120,255,.85), rgba(255,215,130,.85)); }
-
-    .shopGrid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; }
-    @media(min-width:980px){ .wrap2{ display:grid; grid-template-columns:1.08fr .92fr; gap:14px; } .shopGrid{ grid-template-columns:1fr 1fr; } }
-    .item{ border:1px solid rgba(255,255,255,.12); border-radius:18px; background: rgba(255,255,255,.04); padding:14px; transition:.2s; }
-    .item:hover{ transform: translateY(-2px); background: rgba(255,255,255,.07); }
-    .item h3{ margin:0; font-size:16px; }
-    .item p{ margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.7; }
-    .pill{ display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); font-size:12px; color:rgba(255,255,255,.88); }
-    .pill b{ color:#fff; }
-    .mini{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
-    .muted{ color:var(--muted); font-size:12px; line-height:1.7; }
-
-    .toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:50;
-      padding:10px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.55); backdrop-filter:blur(10px); color:rgba(255,255,255,.92); font-size:13px;
-      box-shadow:0 18px 60px rgba(0,0,0,.55); opacity:0; transition:.2s; pointer-events:none;
-      max-width:min(92vw,740px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    .loginInner{position:relative}
+    .title{margin:0;color:#fff;font-weight:1000;letter-spacing:.08em;font-size:28px}
+    .sub{margin-top:8px;color:rgba(255,255,255,.75);font-size:12px;line-height:1.7}
+    input{
+      width:100%;margin-top:12px;
+      padding:12px 12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.28);color:#fff;outline:none;font-size:14px;
     }
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .msg{margin-top:8px;color:rgba(255,255,255,.7);font-size:12px;min-height:18px}
+    .hide{display:none}
   </style>
 </head>
 <body>
-  <canvas id="fx"></canvas>
-  <canvas id="arena"></canvas>
-  <div class="noise"></div>
-  <div class="glow" id="glow"></div>
-  <div class="toast" id="toast"></div>
+  <canvas id="c"></canvas>
 
-  <div class="ui">
-    <div class="nav">
-      <div class="brand"><span class="dot"></span>JKANG NEON ARENA</div>
-      <div class="links">
-        <a href="#play">Play</a>
-        <a href="#up">Upgrades</a>
-        <button onclick="openLogin()">Login</button>
-        <button onclick="logout()">Logout</button>
+  <!-- minimal UI -->
+  <div id="ui" class="hide">
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span>NEON DDT ARENA</div>
+      <div class="right">
+        <div class="pill" id="acct">Guest</div>
+        <div class="pill">Coins: <b id="coins">0</b></div>
+        <button class="btn" id="refreshBtn">Refresh</button>
+        <button class="btn primary" id="topupBtn">Recharge</button>
+        <button class="btn" id="logoutBtn">Logout</button>
       </div>
     </div>
-
-    <div class="wrap2">
-      <section class="card" id="play">
-        <div class="in">
-          <div class="kicker"><span class="pulse"></span>Recharge · Fight · Upgrade · Idle</div>
-          <h1>对打竞技场<br/>武器升级 + 挂机</h1>
-          <div class="sub">
-            充值购买 Coins（无提现）→ 用 Coins 进行战斗/升级。<br/>
-            暴击会爆闪+震屏+粒子爆炸；挂机开启后自动打怪。<br/>
-            <span style="color:#fff">理性消费：</span>建议设置每日上限（后续接 Supabase 后台可控）。
-          </div>
-
-          <div class="row">
-            <button class="btn primary" onclick="attackManual()">⚔️ Attack (-1 coin)</button>
-            <button class="btn" onclick="toggleIdle()" id="idleBtn">🤖 Idle: OFF</button>
-            <button class="btn" onclick="refreshWallet()">🔄 Refresh</button>
-          </div>
-
-          <div class="statGrid">
-            <div class="stat">
-              <div class="t">Account</div>
-              <div class="v" id="acct">Not logged in</div>
-              <div class="muted">请先 Login 才能充值 & 同步钱包</div>
-            </div>
-            <div class="stat">
-              <div class="t">Coins</div>
-              <div class="v" id="coins">0</div>
-              <div class="muted">来自充值 & 战斗奖励</div>
-            </div>
-            <div class="stat">
-              <div class="t">Player</div>
-              <div class="v" id="pLine">Lv.1 · HP 100/100</div>
-              <div class="bar"><i id="pBar"></i></div>
-            </div>
-            <div class="stat">
-              <div class="t">Enemy</div>
-              <div class="v" id="eLine">Slime · HP 80/80</div>
-              <div class="bar"><i id="eBar"></i></div>
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:14px">
-            <span class="pill">充值（SGD）</span>
-            <button class="btn primary" onclick="topup('topup_100')">+100 · $1.99</button>
-            <button class="btn primary" onclick="topup('topup_300')">+300 · $4.99</button>
-            <button class="btn primary" onclick="topup('topup_800')">+800 · $9.99</button>
-          </div>
-
-          <div class="muted" style="margin-top:10px">
-            说明：Coins 仅用于娱乐游戏内消费；不提供现金兑换/提现。
-          </div>
-        </div>
-      </section>
-
-      <section class="card" id="up">
-        <div class="in">
-          <div class="kicker"><span class="pulse"></span>Upgrades</div>
-          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap">
-            <div>
-              <div style="font-size:18px;font-weight:1000">升级系统</div>
-              <div class="sub">升级会影响伤害、攻速、暴击、武器进化 & 特效强度。</div>
-            </div>
-            <div class="pill"><b id="weaponName">Rust Blade</b> · Weapon Lv.<b id="wLv">1</b></div>
-          </div>
-
-          <div class="shopGrid">
-            <div class="item">
-              <h3>💥 Damage +</h3>
-              <p>攻击更疼，爆炸更猛。</p>
-              <div class="mini">
-                <span class="pill">Cost <b id="cDmg">15</b></span>
-                <button class="btn primary" onclick="buy('dmg')">Upgrade</button>
-              </div>
-            </div>
-
-            <div class="item">
-              <h3>⚡ Attack Speed +</h3>
-              <p>攻速更快，挂机更爽。</p>
-              <div class="mini">
-                <span class="pill">Cost <b id="cSpd">22</b></span>
-                <button class="btn primary" onclick="buy('spd')">Upgrade</button>
-              </div>
-            </div>
-
-            <div class="item">
-              <h3>🎯 Crit Chance +</h3>
-              <p>暴击更频繁（爆闪+震屏）。</p>
-              <div class="mini">
-                <span class="pill">Cost <b id="cCrit">30</b></span>
-                <button class="btn primary" onclick="buy('crit')">Upgrade</button>
-              </div>
-            </div>
-
-            <div class="item">
-              <h3>🗡️ Weapon Upgrade</h3>
-              <p>武器进化：更强、更炫、更爆。</p>
-              <div class="mini">
-                <span class="pill">Cost <b id="cWeap">80</b></span>
-                <button class="btn primary" onclick="buy('weap')">Evolve</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="muted" style="margin-top:10px">
-            你要“后台可控”：下一步我给你 admin.html + Supabase 权限 + 日志面板。
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <footer style="margin-top:14px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;opacity:.92">
-      <div>Tap arena canvas to dash</div>
-      <div>© <span id="y"></span> JKang</div>
-    </footer>
+    <div class="hint" id="hint">拖动屏幕瞄准 · 松手发射 · 爆炸/震屏/粒子</div>
   </div>
 
-  <!-- Supabase JS (CDN) -->
+  <!-- login overlay -->
+  <div class="overlay" id="login">
+    <div class="loginBox">
+      <div class="scanline"></div>
+      <div class="loginInner">
+        <h1 class="title">LOGIN → ENTER GAME</h1>
+        <div class="sub">输入邮箱发送 OTP 登录。登录后直接进入弹弹堂风格对战画面，并可充值 Coins。</div>
+        <input id="email" placeholder="you@example.com" />
+        <div class="row">
+          <button class="btn primary" id="otpBtn">Send OTP</button>
+          <button class="btn" id="demoBtn">Demo (No Login)</button>
+        </div>
+        <div class="msg" id="loginMsg"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ====== CONFIG (填你Vercel环境变量里的 anon key / url) ======
-    // 你只需要把下面两行替换成你的 Supabase：
+    // ✅ 改这两行
     const SUPABASE_URL = "YOUR_SUPABASE_URL";
     const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const $ = (id)=>document.getElementById(id);
-    $("y").textContent = new Date().getFullYear();
 
-    // mouse glow
-    const glow = $("glow");
-    window.addEventListener("pointermove",(e)=>{
-      glow.style.left = e.clientX+"px"; glow.style.top = e.clientY+"px";
-      document.documentElement.style.setProperty("--mx", e.clientX+"px");
-      document.documentElement.style.setProperty("--my", e.clientY+"px");
-    },{passive:true});
+    // ====== AUTH + WALLET ======
+    let walletCoins = 0;
+    let loggedIn = false;
 
-    // toast
-    let toastT;
-    function toast(msg){
-      clearTimeout(toastT);
-      $("toast").textContent = msg;
-      $("toast").style.opacity="1";
-      toastT = setTimeout(()=> $("toast").style.opacity="0", 1600);
-    }
-
-    // ===== Auth (Email OTP) =====
-    async function openLogin(){
-      const email = prompt("输入邮箱（用于登录/充值同步钱包）：");
-      if(!email) return;
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if(error){ toast("Login error: "+error.message); return; }
-      toast("已发送验证码/登录链接到邮箱");
-    }
-    window.openLogin = openLogin;
-
-    async function logout(){
-      await supabase.auth.signOut();
-      toast("Logged out");
-      syncAccount();
-    }
-    window.logout = logout;
-
-    async function syncAccount(){
+    async function syncUserUI(){
       const { data } = await supabase.auth.getUser();
       const u = data?.user;
-      $("acct").textContent = u ? (u.email || u.id) : "Not logged in";
-      if(u) await refreshWallet();
+      loggedIn = !!u;
+      $("acct").textContent = u ? (u.email || "Player") : "Guest";
     }
-
-    // ===== Wallet (Supabase) =====
-    let walletCoins = 0;
 
     async function refreshWallet(){
       const { data: userData } = await supabase.auth.getUser();
       const user = userData?.user;
-      if(!user){ toast("请先 Login"); return; }
-
-      // ensure wallet exists (server will upsert too, but we read first)
-      let { data: w, error } = await supabase.from("wallets").select("coins").eq("user_id", user.id).maybeSingle();
-      if(error){ toast("Wallet read error"); return; }
-
-      if(!w){
-        // can't insert wallet with RLS in this demo; wallet will be created on first topup webhook
-        walletCoins = 0;
-      }else{
-        walletCoins = Number(w.coins || 0);
-      }
+      if(!user){ walletCoins = 0; $("coins").textContent = "0"; return; }
+      const { data: w } = await supabase.from("wallets").select("coins").eq("user_id", user.id).maybeSingle();
+      walletCoins = Number(w?.coins || 0);
       $("coins").textContent = walletCoins.toLocaleString();
-      toast("Wallet refreshed");
     }
-    window.refreshWallet = refreshWallet;
 
-    // ===== Stripe topup =====
-    async function topup(pack){
+    async function sendOtp(){
+      const email = $("email").value.trim();
+      if(!email){ $("loginMsg").textContent="请输入邮箱"; return; }
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if(error){ $("loginMsg").textContent="错误："+error.message; return; }
+      $("loginMsg").textContent="已发送 OTP 登录链接到邮箱。打开邮箱点击即可进入游戏。";
+    }
+
+    async function logout(){
+      await supabase.auth.signOut();
+      walletCoins = 0;
+      $("coins").textContent="0";
+      location.reload();
+    }
+
+    async function topup(){
       const { data: s } = await supabase.auth.getSession();
       const token = s?.session?.access_token;
-      if(!token){ toast("请先 Login"); return; }
-
-      toast("跳转到支付…");
-      const resp = await fetch("/api/create-checkout-session", {
+      if(!token){ $("login").classList.remove("hide"); return; }
+      // 默认买 300 coins（你也可以做选择包）
+      const resp = await fetch("/api/create-checkout-session",{
         method:"POST",
-        headers:{ "Content-Type":"application/json", "Authorization": "Bearer "+token },
-        body: JSON.stringify({ pack })
+        headers:{ "Content-Type":"application/json","Authorization":"Bearer "+token },
+        body: JSON.stringify({ pack: "topup_300" })
       });
       const j = await resp.json();
-      if(!resp.ok){ toast(j?.error || "create session failed"); return; }
+      if(!resp.ok){ alert(j?.error || "topup failed"); return; }
       location.href = j.url;
     }
-    window.topup = topup;
 
-    // ===== Game State =====
-    const weaponTiers = [
-      { name:"Rust Blade", base:2, hue:45 },
-      { name:"Neon Saber", base:5, hue:200 },
-      { name:"Plasma Katana", base:10, hue:270 },
-      { name:"Goldfang", base:18, hue:45 },
-      { name:"Void Reaper", base:28, hue:285 }
-    ];
+    $("otpBtn").onclick = sendOtp;
+    $("demoBtn").onclick = () => startGame(false);
+    $("logoutBtn").onclick = logout;
+    $("topupBtn").onclick = topup;
+    $("refreshBtn").onclick = async ()=>{ await refreshWallet(); };
 
-    let S = {
-      level:1, xp:0, nextXp:40,
-      hpMax:100, hp:100,
-      dmgLv:1, spdLv:1, critLv:0,
-      weaponLv:1,
-      idle:false,
-      enemyHpMax:80, enemyHp:80, enemyName:"Slime",
-      fxPower:1
-    };
-
-    const cost = {
-      dmg: ()=> Math.floor(12 + S.dmgLv*8),
-      spd: ()=> Math.floor(18 + S.spdLv*10),
-      crit:()=> Math.floor(24 + (S.critLv+1)*14),
-      weap:()=> Math.floor(70 + (S.weaponLv-1)*85)
-    };
-
-    function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
-    function stats(){
-      const tier = weaponTiers[S.weaponLv-1] || weaponTiers[0];
-      const base = tier.base;
-      const dmg = base + (S.dmgLv-1)*2.4 + S.level*0.6;
-      const spd = 1 + (S.spdLv-1)*0.12;
-      const crit = clamp(0.05 + S.critLv*0.04, 0.05, 0.55);
-      const critMul = 1.8 + (S.weaponLv-1)*0.15;
-      const dps = dmg*spd*(1 + crit*(critMul-1));
-      return { tier,dmg,spd,crit,critMul,dps };
-    }
-
-    function syncUI(){
-      const st = stats();
-      $("pLine").textContent = `Lv.${S.level} · HP ${S.hp}/${S.hpMax}`;
-      $("eLine").textContent = `${S.enemyName} · HP ${Math.max(0,S.enemyHp)}/${S.enemyHpMax}`;
-      $("pBar").style.width = `${Math.floor((S.hp/S.hpMax)*100)}%`;
-      $("eBar").style.width = `${Math.floor((Math.max(0,S.enemyHp)/S.enemyHpMax)*100)}%`;
-      $("weaponName").textContent = st.tier.name;
-      $("wLv").textContent = S.weaponLv;
-      $("cDmg").textContent = cost.dmg();
-      $("cSpd").textContent = cost.spd();
-      $("cCrit").textContent = cost.crit();
-      $("cWeap").textContent = cost.weap();
-      $("idleBtn").textContent = S.idle ? "🤖 Idle: ON" : "🤖 Idle: OFF";
-    }
-
-    // ===== FX Canvas =====
-    const arena = document.getElementById("arena");
-    const actx = arena.getContext("2d");
-    const fx = document.getElementById("fx");
-    const fctx = fx.getContext("2d");
-    let w,h,dpr;
-    function resize(){
-      dpr = Math.max(1, Math.min(2, devicePixelRatio||1));
-      w = arena.width = Math.floor(innerWidth*dpr);
-      h = arena.height= Math.floor(innerHeight*dpr);
-      arena.style.width = innerWidth+"px";
-      arena.style.height= innerHeight+"px";
-      fx.width = w; fx.height = h;
-      fx.style.width = innerWidth+"px";
-      fx.style.height = innerHeight+"px";
-    }
-    resize(); addEventListener("resize", resize);
-
-    const P = { x: 0.30, y: 0.62, r: 30 };
-    const E = { x: 0.70, y: 0.52, r: 34 };
-    let parts=[], texts=[];
-    let shake=0, flashA=0;
-    function burst(x,y,hue,count,power){
-      const n = Math.floor(count*power);
-      for(let i=0;i<n;i++){
-        parts.push({
-          x,y,
-          vx:(Math.random()*2-1)*(3.8+power*2.2)*dpr,
-          vy:(Math.random()*-2-0.6)*(4.2+power*2.0)*dpr,
-          s:(Math.random()*3.2+1.8)*dpr,
-          a:1, h: hue+(Math.random()*30-15), rot:Math.random()*Math.PI,
-          g:(0.10+Math.random()*0.10)*dpr
-        });
-      }
-    }
-    function dmgText(x,y,txt,hue,crit=false){
-      texts.push({x,y,txt,hue,a:1,vy:(-1.5-Math.random()*0.6)*dpr,crit});
-    }
-    function shakeIt(p){ shake = Math.min(18*dpr, shake + p*6*dpr); }
-    function flash(){ flashA = Math.min(1, flashA + 0.7); }
-
-    // dash
-    arena.addEventListener("pointerdown",(e)=>{
-      burst((E.x*w), (E.y*h), 200, 40, 0.8);
-      toast("Dash!");
+    supabase.auth.onAuthStateChange(async (_evt, _sess)=>{
+      // 登录成功后直接进入游戏
+      const { data } = await supabase.auth.getUser();
+      if(data?.user) startGame(true);
     });
 
-    // ===== Enemy/Progression =====
-    function spawnEnemy(){
-      const base = 70 + S.level*20;
-      const hp = Math.floor(base*(1.05 + S.weaponLv*0.08));
-      S.enemyHpMax = hp;
-      S.enemyHp = hp;
-      const names = ["Slime","Drone","Mimic","Golem","Warden","Specter","Titan"];
-      S.enemyName = names[Math.min(names.length-1, Math.floor((S.level-1)/3))];
-    }
-    spawnEnemy();
+    // ====== GAME (DDT STYLE) ======
+    const canvas = $("c");
+    const ctx = canvas.getContext("2d");
+    let W=0,H=0,DPR=1;
 
-    function gainXP(x){
-      S.xp += x;
-      while(S.xp >= S.nextXp){
-        S.xp -= S.nextXp;
-        S.level += 1;
-        S.nextXp = Math.floor(S.nextXp*1.18 + 12);
-        S.hpMax = Math.floor(S.hpMax*1.06 + 6);
-        S.hp = S.hpMax;
-        S.fxPower = Math.min(2.2, 1 + S.level*0.03);
-        toast("LEVEL UP!");
-        flash(); shakeIt(1.2);
+    function resize(){
+      DPR = Math.max(1, Math.min(2, devicePixelRatio||1));
+      W = Math.floor(innerWidth*DPR);
+      H = Math.floor(innerHeight*DPR);
+      canvas.width=W; canvas.height=H;
+      canvas.style.width=innerWidth+"px";
+      canvas.style.height=innerHeight+"px";
+    }
+    addEventListener("resize", resize);
+
+    // world
+    const world = {
+      g: 1800, // gravity px/s^2
+      wind: 0,
+      t:0
+    };
+
+    const player = {
+      x:0, y:0, vx:0, vy:0,
+      hp: 100,
+      hue: 200,
+      power: 760, // launch speed
+      coinsPerShot: 1,
+      bob: 0
+    };
+
+    const enemy = {
+      x:0, y:0,
+      hp: 120,
+      hue: 340,
+      bob: 0,
+      aiCd: 0
+    };
+
+    const terrain = {
+      baseY:0,
+      bumps: [] // noise-like control points
+    };
+
+    let aiming = false;
+    let aim = { sx:0, sy:0, ex:0, ey:0, ang: -0.7, pow: 1.0 };
+
+    let projectiles = [];
+    let particles = [];
+    let rings = [];
+    let shake = 0;
+    let flash = 0;
+
+    function rnd(a,b){ return a + Math.random()*(b-a); }
+    function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+
+    function initWorld(){
+      resize();
+      terrain.baseY = H*0.72;
+      terrain.bumps = Array.from({length: 18}, (_,i)=>({
+        x: (i/17)*W,
+        y: terrain.baseY + Math.sin(i*0.7)*rnd(-26,26)*DPR
+      }));
+      player.x = W*0.22; player.y = groundY(player.x) - 44*DPR;
+      enemy.x  = W*0.78; enemy.y  = groundY(enemy.x)  - 46*DPR;
+      world.wind = rnd(-260,260);
+      world.t=0;
+      player.hp=100;
+      enemy.hp=120;
+      projectiles.length=0; particles.length=0; rings.length=0;
+      shake=0; flash=0;
+    }
+
+    function groundY(x){
+      // simple interp over bumps
+      const pts = terrain.bumps;
+      for(let i=0;i<pts.length-1;i++){
+        if(x >= pts[i].x && x <= pts[i+1].x){
+          const t = (x-pts[i].x)/(pts[i+1].x-pts[i].x);
+          const y = pts[i].y*(1-t) + pts[i+1].y*t;
+          return y;
+        }
+      }
+      return terrain.baseY;
+    }
+
+    function drawBackground(dt){
+      // gradient sky
+      const g = ctx.createRadialGradient(W*0.5,H*0.25,0,W*0.5,H*0.25,Math.max(W,H)*0.75);
+      g.addColorStop(0,"rgba(255,215,130,0.10)");
+      g.addColorStop(0.35,"rgba(180,120,255,0.08)");
+      g.addColorStop(0.7,"rgba(120,200,255,0.07)");
+      g.addColorStop(1,"rgba(0,0,0,0)");
+      ctx.fillStyle = "#050507";
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,W,H);
+
+      // animated clouds (neon fog)
+      const t = world.t;
+      for(let i=0;i<6;i++){
+        const x = ((t*90*DPR) + i*W*0.22) % (W + 260*DPR) - 130*DPR;
+        const y = H*0.18 + Math.sin(t*0.6+i)*H*0.03;
+        const r = (220 + i*18)*DPR;
+        const cg = ctx.createRadialGradient(x,y,0,x,y,r);
+        cg.addColorStop(0, `rgba(180,120,255,${0.06})`);
+        cg.addColorStop(1, `rgba(180,120,255,0)`);
+        ctx.fillStyle = cg;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      }
+
+      // neon grid ground
+      const horizon = H*0.58;
+      ctx.globalAlpha = 0.25;
+      ctx.lineWidth = 1*DPR;
+      for(let i=0;i<30;i++){
+        const z = i/30;
+        const y = horizon + z*z*(H-horizon);
+        ctx.strokeStyle = `rgba(120,200,255,${0.06 + z*0.20})`;
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+      }
+      for(let i=-18;i<=18;i++){
+        const x = W*0.5 + i*W*0.045;
+        ctx.strokeStyle = `rgba(180,120,255,0.12)`;
+        ctx.beginPath(); ctx.moveTo(x, H); ctx.lineTo(W*0.5 + i*W*0.010, horizon); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // wind beam sweep
+      const sweep = (Math.sin(world.t*0.9)+1)/2;
+      const sx = W*(0.15 + sweep*0.7);
+      const beam = ctx.createLinearGradient(sx-220*DPR,0,sx+220*DPR,0);
+      beam.addColorStop(0,"rgba(255,215,130,0)");
+      beam.addColorStop(0.5,"rgba(255,215,130,0.12)");
+      beam.addColorStop(1,"rgba(255,215,130,0)");
+      ctx.fillStyle = beam;
+      ctx.globalAlpha = 0.45;
+      ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha = 1;
+    }
+
+    function drawTerrain(){
+      // terrain body
+      ctx.beginPath();
+      ctx.moveTo(0,H);
+      ctx.lineTo(0,groundY(0));
+      for(let x=0;x<=W;x+=18*DPR){
+        ctx.lineTo(x, groundY(x));
+      }
+      ctx.lineTo(W,H);
+      ctx.closePath();
+
+      const tg = ctx.createLinearGradient(0,terrain.baseY,0,H);
+      tg.addColorStop(0,"rgba(255,255,255,0.04)");
+      tg.addColorStop(1,"rgba(0,0,0,0.35)");
+      ctx.fillStyle = tg;
+      ctx.fill();
+
+      // neon edge
+      ctx.strokeStyle="rgba(120,200,255,0.22)";
+      ctx.lineWidth=2*DPR;
+      ctx.beginPath();
+      ctx.moveTo(0,groundY(0));
+      for(let x=0;x<=W;x+=18*DPR) ctx.lineTo(x, groundY(x));
+      ctx.stroke();
+    }
+
+    function aura(x,y,hue,alpha,r){
+      const g = ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0, `hsla(${hue},95%,70%,${alpha})`);
+      g.addColorStop(1, `hsla(${hue},95%,70%,0)`);
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    }
+
+    function drawTank(t, x,y, hue, facing){
+      // breathing bob
+      const bob = Math.sin(world.t*3 + t)*5*DPR;
+      const breath = (Math.sin(world.t*2 + t)+1)/2;
+
+      aura(x, y-20*DPR, hue, 0.20, (90+breath*12)*DPR);
+
+      // shadow
+      ctx.globalAlpha=0.35;
+      ctx.fillStyle="rgba(0,0,0,0.55)";
+      ctx.beginPath(); ctx.ellipse(x, y+34*DPR, 34*DPR, 14*DPR, 0, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+
+      // body
+      ctx.fillStyle="rgba(255,255,255,0.10)";
+      ctx.strokeStyle=`hsla(${hue},90%,75%,0.70)`;
+      ctx.lineWidth=2.2*DPR;
+
+      const w=70*DPR, h=34*DPR;
+      roundRect(x-w/2, y-h/2+bob, w, h, 14*DPR); ctx.fill(); ctx.stroke();
+
+      // turret
+      ctx.fillStyle="rgba(255,255,255,0.08)";
+      ctx.beginPath(); ctx.ellipse(x, y-16*DPR+bob, 22*DPR, 16*DPR, 0,0,Math.PI*2);
+      ctx.fill(); ctx.stroke();
+
+      // cannon
+      const ang = facing*(0.22 + Math.sin(world.t*1.4+t)*0.06);
+      ctx.save();
+      ctx.translate(x, y-18*DPR+bob);
+      ctx.rotate(ang);
+      const lg = ctx.createLinearGradient(0,0,70*DPR,0);
+      lg.addColorStop(0, `hsla(${hue},95%,70%,0.0)`);
+      lg.addColorStop(0.25, `hsla(${hue},95%,70%,0.75)`);
+      lg.addColorStop(1, `hsla(${hue},95%,75%,0.0)`);
+      ctx.fillStyle=lg;
+      ctx.beginPath(); ctx.roundRect(0, -5*DPR, 70*DPR, 10*DPR, 5*DPR); ctx.fill();
+      ctx.restore();
+
+      // core blink
+      ctx.fillStyle=`hsla(${hue},95%,70%,${0.35+breath*0.25})`;
+      ctx.beginPath(); ctx.arc(x, y-4*DPR+bob, 7*DPR*(1+breath*0.25), 0, Math.PI*2); ctx.fill();
+    }
+
+    function roundRect(x,y,w,h,r){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.arcTo(x+w,y,x+w,y+h,r);
+      ctx.arcTo(x+w,y+h,x,y+h,r);
+      ctx.arcTo(x,y+h,x,y,r);
+      ctx.arcTo(x,y,x+w,y,r);
+      ctx.closePath();
+    }
+
+    function spawnExplosion(x,y,hue,scale=1){
+      rings.push({x,y,r:20*DPR,a:0.9,w:10*DPR,hue});
+      const n = Math.floor(140*scale);
+      for(let i=0;i<n;i++){
+        particles.push({
+          x,y,
+          vx:(Math.random()*2-1)*rnd(260,780)*DPR/100,
+          vy:(Math.random()*-2-0.4)*rnd(340,980)*DPR/100,
+          a:1,
+          s:rnd(2.0,5.5)*DPR,
+          g:rnd(1200,1800)*DPR/1000,
+          hue:hue + rnd(-18,18),
+          rot:rnd(0,Math.PI),
+          glow:rnd(0.3,1.1)
+        });
+      }
+      shake = Math.min(26*DPR, shake + 12*DPR*scale);
+      flash = Math.min(1, flash + 0.9*scale);
+    }
+
+    function fire(fromX, fromY, toX, toY, hue, powerMul){
+      // calculate angle from drag, clamp
+      const dx = (toX - fromX);
+      const dy = (toY - fromY);
+      let ang = Math.atan2(dy, dx);
+      // DDT style: player shoots upward mostly
+      ang = clamp(ang, -2.75, -0.15);
+      const speed = player.power * powerMul;
+
+      const vx = Math.cos(ang) * speed;
+      const vy = Math.sin(ang) * speed;
+
+      projectiles.push({
+        x: fromX, y: fromY,
+        vx, vy,
+        hue,
+        life: 6.0,
+        trail: []
+      });
+
+      // muzzle flash
+      spawnExplosion(fromX + Math.cos(ang)*44*DPR, fromY + Math.sin(ang)*44*DPR, hue, 0.55);
+    }
+
+    function updateProjectiles(dt){
+      for(let i=projectiles.length-1;i>=0;i--){
+        const p = projectiles[i];
+        p.life -= dt;
+        p.vy += world.g * dt;
+        p.vx += world.wind * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        p.trail.push({x:p.x,y:p.y,a:1});
+        if(p.trail.length>18) p.trail.shift();
+
+        // hit ground
+        const gy = groundY(p.x);
+        if(p.y >= gy - 2*DPR){
+          spawnExplosion(p.x, gy, p.hue, 1.0);
+          // damage enemy if close
+          const dist = Math.hypot(enemy.x - p.x, (enemy.y-20*DPR) - gy);
+          if(dist < 140*DPR){
+            enemy.hp -= Math.floor(26 + rnd(0,18));
+            if(enemy.hp <= 0){
+              enemy.hp = 120;
+              // reward
+              walletCoins += 8;
+              $("coins").textContent = walletCoins.toLocaleString();
+              spawnExplosion(enemy.x, enemy.y-30*DPR, 45, 1.25);
+            } else {
+              spawnExplosion(enemy.x, enemy.y-30*DPR, enemy.hue, 0.65);
+            }
+          }
+          projectiles.splice(i,1);
+          continue;
+        }
+
+        // out
+        if(p.life<=0 || p.x<-200*DPR || p.x>W+200*DPR || p.y>H+400*DPR){
+          projectiles.splice(i,1);
+        }
       }
     }
 
-    function onKill(){
-      const reward = Math.floor(6 + S.level*2);
-      walletCoins += reward;
-      $("coins").textContent = walletCoins.toLocaleString();
-      gainXP(Math.floor(12 + S.level*3));
-      burst(E.x*w, E.y*h, 45, 90, S.fxPower);
-      dmgText(E.x*w, E.y*h, `+${reward}`, 45, true);
-      shakeIt(1.0);
-      spawnEnemy();
+    function updateParticles(dt){
+      // rings
+      for(let i=rings.length-1;i>=0;i--){
+        const r = rings[i];
+        r.r += 520*DPR*dt;
+        r.a *= 0.90;
+        r.w *= 0.96;
+        if(r.a<0.04) rings.splice(i,1);
+      }
+
+      // particles
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.vy += p.g*dt;
+        p.x += p.vx*dt*60;
+        p.y += p.vy*dt*60;
+        p.a *= 0.975;
+        p.rot += 0.18;
+        if(p.a<0.05 || p.y>H+240*DPR) particles.splice(i,1);
+      }
+
+      if(shake>0){ shake *= 0.86; if(shake<0.2) shake=0; }
+      if(flash>0){ flash *= 0.86; if(flash<0.02) flash=0; }
+    }
+
+    function drawProjectiles(){
+      for(const p of projectiles){
+        // trail
+        for(let i=0;i<p.trail.length;i++){
+          const t = p.trail[i];
+          const a = (i/p.trail.length);
+          aura(t.x, t.y, p.hue, 0.10*(1-a), 28*DPR*(1-a));
+        }
+
+        // bullet core
+        aura(p.x,p.y,p.hue,0.25,40*DPR);
+        ctx.fillStyle=`hsla(${p.hue},95%,70%,0.95)`;
+        ctx.beginPath(); ctx.arc(p.x,p.y,4.6*DPR,0,Math.PI*2); ctx.fill();
+      }
+    }
+
+    function drawParticles(){
+      // rings
+      for(const r of rings){
+        ctx.strokeStyle = `hsla(${r.hue},95%,70%,${r.a})`;
+        ctx.lineWidth = r.w;
+        ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2); ctx.stroke();
+      }
+
+      for(const p of particles){
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = p.a;
+
+        ctx.fillStyle = `hsla(${p.hue},95%,70%,${0.25*p.glow})`;
+        ctx.beginPath(); ctx.arc(0,0, 10*DPR*p.glow, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = `hsla(${p.hue},95%,70%,0.95)`;
+        ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62);
+
+        ctx.restore();
+      }
+
+      if(flash>0){
+        ctx.fillStyle = `rgba(255,255,255,${flash*0.16})`;
+        ctx.fillRect(0,0,W,H);
+      }
+    }
+
+    function drawAim(){
+      if(!aiming) return;
+      const sx = aim.sx, sy=aim.sy, ex=aim.ex, ey=aim.ey;
+      const hue = player.hue;
+
+      // aiming line glow
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 3*DPR;
+      ctx.strokeStyle = `hsla(${hue},95%,70%,0.55)`;
+      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
+
+      // predicted parabola
+      const dx = ex-sx, dy=ey-sy;
+      let ang = Math.atan2(dy,dx);
+      ang = clamp(ang, -2.75, -0.15);
+      const speed = player.power * aim.pow;
+      let vx = Math.cos(ang)*speed;
+      let vy = Math.sin(ang)*speed;
+
+      let x=sx, y=sy;
+      ctx.globalAlpha = 0.85;
+      for(let i=0;i<24;i++){
+        const t = i*0.08;
+        const px = x + vx*t + 0.5*world.wind*t*t;
+        const py = y + vy*t + 0.5*world.g*t*t;
+        aura(px,py,hue,0.10,18*DPR);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function enemyAI(dt){
+      enemy.aiCd -= dt;
+      if(enemy.aiCd > 0) return;
+      enemy.aiCd = rnd(2.0, 3.8);
+
+      // enemy fires back (no coin cost)
+      const tx = player.x + rnd(-40,40)*DPR;
+      const ty = player.y - 40*DPR;
+      fire(enemy.x, enemy.y-30*DPR, tx, ty, enemy.hue, rnd(0.85,1.05));
     }
 
     function spendCoins(n){
@@ -470,160 +638,115 @@
       return true;
     }
 
-    function hitEnemy(mult=1){
-      const st = stats();
-      const isCrit = Math.random() < st.crit;
-      const dmg = (st.dmg*(isCrit?st.critMul:1))*mult;
-      const dealt = Math.floor(dmg);
-      S.enemyHp -= dealt;
-      burst(E.x*w, E.y*h, st.tier.hue, isCrit?120:55, S.fxPower);
-      dmgText(E.x*w, E.y*h, `-${dealt}`, st.tier.hue, isCrit);
-      if(isCrit){ flash(); shakeIt(1.5); }
-      else shakeIt(0.5);
-      if(S.enemyHp <= 0) onKill();
-    }
+    function startGame(withLogin){
+      $("login").classList.add("hide");
+      $("ui").classList.remove("hide");
+      initWorld();
 
-    // manual attack costs 1 coin
-    function attackManual(){
-      if(!spendCoins(1)){ toast("Coins不足，先充值或打怪赚"); shakeIt(0.4); return; }
-      hitEnemy(1);
-      toast("⚔️ Slash!");
-    }
-    window.attackManual = attackManual;
-
-    let idleTimer=0;
-    function toggleIdle(){
-      S.idle = !S.idle;
-      toast(S.idle ? "Idle ON" : "Idle OFF");
-      syncUI();
-    }
-    window.toggleIdle = toggleIdle;
-
-    function buy(type){
-      const c = cost[type]();
-      if(!spendCoins(c)){ toast("Coins不足"); shakeIt(0.4); return; }
-      if(type==="dmg") S.dmgLv++;
-      if(type==="spd") S.spdLv++;
-      if(type==="crit") S.critLv++;
-      if(type==="weap"){
-        if(S.weaponLv >= weaponTiers.length){ toast("武器已满级"); return; }
-        S.weaponLv++;
-        flash(); shakeIt(1.2);
-      }
-      burst(w*0.5, h*0.22, 200, 120, 1.2);
-      toast("UPGRADED!");
-      syncUI();
-    }
-    window.buy = buy;
-
-    // ===== Background neon particles =====
-    const fxPts = Array.from({length: Math.floor(Math.min(200, Math.max(120, innerWidth/7)))}).map(()=>({
-      x:Math.random()*w,y:Math.random()*h,
-      vx:(Math.random()*2-1)*0.26*dpr,
-      vy:(Math.random()*2-1)*0.18*dpr,
-      r:(Math.random()*2.2+0.8)*dpr,
-      hh: Math.random()<0.33?45:(Math.random()<0.5?270:200),
-      a: Math.random()*0.7+0.15
-    }));
-
-    function drawFighter(x,y,r,hue,isPlayer){
-      const gg = actx.createRadialGradient(x,y,0,x,y,r*2.2);
-      const c1 = isPlayer ? `hsla(${hue},90%,70%,0.30)` : `rgba(255,80,90,0.20)`;
-      const c2 = isPlayer ? `hsla(${hue},90%,70%,0.02)` : `rgba(255,80,90,0.02)`;
-      gg.addColorStop(0,c1); gg.addColorStop(1,c2);
-      actx.fillStyle=gg; actx.beginPath(); actx.arc(x,y,r*2.2,0,Math.PI*2); actx.fill();
-
-      actx.beginPath();
-      actx.fillStyle = "rgba(255,255,255,0.10)";
-      actx.strokeStyle = isPlayer ? `hsla(${hue},90%,70%,0.65)` : `rgba(255,120,120,0.55)`;
-      actx.lineWidth = 2*dpr;
-      actx.arc(x,y,r,0,Math.PI*2);
-      actx.fill(); actx.stroke();
-    }
-
-    let last = performance.now();
-    function loop(now){
-      const dt = Math.min(0.05, (now-last)/1000);
-      last = now;
-
-      // idle attacks spend coin slowly
-      if(S.idle){
-        idleTimer += dt;
-        const st = stats();
-        const interval = 1 / Math.max(0.35, st.spd);
-        while(idleTimer >= interval){
-          idleTimer -= interval;
-          if(!spendCoins(1)) { S.idle=false; toast("Coins不足，Idle停止"); break; }
-          hitEnemy(0.85);
+      (async ()=>{
+        await syncUserUI();
+        if(withLogin){
+          await refreshWallet();
+        } else {
+          walletCoins = 50;
+          $("coins").textContent = walletCoins.toLocaleString();
+          $("acct").textContent = "Demo Player";
         }
+      })();
+
+      // input: drag to aim, release to shoot
+      const pointer = {down:false, id:null};
+
+      function getPos(e){
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * DPR;
+        const y = (e.clientY - rect.top) * DPR;
+        return {x,y};
       }
 
-      // FX bg
-      fctx.clearRect(0,0,w,h);
-      for(const p of fxPts){
-        p.x+=p.vx; p.y+=p.vy;
-        if(p.x<-60)p.x=w+60; if(p.x>w+60)p.x=-60;
-        if(p.y<-60)p.y=h+60; if(p.y>h+60)p.y=-60;
-        fctx.beginPath();
-        fctx.fillStyle = `hsla(${p.hh},90%,70%,${p.a*0.22})`;
-        fctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        fctx.fill();
+      canvas.addEventListener("pointerdown",(e)=>{
+        pointer.down=true; pointer.id=e.pointerId;
+        const p = getPos(e);
+        aiming=true;
+        aim.sx = player.x;
+        aim.sy = player.y - 30*DPR;
+        aim.ex = p.x;
+        aim.ey = p.y;
+        aim.pow = 1.0;
+        canvas.setPointerCapture(e.pointerId);
+      }, {passive:true});
+
+      canvas.addEventListener("pointermove",(e)=>{
+        if(!pointer.down) return;
+        const p = getPos(e);
+        aim.ex = p.x;
+        aim.ey = p.y;
+        // power by drag distance
+        const d = Math.hypot(aim.ex-aim.sx, aim.ey-aim.sy);
+        aim.pow = clamp(d/(420*DPR), 0.35, 1.35);
+      }, {passive:true});
+
+      canvas.addEventListener("pointerup",(e)=>{
+        if(!pointer.down) return;
+        pointer.down=false;
+
+        // spend 1 coin per shot in real mode; demo also spends
+        if(!spendCoins(player.coinsPerShot)){
+          // shake feedback
+          shake = Math.min(18*DPR, shake + 10*DPR);
+          return;
+        }
+        fire(player.x, player.y-30*DPR, aim.ex, aim.ey, player.hue, aim.pow);
+        aiming=false;
+      }, {passive:true});
+
+      // game loop
+      let last = performance.now();
+      function loop(now){
+        const dt = Math.min(0.05, (now-last)/1000);
+        last = now;
+        world.t += dt;
+
+        // wind slowly changes
+        world.wind += Math.sin(world.t*0.18)*dt*18;
+        world.wind = clamp(world.wind, -420, 420);
+
+        updateProjectiles(dt);
+        updateParticles(dt);
+        enemyAI(dt);
+
+        // render (with shake)
+        ctx.save();
+        let sx=0, sy=0;
+        if(shake>0){
+          sx = (Math.random()*2-1)*shake;
+          sy = (Math.random()*2-1)*shake;
+        }
+        ctx.setTransform(1,0,0,1,sx,sy);
+
+        drawBackground(dt);
+        drawTerrain();
+
+        drawTank(0, player.x, player.y, player.hue, +1);
+        drawTank(2, enemy.x, enemy.y, enemy.hue, -1);
+
+        drawProjectiles();
+        drawParticles();
+        drawAim();
+
+        ctx.restore();
+        requestAnimationFrame(loop);
       }
-      if(flashA>0){
-        fctx.fillStyle = `rgba(255,255,255,${flashA*0.12})`;
-        fctx.fillRect(0,0,w,h);
-        flashA *= 0.88;
-      }
-
-      // arena
-      actx.clearRect(0,0,w,h);
-      let sx=0, sy=0;
-      if(shake>0){
-        sx=(Math.random()*2-1)*shake; sy=(Math.random()*2-1)*shake;
-        shake*=0.86; if(shake<0.2) shake=0;
-      }
-      actx.save(); actx.translate(sx,sy);
-
-      const g = actx.createRadialGradient(w*0.5,h*0.72,0,w*0.5,h*0.72,Math.max(w,h)*0.55);
-      g.addColorStop(0,"rgba(255,215,130,0.08)");
-      g.addColorStop(0.35,"rgba(180,120,255,0.07)");
-      g.addColorStop(0.7,"rgba(120,200,255,0.06)");
-      g.addColorStop(1,"rgba(0,0,0,0)");
-      actx.fillStyle=g; actx.fillRect(0,0,w,h);
-
-      const st=stats();
-      drawFighter(P.x*w, P.y*h, P.r*dpr, st.tier.hue, true);
-      drawFighter(E.x*w, E.y*h, E.r*dpr, 0, false);
-
-      for(let i=parts.length-1;i>=0;i--){
-        const p=parts[i];
-        p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.a*=0.985; p.rot+=0.12;
-        actx.save();
-        actx.translate(p.x,p.y); actx.rotate(p.rot);
-        actx.fillStyle=`hsla(${p.h},90%,70%,${p.a})`;
-        actx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62);
-        actx.restore();
-        if(p.a<0.06 || p.y>h+80) parts.splice(i,1);
-      }
-
-      for(let i=texts.length-1;i>=0;i--){
-        const t=texts[i];
-        t.y+=t.vy; t.a*=0.97;
-        actx.font = `${t.crit?(26*dpr):(18*dpr)}px Arial`;
-        actx.fillStyle = `hsla(${t.hue},90%,70%,${t.a})`;
-        actx.fillText(t.txt, t.x + (t.crit?-10*dpr:0), t.y);
-        if(t.a<0.06) texts.splice(i,1);
-      }
-
-      actx.restore();
-      syncUI();
       requestAnimationFrame(loop);
     }
 
-    // start
-    syncAccount();
-    syncUI();
-    requestAnimationFrame(loop);
+    // Auto start if already logged in
+    (async ()=>{
+      const { data } = await supabase.auth.getUser();
+      if(data?.user){
+        startGame(true);
+      }
+    })();
   </script>
 </body>
 </html>
