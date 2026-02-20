@@ -3,615 +3,627 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>JKang Arcade</title>
-  <meta name="description" content="JKang Arcade · Futuristic colorful arcade · Play responsibly · No cash-out" />
+  <title>JKang Neon Arena</title>
+  <meta name="description" content="Recharge · Fight · Upgrade · Weapons · Idle · Crazy FX" />
   <style>
     :root{
-      --bg:#050507;
-      --text:#F6F7FB;
-      --muted:#A7AAB5;
-      --line:rgba(255,255,255,.12);
-      --glass:rgba(255,255,255,.06);
-      --glass2:rgba(255,255,255,.02);
-      --shadow:0 26px 90px rgba(0,0,0,.62);
-      --radius:22px;
-      --gold:#FFD700;
+      --bg:#050507; --text:#F6F7FB; --muted:#A7AAB5; --line:rgba(255,255,255,.12);
+      --glass:rgba(255,255,255,.06); --glass2:rgba(255,255,255,.02);
+      --shadow:0 26px 90px rgba(0,0,0,.62); --radius:22px;
+      --gold:#FFD700; --good:#78ffb4; --bad:#ff6b6b;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      color:var(--text);
-      background: radial-gradient(900px 520px at 18% 30%, rgba(255,215,130,.18), transparent 60%),
-                  radial-gradient(900px 520px at 80% 72%, rgba(120,200,255,.14), transparent 60%),
-                  radial-gradient(780px 480px at 62% 20%, rgba(180,120,255,.14), transparent 60%),
-                  var(--bg);
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; color:var(--text);
+      background:
+        radial-gradient(900px 520px at 18% 30%, rgba(255,215,130,.18), transparent 60%),
+        radial-gradient(900px 520px at 80% 72%, rgba(120,200,255,.14), transparent 60%),
+        radial-gradient(780px 480px at 62% 20%, rgba(180,120,255,.14), transparent 60%),
+        var(--bg);
       overflow-x:hidden;
     }
     a{color:inherit;text-decoration:none}
-
-    /* FX layers */
-    canvas#neon, canvas#confetti { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-    .noise{
-      position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.10; mix-blend-mode:overlay;
+    canvas#fx, canvas#arena{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+    canvas#arena{ pointer-events:auto; z-index:1; }
+    .noise{ position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.10; mix-blend-mode:overlay;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
     }
-    .glow{
-      position:fixed; width:560px; height:560px; border-radius:50%;
-      transform: translate(-50%,-50%);
-      background: radial-gradient(circle at center,
-        rgba(255,215,130,.16) 0%,
-        rgba(180,120,255,.12) 24%,
-        rgba(120,200,255,.10) 46%,
-        rgba(255,255,255,0) 62%);
-      filter: blur(2px);
-      z-index:2;
-      pointer-events:none;
-      opacity:.95;
-      mix-blend-mode:screen;
+    .glow{ position:fixed; width:560px; height:560px; border-radius:50%; transform:translate(-50%,-50%);
+      background: radial-gradient(circle at center, rgba(255,215,130,.16) 0%, rgba(180,120,255,.12) 24%, rgba(120,200,255,.10) 46%, rgba(255,255,255,0) 62%);
+      filter: blur(2px); z-index:3; pointer-events:none; mix-blend-mode:screen;
     }
 
-    .wrap{ position:relative; z-index:3; max-width:1100px; margin:0 auto; padding:16px 14px 90px; }
-    .nav{
-      position:sticky; top:0; z-index:20;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:12px 0;
-      border-bottom:1px solid var(--line);
-      backdrop-filter: blur(14px);
+    .ui{ position:relative; z-index:4; max-width:1120px; margin:0 auto; padding:16px 14px 80px; }
+    .nav{ position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0; border-bottom:1px solid var(--line); backdrop-filter: blur(14px);
       background: linear-gradient(to bottom, rgba(5,5,7,.90), rgba(5,5,7,.40));
     }
-    .brand{
-      font-weight:1000; letter-spacing:.25em; text-transform:uppercase; font-size:13px;
-      display:flex; align-items:center; gap:10px;
-    }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background: radial-gradient(circle, rgba(255,215,130,1), rgba(255,215,130,.1));
-      box-shadow: 0 0 18px rgba(255,215,130,.35);
-    }
-    .links{ display:flex; gap:10px; color:var(--muted); font-size:13px; align-items:center; flex-wrap:wrap; }
-    .links a{
-      padding:8px 10px; border-radius:999px; border:1px solid transparent;
-      transition:.2s ease; background:rgba(255,255,255,.00);
-    }
-    .links a:hover{ border-color:var(--line); color:var(--text); transform: translateY(-1px); background: rgba(255,255,255,.03); }
+    .brand{ display:flex; gap:10px; align-items:center; font-weight:1000; letter-spacing:.25em; text-transform:uppercase; font-size:13px; }
+    .dot{ width:10px; height:10px; border-radius:50%; background: radial-gradient(circle, rgba(255,215,130,1), rgba(255,215,130,.1)); box-shadow:0 0 18px rgba(255,215,130,.35); }
+    .links{ display:flex; gap:10px; color:var(--muted); font-size:13px; flex-wrap:wrap; align-items:center; }
+    .links a, .links button{ padding:8px 10px; border-radius:999px; border:1px solid transparent; background:transparent; color:inherit; cursor:pointer; }
+    .links a:hover, .links button:hover{ border-color:var(--line); color:var(--text); transform: translateY(-1px); background: rgba(255,255,255,.03); }
 
-    .hero{
-      padding:34px 0 6px;
-      display:grid; gap:16px;
-      grid-template-columns: 1fr;
+    .card{ border:1px solid var(--line); border-radius:var(--radius); background: linear-gradient(to bottom, var(--glass), var(--glass2));
+      box-shadow:var(--shadow); overflow:hidden; position:relative;
     }
-    @media(min-width:980px){ .hero{ grid-template-columns: 1.08fr .92fr; align-items:stretch; } }
-
-    .kicker{
-      display:inline-flex; align-items:center; gap:10px;
-      color:rgba(255,255,255,.85);
-      letter-spacing:.18em; text-transform:uppercase; font-size:12px;
-    }
-    .kicker .pulse{
-      width:10px;height:10px;border-radius:50%;
-      background: rgba(120,255,180,.95);
-      box-shadow: 0 0 18px rgba(120,255,180,.45);
-      animation:pulse 1.6s ease-in-out infinite;
-    }
-    @keyframes pulse{ 0%,100%{ transform:scale(1); opacity:.8 } 50%{ transform:scale(1.35); opacity:1 } }
-
-    h1{
-      margin:10px 0 10px;
-      font-size:62px; line-height:1.03; letter-spacing:.02em;
-      background: linear-gradient(90deg,#fff,#FFD700,#FFB800,#B478FF,#7CC8FF);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      text-shadow: 0 0 28px rgba(255,215,130,.10);
-    }
-    .sub{
-      color:var(--muted);
-      font-size:15px; line-height:1.9; max-width:780px;
-    }
-
-    .cta{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
-    .btn{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:12px 14px; border-radius:14px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 12px 34px rgba(0,0,0,.35);
-      transition:.2s ease; font-weight:900; cursor:pointer;
-      user-select:none;
-      position:relative; overflow:hidden;
-    }
-    .btn::after{
-      content:""; position:absolute; inset:-2px;
-      background: radial-gradient(220px 120px at var(--mx,50%) var(--my,50%),
-        rgba(255,215,130,.22), rgba(180,120,255,.14), rgba(120,200,255,.12), transparent 60%);
-      opacity:0; transition:.2s ease;
-      pointer-events:none;
-    }
-    .btn:hover::after{ opacity:1; }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
-    .btn.primary{ background: rgba(255,255,255,.92); color:#000; border-color:transparent; }
-    .btn.primary:hover{ background:#fff; }
-
-    .card{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(to bottom, var(--glass), var(--glass2));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .card::before{
-      content:""; position:absolute; inset:-1px;
-      background: linear-gradient(135deg, rgba(255,215,130,.18), rgba(180,120,255,.12), rgba(120,200,255,.10), rgba(255,255,255,0));
+    .card::before{ content:""; position:absolute; inset:-1px; background: linear-gradient(135deg, rgba(255,215,130,.18), rgba(180,120,255,.12), rgba(120,200,255,.10), rgba(255,255,255,0));
       opacity:.22; pointer-events:none;
     }
     .in{ position:relative; padding:16px; }
-    .grid{ display:grid; gap:14px; grid-template-columns: 1fr; margin-top:14px; }
-    @media(min-width:980px){ .grid{ grid-template-columns: 1fr 1fr; } }
-
-    .tiles{ display:grid; gap:12px; grid-template-columns: 1fr; margin-top:14px; }
-    @media(min-width:980px){ .tiles{ grid-template-columns: 1fr 1fr 1fr; } }
-    .tile{
-      border:1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      background: rgba(255,255,255,.04);
-      padding:14px;
-      transition:.2s ease;
-      position:relative;
-      overflow:hidden;
-      min-height:128px;
-    }
-    .tile:hover{ transform: translateY(-2px); background: rgba(255,255,255,.07); }
-    .tile h3{ margin:0; font-size:16px; letter-spacing:.02em; }
-    .tile p{ margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.7; }
-
-    /* image blocks */
-    .shot{
-      border:1px solid rgba(255,255,255,.12);
-      border-radius: var(--radius);
-      overflow:hidden;
-      background: rgba(255,255,255,.02);
-      position:relative;
-    }
-    .shot img{
-      width:100%; height:100%;
-      display:block;
-      object-fit:cover;
-      filter: saturate(1.15) contrast(1.05);
-      transform: scale(1.02);
-    }
-    .cap{
-      position:absolute; left:12px; bottom:12px;
-      padding:8px 10px;
-      border-radius:999px;
-      background: rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(10px);
-      font-size:12px;
-      color:rgba(255,255,255,.92);
-    }
-
-    /* GAME: 4-digit reels */
-    .gameBox{ margin-top:14px; }
-    .reels{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
-    .reel{
-      width:78px; height:86px;
-      border-radius: 999px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:34px; font-weight:1000;
-      border:1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.03));
-      box-shadow: 0 18px 60px rgba(0,0,0,.55);
-      user-select:none;
-      position:relative;
-    }
-    .reel.locked{
-      border-color: rgba(255,215,130,.55);
-      box-shadow: 0 18px 80px rgba(255,215,130,.12);
-    }
-    .hint{ text-align:center; color:var(--muted); font-size:13px; margin-top:10px; line-height:1.7; }
-    .tagRow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; justify-content:center; }
-    .tag{
-      font-size:12px;
-      padding:8px 10px;
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:999px;
-      background: rgba(255,255,255,.03);
-      color: rgba(255,255,255,.84);
-    }
-
-    .jackpot{
-      position:fixed; inset:0; z-index:50;
-      display:none; align-items:center; justify-content:center;
-      background: radial-gradient(700px 500px at 50% 45%, rgba(255,215,130,.20), rgba(180,120,255,.12), rgba(0,0,0,.92) 70%);
-      backdrop-filter: blur(8px);
-    }
-    .jackpot.show{ display:flex; }
-    .jack{
-      text-align:center;
-      padding:18px 16px;
-      border-radius: 28px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 26px 90px rgba(0,0,0,.65);
-      transform: scale(.95);
-      animation: pop .45s ease forwards;
-    }
-    @keyframes pop{ to{ transform: scale(1) } }
-    .jack h2{
-      margin:0;
-      font-size:44px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      background: linear-gradient(90deg,#fff,#FFD700,#FFB800);
+    .kicker{ display:inline-flex; gap:10px; align-items:center; letter-spacing:.18em; text-transform:uppercase; font-size:12px; color:rgba(255,255,255,.85); }
+    .pulse{ width:10px; height:10px; border-radius:50%; background: rgba(120,255,180,.95); box-shadow:0 0 18px rgba(120,255,180,.45); animation:pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.35);opacity:1}}
+    h1{ margin:10px 0 10px; font-size:56px; line-height:1.03;
+      background: linear-gradient(90deg,#fff,#FFD700,#FFB800,#B478FF,#7CC8FF);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      text-shadow: 0 0 38px rgba(255,215,130,.20);
+      text-shadow:0 0 28px rgba(255,215,130,.10);
     }
-    .jack p{ margin:10px 0 0; color:rgba(255,255,255,.85); line-height:1.8; }
+    .sub{ color:var(--muted); font-size:14px; line-height:1.9; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center; }
 
-    footer{
-      margin-top:18px;
-      color:var(--muted);
-      font-size:12px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      opacity:.92;
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 14px; border-radius:14px; border:1px solid var(--line);
+      background: rgba(255,255,255,.06); box-shadow:0 12px 34px rgba(0,0,0,.35);
+      transition:.2s; font-weight:1000; cursor:pointer; user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+    .btn.primary{ background: rgba(255,255,255,.92); color:#000; border-color:transparent; }
+    .btn.primary:hover{ background:#fff; }
+    .btn.danger{ border-color: rgba(255,120,120,.35); }
+
+    .statGrid{ display:grid; gap:10px; grid-template-columns:1fr 1fr; margin-top:14px; }
+    .stat{ border:1px solid rgba(255,255,255,.12); border-radius:18px; background: rgba(255,255,255,.04); padding:12px; }
+    .stat .t{ font-size:12px; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+    .stat .v{ margin-top:8px; font-size:18px; font-weight:1000; }
+    .bar{ height:10px; border-radius:999px; background: rgba(255,255,255,.08); overflow:hidden; border:1px solid rgba(255,255,255,.10); }
+    .bar > i{ display:block; height:100%; width:50%; background: linear-gradient(90deg, rgba(120,200,255,.85), rgba(180,120,255,.85), rgba(255,215,130,.85)); }
+
+    .shopGrid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; }
+    @media(min-width:980px){ .wrap2{ display:grid; grid-template-columns:1.08fr .92fr; gap:14px; } .shopGrid{ grid-template-columns:1fr 1fr; } }
+    .item{ border:1px solid rgba(255,255,255,.12); border-radius:18px; background: rgba(255,255,255,.04); padding:14px; transition:.2s; }
+    .item:hover{ transform: translateY(-2px); background: rgba(255,255,255,.07); }
+    .item h3{ margin:0; font-size:16px; }
+    .item p{ margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.7; }
+    .pill{ display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); font-size:12px; color:rgba(255,255,255,.88); }
+    .pill b{ color:#fff; }
+    .mini{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .muted{ color:var(--muted); font-size:12px; line-height:1.7; }
+
+    .toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:50;
+      padding:10px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.55); backdrop-filter:blur(10px); color:rgba(255,255,255,.92); font-size:13px;
+      box-shadow:0 18px 60px rgba(0,0,0,.55); opacity:0; transition:.2s; pointer-events:none;
+      max-width:min(92vw,740px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
   </style>
 </head>
 <body>
-  <canvas id="neon"></canvas>
-  <canvas id="confetti"></canvas>
+  <canvas id="fx"></canvas>
+  <canvas id="arena"></canvas>
   <div class="noise"></div>
   <div class="glow" id="glow"></div>
+  <div class="toast" id="toast"></div>
 
-  <div class="jackpot" id="jackpot">
-    <div class="jack">
-      <h2>JACKPOT</h2>
-      <p>Ultra hit! 纯娱乐特效，不兑换现金。<br/>记得理性消费，休息一下更开心。</p>
-      <div style="margin-top:14px">
-        <button class="btn primary" onclick="closeJackpot()">OK</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="wrap">
+  <div class="ui">
     <div class="nav">
-      <div class="brand"><span class="dot"></span>JKANG ARCADE</div>
+      <div class="brand"><span class="dot"></span>JKANG NEON ARENA</div>
       <div class="links">
-        <a href="#games">Games</a>
-        <a href="#draw4">Draw4</a>
-        <a href="/legacy/index.html">Legacy</a>
+        <a href="#play">Play</a>
+        <a href="#up">Upgrades</a>
+        <button onclick="openLogin()">Login</button>
+        <button onclick="logout()">Logout</button>
       </div>
     </div>
 
-    <section class="hero">
-      <div class="card">
+    <div class="wrap2">
+      <section class="card" id="play">
         <div class="in">
-          <div class="kicker"><span class="pulse"></span>Fresh · Colorful · Animated</div>
-          <h1>娱乐城风<br/>线上娱乐</h1>
+          <div class="kicker"><span class="pulse"></span>Recharge · Fight · Upgrade · Idle</div>
+          <h1>对打竞技场<br/>武器升级 + 挂机</h1>
           <div class="sub">
-            这是全新版本：更劲爆、更有动画、更像真正的娱乐厅。<br/>
-            玩法：免费点数（B） + 充值购买点数（A，无提现）。<br/>
-            内置理性消费：每日上限 / 冷静提醒 / 透明记录（后续接 Supabase 后台）。
+            充值购买 Coins（无提现）→ 用 Coins 进行战斗/升级。<br/>
+            暴击会爆闪+震屏+粒子爆炸；挂机开启后自动打怪。<br/>
+            <span style="color:#fff">理性消费：</span>建议设置每日上限（后续接 Supabase 后台可控）。
           </div>
 
-          <div class="cta">
-            <a class="btn primary" href="#draw4">🎰 Start Draw4</a>
-            <a class="btn" href="#games">🎮 Game Lobby</a>
-            <a class="btn" href="/legacy/index.html">📦 Old version</a>
+          <div class="row">
+            <button class="btn primary" onclick="attackManual()">⚔️ Attack (-1 coin)</button>
+            <button class="btn" onclick="toggleIdle()" id="idleBtn">🤖 Idle: OFF</button>
+            <button class="btn" onclick="refreshWallet()">🔄 Refresh</button>
           </div>
 
-          <div class="tagRow">
-            <div class="tag">✅ Play responsibly</div>
-            <div class="tag">✅ No cash-out</div>
-            <div class="tag">✅ Big animations</div>
-            <div class="tag">✅ Mobile-first</div>
+          <div class="statGrid">
+            <div class="stat">
+              <div class="t">Account</div>
+              <div class="v" id="acct">Not logged in</div>
+              <div class="muted">请先 Login 才能充值 & 同步钱包</div>
+            </div>
+            <div class="stat">
+              <div class="t">Coins</div>
+              <div class="v" id="coins">0</div>
+              <div class="muted">来自充值 & 战斗奖励</div>
+            </div>
+            <div class="stat">
+              <div class="t">Player</div>
+              <div class="v" id="pLine">Lv.1 · HP 100/100</div>
+              <div class="bar"><i id="pBar"></i></div>
+            </div>
+            <div class="stat">
+              <div class="t">Enemy</div>
+              <div class="v" id="eLine">Slime · HP 80/80</div>
+              <div class="bar"><i id="eBar"></i></div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:14px">
+            <span class="pill">充值（SGD）</span>
+            <button class="btn primary" onclick="topup('topup_100')">+100 · $1.99</button>
+            <button class="btn primary" onclick="topup('topup_300')">+300 · $4.99</button>
+            <button class="btn primary" onclick="topup('topup_800')">+800 · $9.99</button>
+          </div>
+
+          <div class="muted" style="margin-top:10px">
+            说明：Coins 仅用于娱乐游戏内消费；不提供现金兑换/提现。
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="shot" style="min-height:320px">
-        <img src="/legacy/IMG_0621.png" alt="Hero image" onerror="this.style.display='none'">
-        <div class="cap">Hero Visual</div>
-      </div>
-    </section>
-
-    <section id="games" class="grid">
-      <div class="tile">
-        <h3>🎡 Lucky Wheel (NEW)</h3>
-        <p>下一步我会给你一个新转盘：3D旋转 + 彩纸 + 声音 + 抽奖动画。</p>
-        <div style="margin-top:12">
-          <button class="btn" onclick="toast('Wheel: Coming next step')">Preview</button>
-        </div>
-      </div>
-      <div class="tile">
-        <h3>🎁 Lootbox (NEW)</h3>
-        <p>开箱动画会更炸：光扫 + 爆闪 + 图片卡片掉落。</p>
-        <div style="margin-top:12">
-          <button class="btn" onclick="toast('Lootbox: Coming next step')">Preview</button>
-        </div>
-      </div>
-      <div class="tile">
-        <h3>💳 Wallet + Recharge</h3>
-        <p>下一步接 Supabase：登录、余额、每日上限、Stripe 充值自动加点。</p>
-        <div style="margin-top:12">
-          <button class="btn" onclick="toast('Wallet/Admin: Next step')">Info</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="grid" style="margin-top:14px">
-      <div class="shot" style="min-height:240px">
-        <img src="/legacy/IMG_0622.png" alt="Pack image" onerror="this.style.display='none'">
-        <div class="cap">Product / Content</div>
-      </div>
-      <div class="shot" style="min-height:240px">
-        <img src="/legacy/IMG_0623.png" alt="No1 image" onerror="this.style.display='none'">
-        <div class="cap">Highlight Visual</div>
-      </div>
-    </section>
-
-    <section id="draw4" class="card gameBox" style="margin-top:14px">
-      <div class="in">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-          <div>
-            <div class="kicker" style="margin-bottom:6px"><span class="pulse"></span>New Mini Game</div>
-            <div style="font-size:20px;font-weight:1000">🎰 Draw4 · 4号码抽选（真动画）</div>
-            <div class="sub" style="margin-top:6px">点数字可锁定（锁住不变），按 Draw 开始滚动。出现四连号会触发 Jackpot 特效。</div>
+      <section class="card" id="up">
+        <div class="in">
+          <div class="kicker"><span class="pulse"></span>Upgrades</div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:18px;font-weight:1000">升级系统</div>
+              <div class="sub">升级会影响伤害、攻速、暴击、武器进化 & 特效强度。</div>
+            </div>
+            <div class="pill"><b id="weaponName">Rust Blade</b> · Weapon Lv.<b id="wLv">1</b></div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn primary" onclick="draw(false)" id="btnDraw">Draw</button>
-            <button class="btn" onclick="draw(true)" id="btnTurbo">Turbo</button>
-            <button class="btn" onclick="copyCode()">Copy</button>
+
+          <div class="shopGrid">
+            <div class="item">
+              <h3>💥 Damage +</h3>
+              <p>攻击更疼，爆炸更猛。</p>
+              <div class="mini">
+                <span class="pill">Cost <b id="cDmg">15</b></span>
+                <button class="btn primary" onclick="buy('dmg')">Upgrade</button>
+              </div>
+            </div>
+
+            <div class="item">
+              <h3>⚡ Attack Speed +</h3>
+              <p>攻速更快，挂机更爽。</p>
+              <div class="mini">
+                <span class="pill">Cost <b id="cSpd">22</b></span>
+                <button class="btn primary" onclick="buy('spd')">Upgrade</button>
+              </div>
+            </div>
+
+            <div class="item">
+              <h3>🎯 Crit Chance +</h3>
+              <p>暴击更频繁（爆闪+震屏）。</p>
+              <div class="mini">
+                <span class="pill">Cost <b id="cCrit">30</b></span>
+                <button class="btn primary" onclick="buy('crit')">Upgrade</button>
+              </div>
+            </div>
+
+            <div class="item">
+              <h3>🗡️ Weapon Upgrade</h3>
+              <p>武器进化：更强、更炫、更爆。</p>
+              <div class="mini">
+                <span class="pill">Cost <b id="cWeap">80</b></span>
+                <button class="btn primary" onclick="buy('weap')">Evolve</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="muted" style="margin-top:10px">
+            你要“后台可控”：下一步我给你 admin.html + Supabase 权限 + 日志面板。
           </div>
         </div>
-
-        <div class="reels" id="reels">
-          <div class="reel" data-i="0" onclick="toggleLock(0)">0</div>
-          <div class="reel" data-i="1" onclick="toggleLock(1)">0</div>
-          <div class="reel" data-i="2" onclick="toggleLock(2)">0</div>
-          <div class="reel" data-i="3" onclick="toggleLock(3)">0</div>
-        </div>
-
-        <div class="hint" id="hint">Tap 数字可 Lock。理性消费提示：玩久了记得休息。</div>
-      </div>
-    </section>
-
-    <div class="card" style="margin-top:14px">
-      <div class="in" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <div class="sub">
-          <b style="color:#fff">下一步（我会一步一步教你）</b><br/>
-          1) 新建 /wallet（余额、上限、充值档位）<br/>
-          2) 新建 /admin（你能开关游戏、调参数、看记录）<br/>
-          3) Supabase 接入 + Stripe webhook 自动加点
-        </div>
-        <div>
-          <a class="btn primary" href="/legacy/index.html">Legacy backup</a>
-        </div>
-      </div>
+      </section>
     </div>
 
-    <footer>
-      <div>© <span id="y"></span> JKang Arcade</div>
-      <div>Concept v2 · Colorful UI · Animations</div>
+    <footer style="margin-top:14px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;opacity:.92">
+      <div>Tap arena canvas to dash</div>
+      <div>© <span id="y"></span> JKang</div>
     </footer>
   </div>
 
+  <!-- Supabase JS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
+    // ====== CONFIG (填你Vercel环境变量里的 anon key / url) ======
+    // 你只需要把下面两行替换成你的 Supabase：
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const $ = (id)=>document.getElementById(id);
+    $("y").textContent = new Date().getFullYear();
 
     // mouse glow
-    const glow = document.getElementById("glow");
-    window.addEventListener("mousemove", (e)=>{
-      glow.style.left = e.clientX + "px";
-      glow.style.top  = e.clientY + "px";
-      document.documentElement.style.setProperty("--mx", e.clientX + "px");
-      document.documentElement.style.setProperty("--my", e.clientY + "px");
-    }, {passive:true});
+    const glow = $("glow");
+    window.addEventListener("pointermove",(e)=>{
+      glow.style.left = e.clientX+"px"; glow.style.top = e.clientY+"px";
+      document.documentElement.style.setProperty("--mx", e.clientX+"px");
+      document.documentElement.style.setProperty("--my", e.clientY+"px");
+    },{passive:true});
 
     // toast
-    let toastTimer;
+    let toastT;
     function toast(msg){
-      clearTimeout(toastTimer);
-      let el = document.getElementById("toast");
-      if(!el){
-        el = document.createElement("div");
-        el.id="toast";
-        el.style.position="fixed";
-        el.style.left="50%";
-        el.style.bottom="20px";
-        el.style.transform="translateX(-50%)";
-        el.style.zIndex="60";
-        el.style.padding="10px 12px";
-        el.style.borderRadius="999px";
-        el.style.border="1px solid rgba(255,255,255,.14)";
-        el.style.background="rgba(0,0,0,.55)";
-        el.style.backdropFilter="blur(10px)";
-        el.style.color="rgba(255,255,255,.92)";
-        el.style.fontSize="13px";
-        el.style.boxShadow="0 18px 60px rgba(0,0,0,.55)";
-        document.body.appendChild(el);
-      }
-      el.textContent = msg;
-      el.style.opacity="1";
-      toastTimer = setTimeout(()=>{ el.style.opacity="0"; }, 1800);
+      clearTimeout(toastT);
+      $("toast").textContent = msg;
+      $("toast").style.opacity="1";
+      toastT = setTimeout(()=> $("toast").style.opacity="0", 1600);
     }
 
-    // neon particles background
-    const cn = document.getElementById("neon");
-    const nx = cn.getContext("2d");
+    // ===== Auth (Email OTP) =====
+    async function openLogin(){
+      const email = prompt("输入邮箱（用于登录/充值同步钱包）：");
+      if(!email) return;
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if(error){ toast("Login error: "+error.message); return; }
+      toast("已发送验证码/登录链接到邮箱");
+    }
+    window.openLogin = openLogin;
+
+    async function logout(){
+      await supabase.auth.signOut();
+      toast("Logged out");
+      syncAccount();
+    }
+    window.logout = logout;
+
+    async function syncAccount(){
+      const { data } = await supabase.auth.getUser();
+      const u = data?.user;
+      $("acct").textContent = u ? (u.email || u.id) : "Not logged in";
+      if(u) await refreshWallet();
+    }
+
+    // ===== Wallet (Supabase) =====
+    let walletCoins = 0;
+
+    async function refreshWallet(){
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      if(!user){ toast("请先 Login"); return; }
+
+      // ensure wallet exists (server will upsert too, but we read first)
+      let { data: w, error } = await supabase.from("wallets").select("coins").eq("user_id", user.id).maybeSingle();
+      if(error){ toast("Wallet read error"); return; }
+
+      if(!w){
+        // can't insert wallet with RLS in this demo; wallet will be created on first topup webhook
+        walletCoins = 0;
+      }else{
+        walletCoins = Number(w.coins || 0);
+      }
+      $("coins").textContent = walletCoins.toLocaleString();
+      toast("Wallet refreshed");
+    }
+    window.refreshWallet = refreshWallet;
+
+    // ===== Stripe topup =====
+    async function topup(pack){
+      const { data: s } = await supabase.auth.getSession();
+      const token = s?.session?.access_token;
+      if(!token){ toast("请先 Login"); return; }
+
+      toast("跳转到支付…");
+      const resp = await fetch("/api/create-checkout-session", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "Authorization": "Bearer "+token },
+        body: JSON.stringify({ pack })
+      });
+      const j = await resp.json();
+      if(!resp.ok){ toast(j?.error || "create session failed"); return; }
+      location.href = j.url;
+    }
+    window.topup = topup;
+
+    // ===== Game State =====
+    const weaponTiers = [
+      { name:"Rust Blade", base:2, hue:45 },
+      { name:"Neon Saber", base:5, hue:200 },
+      { name:"Plasma Katana", base:10, hue:270 },
+      { name:"Goldfang", base:18, hue:45 },
+      { name:"Void Reaper", base:28, hue:285 }
+    ];
+
+    let S = {
+      level:1, xp:0, nextXp:40,
+      hpMax:100, hp:100,
+      dmgLv:1, spdLv:1, critLv:0,
+      weaponLv:1,
+      idle:false,
+      enemyHpMax:80, enemyHp:80, enemyName:"Slime",
+      fxPower:1
+    };
+
+    const cost = {
+      dmg: ()=> Math.floor(12 + S.dmgLv*8),
+      spd: ()=> Math.floor(18 + S.spdLv*10),
+      crit:()=> Math.floor(24 + (S.critLv+1)*14),
+      weap:()=> Math.floor(70 + (S.weaponLv-1)*85)
+    };
+
+    function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+    function stats(){
+      const tier = weaponTiers[S.weaponLv-1] || weaponTiers[0];
+      const base = tier.base;
+      const dmg = base + (S.dmgLv-1)*2.4 + S.level*0.6;
+      const spd = 1 + (S.spdLv-1)*0.12;
+      const crit = clamp(0.05 + S.critLv*0.04, 0.05, 0.55);
+      const critMul = 1.8 + (S.weaponLv-1)*0.15;
+      const dps = dmg*spd*(1 + crit*(critMul-1));
+      return { tier,dmg,spd,crit,critMul,dps };
+    }
+
+    function syncUI(){
+      const st = stats();
+      $("pLine").textContent = `Lv.${S.level} · HP ${S.hp}/${S.hpMax}`;
+      $("eLine").textContent = `${S.enemyName} · HP ${Math.max(0,S.enemyHp)}/${S.enemyHpMax}`;
+      $("pBar").style.width = `${Math.floor((S.hp/S.hpMax)*100)}%`;
+      $("eBar").style.width = `${Math.floor((Math.max(0,S.enemyHp)/S.enemyHpMax)*100)}%`;
+      $("weaponName").textContent = st.tier.name;
+      $("wLv").textContent = S.weaponLv;
+      $("cDmg").textContent = cost.dmg();
+      $("cSpd").textContent = cost.spd();
+      $("cCrit").textContent = cost.crit();
+      $("cWeap").textContent = cost.weap();
+      $("idleBtn").textContent = S.idle ? "🤖 Idle: ON" : "🤖 Idle: OFF";
+    }
+
+    // ===== FX Canvas =====
+    const arena = document.getElementById("arena");
+    const actx = arena.getContext("2d");
+    const fx = document.getElementById("fx");
+    const fctx = fx.getContext("2d");
     let w,h,dpr;
     function resize(){
       dpr = Math.max(1, Math.min(2, devicePixelRatio||1));
-      w = cn.width = Math.floor(innerWidth*dpr);
-      h = cn.height= Math.floor(innerHeight*dpr);
-      cn.style.width = innerWidth+"px";
-      cn.style.height= innerHeight+"px";
+      w = arena.width = Math.floor(innerWidth*dpr);
+      h = arena.height= Math.floor(innerHeight*dpr);
+      arena.style.width = innerWidth+"px";
+      arena.style.height= innerHeight+"px";
+      fx.width = w; fx.height = h;
+      fx.style.width = innerWidth+"px";
+      fx.style.height = innerHeight+"px";
     }
     resize(); addEventListener("resize", resize);
 
-    const N = Math.floor(Math.min(210, Math.max(120, innerWidth/7)));
-    const pts = Array.from({length:N}).map(()=>({
-      x:Math.random()*w, y:Math.random()*h,
-      vx:(Math.random()*2-1)*0.26*dpr,
-      vy:(Math.random()*2-1)*0.18*dpr,
-      r:(Math.random()*2.2+0.8)*dpr,
-      h: Math.random()<0.33?45:(Math.random()<0.5?270:200),
-      a: Math.random()*0.7+0.15
-    }));
-    function tick(){
-      nx.clearRect(0,0,w,h);
-      for(const p of pts){
-        p.x+=p.vx; p.y+=p.vy;
-        if(p.x<-60)p.x=w+60; if(p.x>w+60)p.x=-60;
-        if(p.y<-60)p.y=h+60; if(p.y>h+60)p.y=-60;
-        nx.beginPath();
-        nx.fillStyle = `hsla(${p.h},90%,70%,${p.a*0.22})`;
-        nx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        nx.fill();
-      }
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    // confetti
-    const cf = document.getElementById("confetti");
-    const cx = cf.getContext("2d");
-    let conf = [];
-    function resizeCf(){
-      cf.width = Math.floor(innerWidth*dpr);
-      cf.height= Math.floor(innerHeight*dpr);
-      cf.style.width = innerWidth+"px";
-      cf.style.height= innerHeight+"px";
-    }
-    resizeCf(); addEventListener("resize", resizeCf);
-    function burst(n=120){
+    const P = { x: 0.30, y: 0.62, r: 30 };
+    const E = { x: 0.70, y: 0.52, r: 34 };
+    let parts=[], texts=[];
+    let shake=0, flashA=0;
+    function burst(x,y,hue,count,power){
+      const n = Math.floor(count*power);
       for(let i=0;i<n;i++){
-        conf.push({
-          x: cf.width*0.5 + (Math.random()*180-90)*dpr,
-          y: cf.height*0.28 + (Math.random()*80-40)*dpr,
-          vx:(Math.random()*2-1)*3.6*dpr,
-          vy:(Math.random()*-2-0.7)*3.9*dpr,
-          s:(Math.random()*3.2+2.0)*dpr,
-          a:1,
-          h: Math.random()<0.34 ? 45 : (Math.random()<0.5 ? 270 : 200),
-          rot: Math.random()*Math.PI
+        parts.push({
+          x,y,
+          vx:(Math.random()*2-1)*(3.8+power*2.2)*dpr,
+          vy:(Math.random()*-2-0.6)*(4.2+power*2.0)*dpr,
+          s:(Math.random()*3.2+1.8)*dpr,
+          a:1, h: hue+(Math.random()*30-15), rot:Math.random()*Math.PI,
+          g:(0.10+Math.random()*0.10)*dpr
         });
       }
     }
-    function tickCf(){
-      cx.clearRect(0,0,cf.width,cf.height);
-      for(let i=conf.length-1;i>=0;i--){
-        const p=conf[i];
-        p.vy += 0.12*dpr;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.a *= 0.985;
-        p.rot += 0.12;
-        cx.save();
-        cx.translate(p.x,p.y);
-        cx.rotate(p.rot);
-        cx.fillStyle = `hsla(${p.h},90%,70%,${p.a})`;
-        cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62);
-        cx.restore();
-        if(p.a<0.06 || p.y>cf.height+80) conf.splice(i,1);
+    function dmgText(x,y,txt,hue,crit=false){
+      texts.push({x,y,txt,hue,a:1,vy:(-1.5-Math.random()*0.6)*dpr,crit});
+    }
+    function shakeIt(p){ shake = Math.min(18*dpr, shake + p*6*dpr); }
+    function flash(){ flashA = Math.min(1, flashA + 0.7); }
+
+    // dash
+    arena.addEventListener("pointerdown",(e)=>{
+      burst((E.x*w), (E.y*h), 200, 40, 0.8);
+      toast("Dash!");
+    });
+
+    // ===== Enemy/Progression =====
+    function spawnEnemy(){
+      const base = 70 + S.level*20;
+      const hp = Math.floor(base*(1.05 + S.weaponLv*0.08));
+      S.enemyHpMax = hp;
+      S.enemyHp = hp;
+      const names = ["Slime","Drone","Mimic","Golem","Warden","Specter","Titan"];
+      S.enemyName = names[Math.min(names.length-1, Math.floor((S.level-1)/3))];
+    }
+    spawnEnemy();
+
+    function gainXP(x){
+      S.xp += x;
+      while(S.xp >= S.nextXp){
+        S.xp -= S.nextXp;
+        S.level += 1;
+        S.nextXp = Math.floor(S.nextXp*1.18 + 12);
+        S.hpMax = Math.floor(S.hpMax*1.06 + 6);
+        S.hp = S.hpMax;
+        S.fxPower = Math.min(2.2, 1 + S.level*0.03);
+        toast("LEVEL UP!");
+        flash(); shakeIt(1.2);
       }
-      requestAnimationFrame(tickCf);
-    }
-    tickCf();
-
-    // Draw4 game
-    let digits=[0,0,0,0];
-    let locks=[false,false,false,false];
-    let rolling=false;
-    let played=0;
-    const reels=[...document.querySelectorAll(".reel")];
-    function render(){
-      reels.forEach((el,i)=>{
-        el.textContent = String(digits[i]);
-        el.classList.toggle("locked", locks[i]);
-      });
-    }
-    render();
-
-    function toggleLock(i){
-      if(rolling) return;
-      locks[i]=!locks[i];
-      render();
-      toast(locks[i] ? `Locked #${i+1}` : `Unlocked #${i+1}`);
     }
 
-    function rarity(code){
-      if(/(\d)\1\1\1/.test(code)) return "ULTRA";
-      const c={}; for(const ch of code){ c[ch]=(c[ch]||0)+1; }
-      const max=Math.max(...Object.values(c));
-      if(max===3) return "EPIC";
-      if(max===2) return "RARE";
-      return "COMMON";
+    function onKill(){
+      const reward = Math.floor(6 + S.level*2);
+      walletCoins += reward;
+      $("coins").textContent = walletCoins.toLocaleString();
+      gainXP(Math.floor(12 + S.level*3));
+      burst(E.x*w, E.y*h, 45, 90, S.fxPower);
+      dmgText(E.x*w, E.y*h, `+${reward}`, 45, true);
+      shakeIt(1.0);
+      spawnEnemy();
     }
 
-    async function draw(turbo){
-      if(rolling) return;
-      rolling=true;
-      document.getElementById("btnDraw").disabled=true;
-      document.getElementById("btnTurbo").disabled=true;
+    function spendCoins(n){
+      if(walletCoins < n) return false;
+      walletCoins -= n;
+      $("coins").textContent = walletCoins.toLocaleString();
+      return true;
+    }
 
-      const ms = turbo ? 650 : 1300;
-      const step = turbo ? 45 : 70;
-      const start = performance.now();
+    function hitEnemy(mult=1){
+      const st = stats();
+      const isCrit = Math.random() < st.crit;
+      const dmg = (st.dmg*(isCrit?st.critMul:1))*mult;
+      const dealt = Math.floor(dmg);
+      S.enemyHp -= dealt;
+      burst(E.x*w, E.y*h, st.tier.hue, isCrit?120:55, S.fxPower);
+      dmgText(E.x*w, E.y*h, `-${dealt}`, st.tier.hue, isCrit);
+      if(isCrit){ flash(); shakeIt(1.5); }
+      else shakeIt(0.5);
+      if(S.enemyHp <= 0) onKill();
+    }
 
-      const timer = setInterval(()=>{
-        digits = digits.map((d,i)=> locks[i] ? d : Math.floor(Math.random()*10));
-        render();
-      }, step);
+    // manual attack costs 1 coin
+    function attackManual(){
+      if(!spendCoins(1)){ toast("Coins不足，先充值或打怪赚"); shakeIt(0.4); return; }
+      hitEnemy(1);
+      toast("⚔️ Slash!");
+    }
+    window.attackManual = attackManual;
 
-      while(performance.now()-start < ms){
-        await new Promise(r=>setTimeout(r, 20));
+    let idleTimer=0;
+    function toggleIdle(){
+      S.idle = !S.idle;
+      toast(S.idle ? "Idle ON" : "Idle OFF");
+      syncUI();
+    }
+    window.toggleIdle = toggleIdle;
+
+    function buy(type){
+      const c = cost[type]();
+      if(!spendCoins(c)){ toast("Coins不足"); shakeIt(0.4); return; }
+      if(type==="dmg") S.dmgLv++;
+      if(type==="spd") S.spdLv++;
+      if(type==="crit") S.critLv++;
+      if(type==="weap"){
+        if(S.weaponLv >= weaponTiers.length){ toast("武器已满级"); return; }
+        S.weaponLv++;
+        flash(); shakeIt(1.2);
       }
-      clearInterval(timer);
+      burst(w*0.5, h*0.22, 200, 120, 1.2);
+      toast("UPGRADED!");
+      syncUI();
+    }
+    window.buy = buy;
 
-      digits = digits.map((d,i)=> locks[i] ? d : Math.floor(Math.random()*10));
-      render();
+    // ===== Background neon particles =====
+    const fxPts = Array.from({length: Math.floor(Math.min(200, Math.max(120, innerWidth/7)))}).map(()=>({
+      x:Math.random()*w,y:Math.random()*h,
+      vx:(Math.random()*2-1)*0.26*dpr,
+      vy:(Math.random()*2-1)*0.18*dpr,
+      r:(Math.random()*2.2+0.8)*dpr,
+      hh: Math.random()<0.33?45:(Math.random()<0.5?270:200),
+      a: Math.random()*0.7+0.15
+    }));
 
-      const code = digits.join("");
-      const r = rarity(code);
+    function drawFighter(x,y,r,hue,isPlayer){
+      const gg = actx.createRadialGradient(x,y,0,x,y,r*2.2);
+      const c1 = isPlayer ? `hsla(${hue},90%,70%,0.30)` : `rgba(255,80,90,0.20)`;
+      const c2 = isPlayer ? `hsla(${hue},90%,70%,0.02)` : `rgba(255,80,90,0.02)`;
+      gg.addColorStop(0,c1); gg.addColorStop(1,c2);
+      actx.fillStyle=gg; actx.beginPath(); actx.arc(x,y,r*2.2,0,Math.PI*2); actx.fill();
 
-      played++;
-      if(played % 10 === 0){
-        toast("理性提示：你已玩了10次，休息一下更开心。");
+      actx.beginPath();
+      actx.fillStyle = "rgba(255,255,255,0.10)";
+      actx.strokeStyle = isPlayer ? `hsla(${hue},90%,70%,0.65)` : `rgba(255,120,120,0.55)`;
+      actx.lineWidth = 2*dpr;
+      actx.arc(x,y,r,0,Math.PI*2);
+      actx.fill(); actx.stroke();
+    }
+
+    let last = performance.now();
+    function loop(now){
+      const dt = Math.min(0.05, (now-last)/1000);
+      last = now;
+
+      // idle attacks spend coin slowly
+      if(S.idle){
+        idleTimer += dt;
+        const st = stats();
+        const interval = 1 / Math.max(0.35, st.spd);
+        while(idleTimer >= interval){
+          idleTimer -= interval;
+          if(!spendCoins(1)) { S.idle=false; toast("Coins不足，Idle停止"); break; }
+          hitEnemy(0.85);
+        }
       }
 
-      if(r !== "COMMON") burst(r==="RARE"?90:r==="EPIC"?150:260);
-      if(r === "ULTRA") openJackpot();
+      // FX bg
+      fctx.clearRect(0,0,w,h);
+      for(const p of fxPts){
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<-60)p.x=w+60; if(p.x>w+60)p.x=-60;
+        if(p.y<-60)p.y=h+60; if(p.y>h+60)p.y=-60;
+        fctx.beginPath();
+        fctx.fillStyle = `hsla(${p.hh},90%,70%,${p.a*0.22})`;
+        fctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        fctx.fill();
+      }
+      if(flashA>0){
+        fctx.fillStyle = `rgba(255,255,255,${flashA*0.12})`;
+        fctx.fillRect(0,0,w,h);
+        flashA *= 0.88;
+      }
 
-      document.getElementById("hint").innerHTML =
-        `当前号码：<b style="color:#fff">${code}</b> · 评级：<b style="color:#fff">${r}</b>`;
+      // arena
+      actx.clearRect(0,0,w,h);
+      let sx=0, sy=0;
+      if(shake>0){
+        sx=(Math.random()*2-1)*shake; sy=(Math.random()*2-1)*shake;
+        shake*=0.86; if(shake<0.2) shake=0;
+      }
+      actx.save(); actx.translate(sx,sy);
 
-      rolling=false;
-      document.getElementById("btnDraw").disabled=false;
-      document.getElementById("btnTurbo").disabled=false;
+      const g = actx.createRadialGradient(w*0.5,h*0.72,0,w*0.5,h*0.72,Math.max(w,h)*0.55);
+      g.addColorStop(0,"rgba(255,215,130,0.08)");
+      g.addColorStop(0.35,"rgba(180,120,255,0.07)");
+      g.addColorStop(0.7,"rgba(120,200,255,0.06)");
+      g.addColorStop(1,"rgba(0,0,0,0)");
+      actx.fillStyle=g; actx.fillRect(0,0,w,h);
+
+      const st=stats();
+      drawFighter(P.x*w, P.y*h, P.r*dpr, st.tier.hue, true);
+      drawFighter(E.x*w, E.y*h, E.r*dpr, 0, false);
+
+      for(let i=parts.length-1;i>=0;i--){
+        const p=parts[i];
+        p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.a*=0.985; p.rot+=0.12;
+        actx.save();
+        actx.translate(p.x,p.y); actx.rotate(p.rot);
+        actx.fillStyle=`hsla(${p.h},90%,70%,${p.a})`;
+        actx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62);
+        actx.restore();
+        if(p.a<0.06 || p.y>h+80) parts.splice(i,1);
+      }
+
+      for(let i=texts.length-1;i>=0;i--){
+        const t=texts[i];
+        t.y+=t.vy; t.a*=0.97;
+        actx.font = `${t.crit?(26*dpr):(18*dpr)}px Arial`;
+        actx.fillStyle = `hsla(${t.hue},90%,70%,${t.a})`;
+        actx.fillText(t.txt, t.x + (t.crit?-10*dpr:0), t.y);
+        if(t.a<0.06) texts.splice(i,1);
+      }
+
+      actx.restore();
+      syncUI();
+      requestAnimationFrame(loop);
     }
 
-    function copyCode(){
-      const code = digits.join("");
-      navigator.clipboard?.writeText(code);
-      toast("Copied: " + code);
-    }
-
-    function openJackpot(){
-      document.getElementById("jackpot").classList.add("show");
-      // little screen shake
-      document.body.animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],
-        {duration:260,iterations:2});
-      burst(300);
-    }
-    function closeJackpot(){
-      document.getElementById("jackpot").classList.remove("show");
-    }
-    window.closeJackpot = closeJackpot;
+    // start
+    syncAccount();
+    syncUI();
+    requestAnimationFrame(loop);
   </script>
 </body>
 </html>
