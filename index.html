@@ -320,7 +320,7 @@
     <div class="hudBtns" id="hudBtns"></div>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     /*********************
      * 你只要改这两行
@@ -370,18 +370,6 @@
       $("wlv").textContent = String(weapon.weapon_level||1);
     }
 
-    window.onerror = function (msg, src, line, col, err) {
-  const e = err?.message || msg;
-  const where = `${src || ""}:${line || ""}:${col || ""}`;
-  const box = document.getElementById("loginMsg");
-  if (box) box.textContent = `❌ JS Error\n${e}\n${where}`;
-};
-window.onunhandledrejection = function (ev) {
-  const e = ev?.reason?.message || String(ev?.reason || ev);
-  const box = document.getElementById("loginMsg");
-  if (box) box.textContent = `❌ Promise Error\n${e}`;
-};
-    
     async function initSupabase(){
       // hard guard: if user forgot to paste keys -> show clear message
       if(!SUPABASE_URL.includes("supabase.co") || SUPABASE_ANON_KEY.includes("PASTE_")){
@@ -534,7 +522,7 @@ window.onunhandledrejection = function (ev) {
 
       try{
         // ✅ 关键：redirect 用 origin，必须在 Redirect URLs 允许
-        const redirectTo = window.location.origin + "/";
+        const redirectTo = window.location.origin;
 
         const { error } = await supabase.auth.signInWithOtp({
           email,
@@ -572,79 +560,13 @@ window.onunhandledrejection = function (ev) {
     }
 
     async function logout(){
-      function clearSupabaseTokens(){
-    try{
-      // 清掉 supabase v2 在 localStorage 里存的 token（不同项目 key 前缀可能不同）
-      const keys = [];
-      for(let i=0;i<localStorage.length;i++){
-        const k = localStorage.key(i);
-        if(!k) continue;
-        if(k.startsWith("sb-") || k.includes("supabase") || k.includes("auth-token")) keys.push(k);
-      }
-      keys.forEach(k=>localStorage.removeItem(k));
-    }catch(e){}
-  }
-
-  function withTimeout(promise, ms=2500){
-    return Promise.race([
-      promise,
-      new Promise((_, reject)=>setTimeout(()=>reject(new Error("signOut timeout")), ms))
-    ]);
-  }
-
-  async function logout(){<script>
-  // ... 你原本其它代码保持不变
-
-  function clearSupabaseTokens(){
-    try{
-      // 清掉 supabase v2 在 localStorage 里存的 token（不同项目 key 前缀可能不同）
-      const keys = [];
-      for(let i=0;i<localStorage.length;i++){
-        const k = localStorage.key(i);
-        if(!k) continue;
-        if(k.startsWith("sb-") || k.includes("supabase") || k.includes("auth-token")) keys.push(k);
-      }
-      keys.forEach(k=>localStorage.removeItem(k));
-    }catch(e){}
-  }
-
-  function withTimeout(promise, ms=2500){
-    return Promise.race([
-      promise,
-      new Promise((_, reject)=>setTimeout(()=>reject(new Error("signOut timeout")), ms))
-    ]);
-  }
-
-  async function logout(){
-    // 1) 立刻让用户看到“已经退出” —— 不等网络
-    try{
-      $("logoutBtn").disabled = true;
-      setStatus("退出中…");
       isGuest = false;
+      try{ await supabase.auth.signOut(); }catch(e){}
       sessionUser = null;
       setUIUser("Guest");
-      $("login").style.display = "flex";   // 直接盖回登录层
+      $("login").style.display = "flex";
+      setStatus("已退出登录。");
       endMode();
-      toast("已退出（本地）");
-    }catch(e){}
-
-    // 2) 后台尝试 signOut（就算失败也不影响 UI）
-    try{
-      if(supabase){
-        await withTimeout(supabase.auth.signOut(), 2500);
-      }
-    }catch(e){
-      console.log("signOut failed/timeout:", e);
-    }
-
-    // 3) 最狠的一步：清 token + 刷新（保证一定干净）
-    clearSupabaseTokens();
-    setTimeout(()=>location.reload(), 150);
-  }
-
-  // 你原本 bindUI 里已经有这行就不用改：
-  // $("logoutBtn").addEventListener("click", logout);
-      </script>
     }
 
     async function tryRestoreSession(){
