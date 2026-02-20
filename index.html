@@ -320,7 +320,7 @@
     <div class="hudBtns" id="hudBtns"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script>
     /*********************
      * 你只要改这两行
@@ -370,6 +370,18 @@
       $("wlv").textContent = String(weapon.weapon_level||1);
     }
 
+    window.onerror = function (msg, src, line, col, err) {
+  const e = err?.message || msg;
+  const where = `${src || ""}:${line || ""}:${col || ""}`;
+  const box = document.getElementById("loginMsg");
+  if (box) box.textContent = `❌ JS Error\n${e}\n${where}`;
+};
+window.onunhandledrejection = function (ev) {
+  const e = ev?.reason?.message || String(ev?.reason || ev);
+  const box = document.getElementById("loginMsg");
+  if (box) box.textContent = `❌ Promise Error\n${e}`;
+};
+    
     async function initSupabase(){
       // hard guard: if user forgot to paste keys -> show clear message
       if(!SUPABASE_URL.includes("supabase.co") || SUPABASE_ANON_KEY.includes("PASTE_")){
@@ -522,7 +534,7 @@
 
       try{
         // ✅ 关键：redirect 用 origin，必须在 Redirect URLs 允许
-        const redirectTo = window.location.origin;
+        const redirectTo = window.location.origin + "/";
 
         const { error } = await supabase.auth.signInWithOtp({
           email,
