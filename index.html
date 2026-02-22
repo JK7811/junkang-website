@@ -3,230 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>JKang Market Debug</title>
+  <title>JKang Click Test</title>
   <style>
-    :root{--bg:#0b1024;--card:#111a3a;--line:rgba(255,255,255,.12);--txt:#eef2ff;--mut:rgba(255,255,255,.65)}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:var(--txt);
-      background:radial-gradient(900px 520px at 30% 0%, rgba(124,200,255,.14), transparent 60%),
-                 radial-gradient(900px 520px at 80% 80%, rgba(180,120,255,.12), transparent 60%),
-                 var(--bg);}
-    .wrap{max-width:960px;margin:0 auto;padding:18px}
-    h1{margin:6px 0 16px;font-size:34px;letter-spacing:.02em}
-    .card{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:18px;padding:14px;margin:12px 0}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    input{flex:1;min-width:220px;padding:12px 12px;border-radius:12px;border:1px solid var(--line);
-      background:rgba(0,0,0,.22);color:var(--txt);outline:none}
-    button{padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.08);
-      color:var(--txt);font-weight:800;cursor:pointer}
-    button.primary{background:#fff;color:#000;border-color:transparent}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .mut{color:var(--mut);font-size:13px;line-height:1.7}
-    .log{white-space:pre-wrap;background:rgba(0,0,0,.35);border:1px solid var(--line);
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;background:#0b1024;color:#fff}
+    .wrap{max-width:900px;margin:0 auto;padding:18px}
+    .card{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:18px;padding:14px;margin:12px 0}
+    button{padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:#fff;color:#000;font-weight:900}
+    .log{margin-top:12px;white-space:pre-wrap;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);
       border-radius:14px;padding:12px;min-height:140px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
-    .pill{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.2);font-size:12px;color:var(--mut)}
-    .ok{color:#7CFFB5} .bad{color:#ff8aa1}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>JKang Market Debug</h1>
-
+    <h1>JKang Click Test</h1>
     <div class="card">
-      <div class="mut"><b>Step 1：</b>确认按钮能点 + Supabase 通不通</div>
-      <div class="row" style="margin-top:10px">
-        <button id="btnAlert">点我（必须弹窗）</button>
-        <button class="primary" id="btnPing">Ping Supabase</button>
-        <span class="pill">origin: <span id="origin"></span></span>
-      </div>
-      <div class="mut" style="margin-top:8px">
-        你现在看到没反应，99% 是：旧版本缓存 / 没部署成功 / JS 报错。这个页面会把所有错误写进 Log。
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="mut"><b>Step 2：</b>Email 登录（Magic Link）</div>
-      <div class="row" style="margin-top:10px">
-        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
-        <button class="primary" id="btnSend">Send Link</button>
-        <button id="btnLogout">Logout</button>
-      </div>
-      <div class="mut" style="margin-top:8px">
-        Auth: <b id="auth">-</b> ｜ User: <b id="user">-</b>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="mut"><b>Step 3：</b>卖家 / 商品（登录后才能用）</div>
-      <div class="row" style="margin-top:10px">
-        <button id="btnBecomeSeller">Become Seller（创建店铺）</button>
-        <button id="btnAddProduct">Add Product（上架一个商品）</button>
-        <button class="primary" id="btnLoadProducts">Load Products（所有商品）</button>
-      </div>
-      <div class="mut" id="products" style="margin-top:10px"></div>
-    </div>
-
-    <div class="card">
-      <div class="mut"><b>Log（这里一定会有东西）</b></div>
-      <div id="log" class="log">loading…</div>
+      <button onclick="alert('你点到按钮 ✅'); document.getElementById('log').textContent += '\\nclicked ✅';">
+        点我（必须弹窗）
+      </button>
+      <div id="log" class="log">loading…（如果 JS 正常，会变成 JS running ✅）</div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    /************** 你只要改这两行 **************/
-    const SUPABASE_URL = "https://zdfoelcwmmbvwtjhfixv.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkZm9lbGN3bW1idnd0amhmaXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MzAzNjEsImV4cCI6MjA4NzMwNjM2MX0.Ije9hEA0q4NFnQlThh75BV-MQ0Ph95MFTss3FO2ANWc";
-    /********************************************/
-
-    const $ = (id)=>document.getElementById(id);
-    const logEl = $("log");
-    const log = (s)=>{ logEl.textContent += `\n[${new Date().toISOString()}] ${s}`; logEl.scrollTop = logEl.scrollHeight; };
-
-    $("origin").textContent = location.origin;
-
-    window.addEventListener("error",(e)=>log("❌ window.onerror: " + (e.message||e.error||e)));
-    window.addEventListener("unhandledrejection",(e)=>log("❌ unhandledrejection: " + (e.reason?.message||e.reason)));
-
-    // Guard
-    if(!window.supabase){ log("❌ Supabase SDK 没加载（cdn 被拦/网络问题）"); }
-
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
-    });
-
-    function setAuth(session){
-      if(session?.user){
-        $("auth").textContent = "SIGNED_IN ✅";
-        $("user").textContent = session.user.email || session.user.id;
-      }else{
-        $("auth").textContent = "SIGNED_OUT -";
-        $("user").textContent = "-";
-      }
-    }
-
-    supabase.auth.onAuthStateChange((event, session)=>{
-      log(`onAuthStateChange: ${event} ${(session?.user)?("✅ "+(session.user.email||session.user.id)):"-"}`);
-      setAuth(session);
-    });
-
-    async function boot(){
-      logEl.textContent = "";
-      log("JS running ✅");
-      log("origin = " + location.origin);
-      log("url = " + SUPABASE_URL);
-
-      const { data, error } = await supabase.auth.getSession();
-      if(error) log("❌ getSession error: " + error.message);
-      else log("getSession ok: " + (data?.session?.user ? "SIGNED_IN ✅" : "SIGNED_OUT -"));
-      setAuth(data.session);
-    }
-
-    $("btnAlert").onclick = ()=>{
-      alert("你点到按钮 ✅");
-      log("clicked alert ✅");
-    };
-
-    $("btnPing").onclick = async ()=>{
-      try{
-        log("Ping…");
-        const r = await fetch(SUPABASE_URL + "/rest/v1/", { method:"GET" });
-        log("Ping HTTP = " + r.status + " (200/401 都算通)");
-      }catch(e){
-        log("❌ Ping failed: " + (e?.message||e));
-      }
-    };
-
-    $("btnSend").onclick = async ()=>{
-      const email = $("email").value.trim();
-      if(!email){ log("❌ 请输入邮箱"); return; }
-
-      $("btnSend").disabled = true;
-      try{
-        log("Send OTP… redirectTo=" + location.origin);
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options:{ emailRedirectTo: location.origin }
-        });
-        if(error) throw error;
-        log("✅ Send OTP ok（去邮箱点链接回到网站）");
-      }catch(e){
-        log("❌ Send OTP failed: " + (e?.message||e));
-        log("检查：Supabase Email Provider 是否启用 / Redirect URLs 是否包含 " + location.origin);
-      }finally{
-        $("btnSend").disabled = false;
-      }
-    };
-
-    $("btnLogout").onclick = async ()=>{
-      try{
-        log("Signing out…");
-        const { error } = await supabase.auth.signOut();
-        if(error) throw error;
-        log("signOut ok ✅");
-        localStorage.clear(); sessionStorage.clear();
-        const { data } = await supabase.auth.getSession();
-        log("after signOut: " + (data?.session ? "STILL_SIGNED_IN ❌" : "SIGNED_OUT ✅"));
-        setAuth(data.session);
-      }catch(e){
-        log("❌ signOut failed: " + (e?.message||e));
-      }
-    };
-
-    $("btnBecomeSeller").onclick = async ()=>{
-      try{
-        const { data: ses } = await supabase.auth.getSession();
-        if(!ses?.session?.user){ log("❌ 先登录"); return; }
-        const userId = ses.session.user.id;
-
-        log("Create seller user=" + userId);
-        const { error } = await supabase.from("sellers")
-          .upsert({ user_id:userId, shop_name:"My Shop" }, { onConflict:"user_id" });
-        if(error) throw error;
-        log("✅ Become Seller ok");
-      }catch(e){
-        log("❌ Become Seller failed: " + (e?.message||e));
-        log("提示：多数是 RLS policy / 表名不对 / 没建 sellers 表");
-      }
-    };
-
-    $("btnAddProduct").onclick = async ()=>{
-      try{
-        const { data: ses } = await supabase.auth.getSession();
-        if(!ses?.session?.user){ log("❌ 先登录"); return; }
-        const userId = ses.session.user.id;
-
-        const title = "Test Product " + Math.floor(Math.random()*99999);
-        const price_cents = 199;
-        const stock = 10;
-
-        log("Add product… seller_id=" + userId);
-        const { error } = await supabase.from("products").insert({ seller_id:userId, title, price_cents, stock });
-        if(error) throw error;
-        log("✅ Add product ok: " + title);
-      }catch(e){
-        log("❌ Add product failed: " + (e?.message||e));
-        log("提示：如果你开了 RLS，需要允许 seller 插入自己的 products");
-      }
-    };
-
-    $("btnLoadProducts").onclick = async ()=>{
-      try{
-        log("Load products…");
-        const { data, error } = await supabase.from("products")
-          .select("id,title,price_cents,stock,created_at").order("created_at",{ascending:false}).limit(20);
-        if(error) throw error;
-
-        $("products").innerHTML = (data||[]).map(p =>
-          `• ${p.title} — $${(p.price_cents/100).toFixed(2)} — stock:${p.stock}`
-        ).join("<br>") || "(empty)";
-        log("✅ Loaded " + (data?.length||0) + " products");
-      }catch(e){
-        log("❌ Load products failed: " + (e?.message||e));
-      }
-    };
-
-    boot();
+    // 只要 JS 有执行，Log 会立刻变化
+    const log = document.getElementById("log");
+    log.textContent = "JS running ✅\\n" + new Date().toISOString() + "\\norigin=" + location.origin;
   </script>
 </body>
 </html>
