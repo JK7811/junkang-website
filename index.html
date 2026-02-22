@@ -1,130 +1,202 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  <title>JKang Market</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>JKang Market Debug</title>
   <style>
-    body{font-family:Arial;padding:20px;background:#f5f5f5}
-    .card{background:white;padding:15px;margin:10px 0;border-radius:8px}
-    button{padding:8px 12px;margin-top:5px}
-    input{padding:6px;margin:4px 0}
+    body{font-family:-apple-system,BlinkMacSystemFont,Arial; margin:0; background:#0b1020; color:#fff}
+    .wrap{padding:16px; max-width:880px; margin:0 auto}
+    .card{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; margin:12px 0}
+    input,button{font-size:16px}
+    input{width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(0,0,0,.25); color:#fff; outline:none}
+    button{padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.12); color:#fff; font-weight:700}
+    button.primary{background:#fff; color:#000; border-color:transparent}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .row > *{flex:1}
+    pre{white-space:pre-wrap; word-break:break-word; margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; line-height:1.5; color:rgba(255,255,255,.88)}
+    .ok{color:#7CFFB5}
+    .bad{color:#FF6D8B}
+    .muted{color:rgba(255,255,255,.7)}
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <h2 style="margin:10px 0 6px">JKang Market Debug</h2>
+    <div class="muted" id="ver"></div>
 
-<h2>JKang Market</h2>
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:8px">Step 1 · JS / SDK / Network 自检</div>
+      <pre id="check">checking…</pre>
+      <div style="height:10px"></div>
+      <div class="row">
+        <button id="btnTest">点我（必须弹窗）</button>
+        <button class="primary" id="btnPing">Ping Supabase</button>
+      </div>
+    </div>
 
-<div id="loginBox">
-  <input id="email" placeholder="email">
-  <button onclick="login()">Login</button>
-  <p id="msg"></p>
-</div>
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:8px">Step 2 · Email 登录（OTP Magic Link）</div>
+      <input id="email" type="email" placeholder="你邮箱，例如 junkang1999@live.com" autocomplete="email" />
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="primary" id="btnLogin">Send Login Link</button>
+        <button id="btnLogout">Logout</button>
+      </div>
+      <div style="height:10px"></div>
+      <pre id="auth">auth: -</pre>
+    </div>
 
-<div id="app" style="display:none">
-  <button onclick="logout()">Logout</button>
-  <h3>发布商品</h3>
-  <input id="title" placeholder="商品名">
-  <input id="price" placeholder="价格 (SGD)">
-  <button onclick="createProduct()">发布</button>
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:8px">Log</div>
+      <pre id="log"></pre>
+    </div>
+  </div>
 
-  <h3>商品列表</h3>
-  <div id="products"></div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ✅ 你的项目
+    const SUPABASE_URL = "https://zdfoelcwmmbvwtjhfixv.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkZm9lbGN3bW1idnd0amhmaXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MzAzNjEsImV4cCI6MjA4NzMwNjM2MX0.Ije9hEA0q4NFnQlThh75BV-MQ0Ph95MFTss3FO2ANWc";
 
-<script>
-const supabase = window.supabase.createClient(
-  "https://zdfoelcwmmbvwtjhfixv.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkZm9lbGN3bW1idnd0amhmaXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MzAzNjEsImV4cCI6MjA4NzMwNjM2MX0.Ije9hEA0q4NFnQlThh75BV-MQ0Ph95MFTss3FO2ANWc"
-);
+    const $ = (id)=>document.getElementById(id);
+    const logEl = $("log");
+    const checkEl = $("check");
+    const authEl = $("auth");
 
-async function login(){
-  const email = document.getElementById("email").value;
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options:{ emailRedirectTo: window.location.origin }
-  });
-  document.getElementById("msg").innerText =
-    error ? error.message : "Check your email!";
-}
+    function log(...a){
+      const line = a.map(x=>typeof x==="string"?x:JSON.stringify(x,null,2)).join(" ");
+      logEl.textContent += line + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+    function setCheck(lines){ checkEl.textContent = lines.join("\n"); }
+    function setAuth(t){ authEl.textContent = t; }
 
-async function logout(){
-  await supabase.auth.signOut();
-  location.reload();
-}
+    // 捕捉所有 JS 报错（你不用开 console）
+    window.onerror = (msg, src, line, col, err)=>{
+      log("❌ window.onerror:", msg, " @", src, line+":"+col, err?.message||"");
+    };
+    window.onunhandledrejection = (e)=>{
+      log("❌ unhandledrejection:", e?.reason?.message || String(e?.reason || e));
+    };
 
-async function createProduct(){
-  const user = (await supabase.auth.getUser()).data.user;
-  if(!user) return alert("not logged in");
+    $("ver").textContent = "Build stamp: " + new Date().toISOString() + " | origin=" + location.origin;
 
-  // 确保 seller 存在
-  await supabase.rpc("ensure_seller");
+    // 1) 基础点击测试：必须弹窗 + 记录 log
+    $("btnTest").addEventListener("click", ()=>{
+      log("✅ clicked test button @", new Date().toISOString());
+      alert("你点到了按钮 ✅（JS 正常）");
+    });
 
-  const title = document.getElementById("title").value;
-  const price = parseFloat(document.getElementById("price").value) * 100;
+    // 2) 初始化 supabase（带 detectSessionInUrl）
+    let supabase = null;
+    function initSupabase(){
+      if(!window.supabase){
+        log("❌ Supabase SDK 没加载到（cdn 被挡/网络问题）");
+        return false;
+      }
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+      });
+      return true;
+    }
 
-  const { error } = await supabase.from("products").insert({
-    seller_id: user.id,
-    title,
-    price_cents: price,
-    stock: 10
-  });
+    async function selfCheck(){
+      const sdkOk = !!window.supabase;
+      const httpsOk = location.origin.startsWith("https://");
+      let restOk = false, restStatus = "NA";
+      try{
+        const r = await fetch(SUPABASE_URL + "/rest/v1/", { method:"GET" });
+        restStatus = String(r.status);
+        restOk = (r.status === 200 || r.status === 401);
+      }catch(e){
+        restStatus = "fetch failed";
+      }
 
-  if(error) alert(error.message);
-  else{
-    alert("发布成功");
-    loadProducts();
-  }
-}
+      setCheck([
+        (sdkOk ? "✅" : "❌") + " Supabase SDK loaded",
+        (httpsOk ? "✅" : "❌") + " HTTPS origin = " + location.origin,
+        (restOk ? "✅" : "❌") + " Supabase REST reachable = " + restStatus,
+        "URL = " + SUPABASE_URL
+      ]);
 
-async function loadProducts(){
-  const { data } = await supabase.from("products")
-    .select("*")
-    .eq("is_active", true);
+      log("selfCheck:", { sdkOk, httpsOk, restStatus, origin: location.origin });
+    }
 
-  const box = document.getElementById("products");
-  box.innerHTML = "";
+    $("btnPing").addEventListener("click", async ()=>{
+      log("ping start…");
+      await selfCheck();
+      alert("Ping 完成（看 Log 面板）");
+    });
 
-  data.forEach(p=>{
-    const div = document.createElement("div");
-    div.className="card";
-    div.innerHTML = `
-      <b>${p.title}</b><br>
-      SGD ${(p.price_cents/100).toFixed(2)}<br>
-      <button onclick="buy('${p.id}', ${p.price_cents})">购买</button>
-    `;
-    box.appendChild(div);
-  });
-}
+    // 3) 登录：一定会写 log
+    $("btnLogin").addEventListener("click", async ()=>{
+      try{
+        const email = $("email").value.trim();
+        if(!email) { alert("先输入邮箱"); return; }
+        if(!supabase) { alert("Supabase 没初始化"); return; }
 
-async function buy(id, price){
-  const user = (await supabase.auth.getUser()).data.user;
-  if(!user) return alert("login first");
+        log("login start:", email);
+        setAuth("auth: sending…");
 
-  const { data: order } = await supabase.from("orders")
-    .insert({ buyer_id:user.id, total_cents:price })
-    .select()
-    .single();
+        const redirectTo = location.origin; // 必须在 Supabase Redirect URLs 里
+        const { data, error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: redirectTo }
+        });
 
-  await supabase.from("order_items").insert({
-    order_id: order.id,
-    product_id: id,
-    title_snapshot: "item",
-    price_cents_snapshot: price,
-    qty:1
-  });
+        if(error) throw error;
 
-  alert("下单成功（未付款版）");
-}
+        log("✅ signInWithOtp ok:", data || {});
+        setAuth("auth: email sent ✅（去邮箱点链接）");
+        alert("已发送登录邮件 ✅（去邮箱点链接）");
+      } catch (e){
+        log("❌ signInWithOtp error:", e?.message || String(e));
+        setAuth("auth: error ❌ " + (e?.message || String(e)));
+        alert("发送失败 ❌（看 Log 面板）");
+      }
+    });
 
-supabase.auth.onAuthStateChange((event, session)=>{
-  if(session){
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("app").style.display="block";
-    loadProducts();
-  }
-});
-</script>
+    // 4) logout：一定会写 log
+    $("btnLogout").addEventListener("click", async ()=>{
+      try{
+        if(!supabase){ alert("Supabase 没初始化"); return; }
+        log("logout start…");
+        const { error } = await supabase.auth.signOut();
+        if(error) throw error;
+        log("✅ signOut ok");
+        setAuth("auth: signed out ✅");
+        alert("已退出 ✅");
+      }catch(e){
+        log("❌ signOut error:", e?.message || String(e));
+        setAuth("auth: signOut error ❌ " + (e?.message || String(e)));
+        alert("退出失败 ❌（看 Log 面板）");
+      }
+    });
 
+    async function boot(){
+      log("JS running ✅", new Date().toISOString());
+      const ok = initSupabase();
+      if(!ok){
+        setCheck(["❌ Supabase SDK 没加载到（CDN/网络问题）"]);
+        return;
+      }
+      await selfCheck();
+
+      // 监听登录状态变化
+      supabase.auth.onAuthStateChange(async (event, session)=>{
+        log("onAuthStateChange:", event, session?.user?.email || "-");
+        setAuth("auth: " + event + " " + (session?.user?.email || "-"));
+      });
+
+      // 主动恢复 session（非常关键：不然你会以为“没反应”）
+      const { data } = await supabase.auth.getSession();
+      log("getSession:", !!data?.session, data?.session?.user?.email || "-");
+      if(data?.session) setAuth("auth: session restored ✅ " + (data.session.user.email || ""));
+      else setAuth("auth: no session (not logged in)");
+    }
+
+    boot();
+  </script>
 </body>
 </html>
