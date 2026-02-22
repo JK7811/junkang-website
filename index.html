@@ -3,175 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Login Test · Supabase</title>
+  <title>CLICK TEST</title>
   <style>
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#0b1020;color:#fff}
-    .wrap{max-width:780px;margin:0 auto;padding:18px}
-    .card{border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:14px;background:rgba(255,255,255,.06)}
-    input,button{font-size:16px}
-    input{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;outline:none}
-    button{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);color:#fff;font-weight:800;cursor:pointer}
-    button.primary{background:#fff;color:#000;border-color:transparent}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .pill{display:inline-block;padding:6px 10px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(0,0,0,.25);color:rgba(255,255,255,.85);font-size:13px}
-    pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.25);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
-    .muted{color:rgba(255,255,255,.7);line-height:1.6}
-    .ok{color:#7CFFB5}
-    .bad{color:#FF6D8B}
-    a{color:#9bd1ff}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;background:#0b1020;color:#fff}
+    .wrap{max-width:680px;margin:0 auto;padding:18px}
+    button{width:100%;padding:16px;font-size:18px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:#fff;color:#000;font-weight:900}
+    pre{margin-top:12px;background:rgba(255,255,255,.08);padding:12px;border-radius:12px;white-space:pre-wrap}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h2>✅ Supabase Email Login Test</h2>
-    <p class="muted">目标：<b>点 Send Login Link 一定有反应</b>、邮箱点链接回站后<b>能显示已登录</b>、<b>Logout 一定能退出</b>。</p>
-
-    <div class="card">
-      <div class="row" style="align-items:center;justify-content:space-between">
-        <span class="pill">Origin: <b id="origin"></b></span>
-        <span class="pill">Status: <b id="status">booting…</b></span>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <input id="email" type="email" placeholder="你邮箱（例如 junkang1999@live.com）" autocomplete="email" />
-      </div>
-
-      <div class="row">
-        <button class="primary" id="sendBtn">Send Login Link</button>
-        <button id="logoutBtn">Logout</button>
-        <button id="clearBtn">Clear Local Session</button>
-      </div>
-
-      <p class="muted" style="margin:10px 0 6px">当前用户：</p>
-      <pre id="me">（未登录）</pre>
-
-      <p class="muted" style="margin:10px 0 6px">日志：</p>
-      <pre id="log"></pre>
-    </div>
-
-    <p class="muted" style="margin-top:14px">
-      如果你点了 Send Login Link “完全没反应”，90% 是：<br>
-      1) 浏览器 Console 有 JS 报错（最常见）<br>
-      2) Supabase URL/Key 不对（你这次给的是 eyJ… 的 anon key ✅）<br>
-      3) Redirect URL 不匹配（你已按第2步设了 ✅）
-    </p>
+    <h2>按钮点击测试</h2>
+    <button id="btn" type="button">点我（必须弹窗）</button>
+    <pre id="log">log:</pre>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ===== 你的 Supabase（已填好）=====
-    const SUPABASE_URL = "https://zdfoelcwmmbvwtjhfixv.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkZm9lbGN3bW1idnd0amhmaXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MzAzNjEsImV4cCI6MjA4NzMwNjM2MX0.Ije9hEA0q4NFnQlThh75BV-MQ0Ph95MFTss3FO2ANWc";
+    const log = (t)=>document.getElementById("log").textContent += "\n" + t;
 
-    const $ = (id)=>document.getElementById(id);
-    const logEl = $("log");
+    // 页面一加载就写一行：证明 JS 有在跑
+    log("JS running ✅ " + new Date().toISOString());
 
-    function log(msg){
-      const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
-      logEl.textContent = (line + "\n" + (logEl.textContent || "")).slice(0, 6000);
-      console.log(line);
-    }
-
-    $("origin").textContent = window.location.origin;
-
-    // 关键：detectSessionInUrl 要开（处理 magic link 回跳）
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    });
-
-    function showUser(user){
-      if(!user){
-        $("me").textContent = "（未登录）";
-        $("status").innerHTML = `<span class="bad">logged out</span>`;
-        return;
-      }
-      $("me").textContent = JSON.stringify({
-        id: user.id,
-        email: user.email,
-        last_sign_in_at: user.last_sign_in_at
-      }, null, 2);
-      $("status").innerHTML = `<span class="ok">logged in</span>`;
-    }
-
-    async function refreshSession(){
-      const { data, error } = await supabase.auth.getSession();
-      if(error){
-        log("getSession ERROR: " + error.message);
-        showUser(null);
-        return;
-      }
-      const user = data?.session?.user || null;
-      showUser(user);
-      log(user ? ("Session OK: " + (user.email || user.id)) : "No session");
-    }
-
-    // 监听登录/登出变化（非常重要）
-    supabase.auth.onAuthStateChange((event, session)=>{
-      log("Auth event: " + event);
-      showUser(session?.user || null);
-    });
-
-    $("sendBtn").addEventListener("click", async ()=>{
-      const email = $("email").value.trim();
-      if(!email){ alert("先输入邮箱"); return; }
-
-      $("sendBtn").disabled = true;
-      log("Sending magic link to: " + email);
-
-      try{
-        const redirectTo = window.location.origin; // 你第2步 Redirect URLs 已允许
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: redirectTo }
-        });
-        if(error) throw error;
-
-        log("✅ Sent! 去邮箱点链接回到本站完成登录（看垃圾邮件）");
-        alert("已发送登录邮件，去邮箱点链接回到本站完成登录");
-      }catch(e){
-        log("❌ signInWithOtp ERROR: " + (e?.message || String(e)));
-        alert("发送失败：\n" + (e?.message || String(e)) + "\n\n打开浏览器 Console 看更详细报错。");
-      }finally{
-        $("sendBtn").disabled = false;
-      }
-    });
-
-    $("logoutBtn").addEventListener("click", async ()=>{
-      log("Logout clicked");
-      try{
-        const { error } = await supabase.auth.signOut();
-        if(error) throw error;
-        log("✅ Signed out");
-        await refreshSession();
-      }catch(e){
-        log("❌ signOut ERROR: " + (e?.message || String(e)));
-        alert("退出失败：\n" + (e?.message || String(e)));
-      }
-    });
-
-    $("clearBtn").addEventListener("click", async ()=>{
-      // 有时旧项目残留 localStorage 会干扰，直接清
-      log("Clearing localStorage/sessionStorage");
-      localStorage.clear();
-      sessionStorage.clear();
-      await refreshSession();
-      alert("已清除本机缓存（local/session storage）");
-    });
-
-    // boot
-    (async ()=>{
-      log("Boot…");
-      // 可选：简单连通性检查
-      try{
-        const r = await fetch(SUPABASE_URL + "/rest/v1/", { method:"GET" });
-        log("REST reach: status=" + r.status + " (200/401 都算可达)");
-      }catch(e){
-        log("REST reach FAIL: " + (e?.message || String(e)));
-      }
-      await refreshSession();
-      log("Ready.");
-    })();
+    document.getElementById("btn").onclick = () => {
+      log("clicked ✅ " + new Date().toISOString());
+      alert("你点到了按钮 ✅");
+    };
   </script>
 </body>
 </html>
