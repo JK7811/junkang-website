@@ -1,1130 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hans">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>JKang Neon Arena</title>
-  <meta name="description" content="JKang Neon Arena · A/B/C/D modes · Supabase Login" />
+  <title>Login Test · Supabase</title>
   <style>
-    :root{
-      --bg:#070716;
-      --text:#F6F7FF;
-      --muted:rgba(255,255,255,.68);
-      --line:rgba(255,255,255,.12);
-      --good:#7CFFB5;
-      --warn:#FFD27C;
-      --danger:#FF6D8B;
-      --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.03);
-      --shadow:0 32px 100px rgba(0,0,0,.55);
-      --r:22px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 50% 0%, rgba(124,200,255,.14), transparent 60%),
-        radial-gradient(900px 520px at 80% 80%, rgba(180,120,255,.10), transparent 60%),
-        var(--bg);
-      overflow:hidden;
-      -webkit-tap-highlight-color: transparent;
-    }
-    canvas#fx{position:fixed;inset:0;width:100%;height:100%;z-index:0}
-    canvas#game{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:none}
-
-    .wrap{position:relative;z-index:2;height:100%;display:flex;align-items:center;justify-content:center;padding:14px}
-    .shell{
-      width:min(1100px,94vw);
-      border-radius:28px;
-      border:1px solid var(--line);
-      background:linear-gradient(to bottom, var(--card), var(--card2));
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .shell::before{
-      content:"";position:absolute;inset:-2px;
-      background:linear-gradient(135deg, rgba(124,200,255,.20), rgba(180,120,255,.16), transparent 72%);
-      opacity:.35;pointer-events:none;
-    }
-    .topbar{
-      position:relative;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:14px 16px;border-bottom:1px solid var(--line);
-      backdrop-filter: blur(12px);
-      background: linear-gradient(to bottom, rgba(7,7,22,.78), rgba(7,7,22,.25));
-      gap:10px;flex-wrap:wrap;
-    }
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;font-size:13px}
-    .dot{
-      width:10px;height:10px;border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.2));
-      box-shadow:0 0 24px rgba(124,200,255,.45);
-    }
-    .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .pill{
-      padding:8px 10px;border-radius:999px;border:1px solid var(--line);
-      background:rgba(0,0,0,.18);
-      font-size:12px;color:var(--muted);
-      display:flex;gap:8px;align-items:center;
-      user-select:none;
-    }
-    .pill b{color:var(--text)}
-    .btn{
-      padding:10px 12px;border-radius:14px;border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      color:var(--text);cursor:pointer;font-weight:800;font-size:13px;
-      transition:.18s ease; user-select:none;
-    }
-    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.09)}
-    .btn.primary{background:#fff;color:#000;border-color:transparent}
-    .btn.good{border-color:rgba(124,255,181,.35); background:rgba(124,255,181,.10)}
-    .btn.danger{border-color:rgba(255,109,139,.35); background:rgba(255,109,139,.10)}
-    .btn.small{padding:8px 10px;border-radius:12px;font-size:12px}
-    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
-
-    .content{position:relative;padding:16px}
-    .grid{display:grid;grid-template-columns:1fr;gap:14px}
-    @media(min-width:900px){.grid{grid-template-columns:1.35fr .65fr}}
-
-    .panel{
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      background:rgba(0,0,0,.22);
-      padding:14px;
-      overflow:hidden;
-    }
-    .panel h2{margin:0 0 6px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.78)}
-    .panel p{margin:0;color:var(--muted);line-height:1.75;font-size:13px}
-    .sep{height:1px;background:var(--line);margin:12px 0}
-
-    .modes{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
-    @media(min-width:700px){.modes{grid-template-columns:1fr 1fr}}
-    .mode{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background: linear-gradient(to bottom, rgba(255,255,255,.07), rgba(255,255,255,.02));
-      padding:12px;
-      cursor:pointer;
-      transition:.18s ease;
-      position:relative;
-      overflow:hidden;
-      min-height:96px;
-    }
-    .mode::after{
-      content:"";position:absolute;inset:-2px;
-      background: radial-gradient(340px 170px at var(--mx,50%) var(--my,50%),
-        rgba(124,200,255,.18), rgba(180,120,255,.12), transparent 60%);
-      opacity:0;transition:.18s ease;pointer-events:none;
-    }
-    .mode:hover::after{opacity:1}
-    .mode:hover{transform:translateY(-2px)}
-    .mode .t{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .badge{font-weight:900;font-size:12px;letter-spacing:.18em;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid var(--line)}
-    .mode h3{margin:10px 0 6px;font-size:18px}
-    .mode small{color:var(--muted);line-height:1.5;display:block}
-
-    .overlay{
-      position:fixed;inset:0;z-index:5;
-      display:flex;align-items:center;justify-content:center;
-      background:rgba(5,6,16,.74);
-      backdrop-filter: blur(12px);
-      padding:14px;
-    }
-    .loginBox{
-      width:min(560px,92vw);
-      border:1px solid var(--line);
-      border-radius:28px;
-      background: linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      box-shadow:var(--shadow);
-      padding:16px;
-      position:relative;
-      overflow:hidden;
-    }
-    .loginBox::before{
-      content:"";position:absolute;inset:-2px;
-      background:
-        radial-gradient(520px 240px at 20% 20%, rgba(124,200,255,.20), transparent 60%),
-        radial-gradient(520px 240px at 80% 80%, rgba(180,120,255,.16), transparent 60%);
-      opacity:.85;pointer-events:none;
-    }
-    .loginInner{position:relative}
-    .title{margin:0 0 6px;font-size:20px;letter-spacing:.14em}
-    .sub{margin:0 0 14px;color:var(--muted);line-height:1.7;font-size:13px}
-    input{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.20);
-      color:var(--text);
-      outline:none;
-    }
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#0b1020;color:#fff}
+    .wrap{max-width:780px;margin:0 auto;padding:18px}
+    .card{border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:14px;background:rgba(255,255,255,.06)}
+    input,button{font-size:16px}
+    input{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;outline:none}
+    button{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);color:#fff;font-weight:800;cursor:pointer}
+    button.primary{background:#fff;color:#000;border-color:transparent}
+    button:disabled{opacity:.55;cursor:not-allowed}
     .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .msg{margin-top:10px;color:rgba(255,255,255,.90);font-size:13px;white-space:pre-wrap}
-    .tiny{margin-top:10px;color:rgba(255,255,255,.55);font-size:12px;line-height:1.6}
-
-    .hud{
-      position:fixed;left:14px;right:14px;bottom:14px;z-index:4;
-      border:1px solid var(--line);
-      border-radius:26px;
-      background:rgba(0,0,0,.34);
-      backdrop-filter: blur(10px);
-      padding:12px;
-      display:none;
-    }
-    .hudTop{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
-    .hudTitle{font-weight:900;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:rgba(255,255,255,.82)}
-    .hudDesc{color:rgba(255,255,255,.68);font-size:12px;line-height:1.5;margin-top:4px}
-    .hudBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-
-    .flash{
-      position:fixed;inset:0;z-index:3;
-      pointer-events:none;
-      background:radial-gradient(800px 400px at 50% 50%, rgba(255,255,255,.10), transparent 60%);
-      opacity:0;transition:.12s ease;
-    }
-    .flash.on{opacity:1}
-    @keyframes shake{
-      0%,100%{transform:translate(0,0)}
-      20%{transform:translate(-2px,1px)}
-      40%{transform:translate(2px,-1px)}
-      60%{transform:translate(-1px,-2px)}
-      80%{transform:translate(1px,2px)}
-    }
-    .shake{animation:shake .18s linear 1}
-
-    .toast{
-      position:fixed;top:14px;left:50%;transform:translateX(-50%);
-      z-index:6;
-      padding:10px 12px;border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(0,0,0,.45);
-      backdrop-filter: blur(10px);
-      color:rgba(255,255,255,.86);
-      font-size:12px;
-      opacity:0;pointer-events:none;
-      transition:.2s ease;
-      max-width:min(92vw,680px);
-      white-space:pre-wrap;text-align:center;
-    }
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .pill{display:inline-block;padding:6px 10px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(0,0,0,.25);color:rgba(255,255,255,.85);font-size:13px}
+    pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.25);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+    .muted{color:rgba(255,255,255,.7);line-height:1.6}
+    .ok{color:#7CFFB5}
+    .bad{color:#FF6D8B}
+    a{color:#9bd1ff}
   </style>
 </head>
-
 <body>
-  <canvas id="fx"></canvas>
-  <canvas id="game"></canvas>
-  <div class="flash" id="flash"></div>
-  <div class="toast" id="toast"></div>
-
-  <!-- Login Overlay -->
-  <div class="overlay" id="login">
-    <div class="loginBox">
-      <div class="loginInner">
-        <h1 class="title">LOGIN → ENTER ARENA</h1>
-        <p class="sub">
-          这是 <b>娱乐型</b> 游戏站：金币/宝石仅用于游戏玩法，<b>不提供提现</b>。<br/>
-          Email 登录后自动进入动画游戏大厅。
-        </p>
-        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
-        <div class="row">
-          <button class="btn primary" id="otpBtn">Send Login Link</button>
-          <button class="btn" id="demoBtn">Demo（Guest）</button>
-        </div>
-        <div class="msg" id="loginMsg"></div>
-        <div class="tiny" id="selfCheck">自检中…</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- App -->
   <div class="wrap">
-    <div class="shell" id="app">
-      <div class="topbar">
-        <div class="brand"><span class="dot"></span> JKANG NEON ARENA</div>
-        <div class="right">
-          <div class="pill">Account: <b id="acct">Guest</b></div>
-          <div class="pill">Coins: <b id="coins">0</b></div>
-          <div class="pill">Gems: <b id="gems">0</b></div>
-          <div class="pill">Weapon Lv: <b id="wlv">1</b></div>
-          <button class="btn good" id="topupBtn">Recharge</button>
-          <button class="btn danger" id="logoutBtn">Logout</button>
-        </div>
+    <h2>✅ Supabase Email Login Test</h2>
+    <p class="muted">目标：<b>点 Send Login Link 一定有反应</b>、邮箱点链接回站后<b>能显示已登录</b>、<b>Logout 一定能退出</b>。</p>
+
+    <div class="card">
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <span class="pill">Origin: <b id="origin"></b></span>
+        <span class="pill">Status: <b id="status">booting…</b></span>
       </div>
 
-      <div class="content" id="lobby">
-        <div class="grid">
-          <div class="panel">
-            <h2>Lobby</h2>
-            <p>Canvas 真动画：爆炸粒子、闪光、抖屏、能量弹道。A/B/C/D 都可玩。</p>
-            <div class="sep"></div>
-
-            <div class="modes">
-              <div class="mode" data-mode="A">
-                <div class="t"><div class="badge">A</div><div class="badge" style="opacity:.75">Duel</div></div>
-                <h3>对战 Arena</h3>
-                <small>横版对打 · AI 敌人 · 技能爆炸 + 抖屏</small>
-              </div>
-              <div class="mode" data-mode="B">
-                <div class="t"><div class="badge">B</div><div class="badge" style="opacity:.75">AFK</div></div>
-                <h3>挂机 Dungeon</h3>
-                <small>自动打怪 · 掉金币动画 · 持续收益</small>
-              </div>
-              <div class="mode" data-mode="C">
-                <div class="t"><div class="badge">C</div><div class="badge" style="opacity:.75">Forge</div></div>
-                <h3>武器强化</h3>
-                <small>升级武器 · 提升伤害 · 消耗金币</small>
-              </div>
-              <div class="mode" data-mode="D">
-                <div class="t"><div class="badge">D</div><div class="badge" style="opacity:.75">Rank</div></div>
-                <h3>排行榜</h3>
-                <small>查看金币榜（wallets）</small>
-              </div>
-            </div>
-
-            <div class="sep"></div>
-            <p style="color:rgba(255,255,255,.62);font-size:12px;line-height:1.7">
-              充值说明：Recharge 当前跳转支付链接。要“支付成功自动加币”，下一步用 Stripe Webhook + Edge Function 才能实现。
-            </p>
-          </div>
-
-          <div class="panel">
-            <h2>Status</h2>
-            <p id="status">初始化中…</p>
-            <div class="sep"></div>
-            <p style="font-size:12px;color:rgba(255,255,255,.62);line-height:1.7">
-              快捷键（对战模式）：A/D 移动，J 近战，K 技能，L 开火。
-            </p>
-          </div>
-        </div>
+      <div class="row" style="margin-top:12px">
+        <input id="email" type="email" placeholder="你邮箱（例如 junkang1999@live.com）" autocomplete="email" />
       </div>
+
+      <div class="row">
+        <button class="primary" id="sendBtn">Send Login Link</button>
+        <button id="logoutBtn">Logout</button>
+        <button id="clearBtn">Clear Local Session</button>
+      </div>
+
+      <p class="muted" style="margin:10px 0 6px">当前用户：</p>
+      <pre id="me">（未登录）</pre>
+
+      <p class="muted" style="margin:10px 0 6px">日志：</p>
+      <pre id="log"></pre>
     </div>
-  </div>
 
-  <!-- HUD -->
-  <div class="hud" id="hud">
-    <div class="hudTop">
-      <div>
-        <div class="hudTitle" id="hudTitle">MODE</div>
-        <div class="hudDesc" id="hudDesc">…</div>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
-        <button class="btn small" id="backBtn">Back</button>
-        <button class="btn small primary" id="actionBtn">Action</button>
-      </div>
-    </div>
-    <div class="hudBtns" id="hudBtns"></div>
+    <p class="muted" style="margin-top:14px">
+      如果你点了 Send Login Link “完全没反应”，90% 是：<br>
+      1) 浏览器 Console 有 JS 报错（最常见）<br>
+      2) Supabase URL/Key 不对（你这次给的是 eyJ… 的 anon key ✅）<br>
+      3) Redirect URL 不匹配（你已按第2步设了 ✅）
+    </p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    /*********************
-     * 你只要改这两行
-     *********************/
-    const SUPABASE_URL = "https://zrulbxnqtliyxycfjgks.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpydWxieG5xdGxpeXh5Y2ZqZ2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NjE5NzUsImV4cCI6MjA4NzEzNzk3NX0.vKZOi1nZM8ssAUufJJ4QDZSauWB9Nfzy4_hObx4uCyM";
+    // ===== 你的 Supabase（已填好）=====
+    const SUPABASE_URL = "https://zdfoelcwmmbvwtjhfixv.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkZm9lbGN3bW1idnd0amhmaXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MzAzNjEsImV4cCI6MjA4NzMwNjM2MX0.Ije9hEA0q4NFnQlThh75BV-MQ0Ph95MFTss3FO2ANWc";
 
-    // 充值跳转（你现在先用这个，后续做自动加币）
-    const TOPUP_URL = "https://buy.stripe.com/fZu6oIc6V4zrdAk8kB9fW01";
-
-    /*********************
-     * helpers
-     *********************/
     const $ = (id)=>document.getElementById(id);
-    const toastEl = $("toast");
-    const flashEl = $("flash");
+    const logEl = $("log");
 
-    function toast(msg){
-      toastEl.textContent = msg;
-      toastEl.classList.add("show");
-      clearTimeout(toastEl._t);
-      toastEl._t = setTimeout(()=>toastEl.classList.remove("show"), 2400);
-    }
-    function fmt(n){ return Number(n||0).toLocaleString(); }
-    function setStatus(t){ $("status").textContent = t; }
-    function selfCheckLine(t){ $("selfCheck").textContent = t; }
-
-    window.addEventListener("mousemove",(e)=>{
-      document.documentElement.style.setProperty("--mx", e.clientX+"px");
-      document.documentElement.style.setProperty("--my", e.clientY+"px");
-    }, {passive:true});
-
-    /*********************
-     * Supabase auth + data
-     *********************/
-    let supabase = null;
-    let sessionUser = null;
-    let isGuest = false;
-
-    let wallet = { coins:0, gems:0 };
-    let weapon = { weapon_level:1, weapon_power:10 };
-
-    function setUIUser(name){ $("acct").textContent = name || "Guest"; }
-    function setUIStats(){
-      $("coins").textContent = fmt(wallet.coins);
-      $("gems").textContent = fmt(wallet.gems);
-      $("wlv").textContent = String(weapon.weapon_level||1);
+    function log(msg){
+      const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logEl.textContent = (line + "\n" + (logEl.textContent || "")).slice(0, 6000);
+      console.log(line);
     }
 
-    async function initSupabase(){
-      // hard guard: if user forgot to paste keys -> show clear message
-      if(!SUPABASE_URL.includes("supabase.co") || SUPABASE_ANON_KEY.includes("PASTE_")){
-        $("loginMsg").textContent =
-          "⚠️ 你还没把 Supabase URL / Key 填进 index.html。\n" +
-          "回 GitHub 编辑 index.html，把两行粘贴进去再刷新。";
-        selfCheckLine("自检失败：未填 URL/KEY。");
-        return false;
-      }
-      try{
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-        });
-        return true;
-      }catch(e){
-        console.log(e);
-        $("loginMsg").textContent = "❌ Supabase 初始化失败：" + (e?.message || e);
-        selfCheckLine("自检失败：Supabase 初始化异常。");
-        return false;
-      }
-    }
+    $("origin").textContent = window.location.origin;
 
-    async function selfCheck(){
-      // check 1: https
-      const httpsOk = window.location.origin.startsWith("https://");
-      // check 2: can reach supabase rest endpoint
-      let reachOk = false, reachMsg = "";
-      try{
-        const r = await fetch(SUPABASE_URL + "/rest/v1/", { method:"GET" });
-        reachOk = (r.status === 200 || r.status === 401); // 401 also means reachable
-        reachMsg = "REST status=" + r.status;
-      }catch(e){
-        reachOk = false;
-        reachMsg = "REST fetch failed";
-      }
-      selfCheckLine(
-        `自检：HTTPS=${httpsOk?"OK":"NO"} · Supabase=${reachOk?"OK":"NO"} (${reachMsg}) · origin=${window.location.origin}`
-      );
-      if(!httpsOk){
-        $("loginMsg").textContent = "❌ 你的页面不是 HTTPS。Vercel 必须用 https://jkang.vercel.app";
-      }
-      if(!reachOk){
-        $("loginMsg").textContent =
-          "❌ 连接 Supabase 失败（网络/CORS/URL不对）。\n" +
-          "确认 Project URL 是否正确：https://xxxx.supabase.co";
-      }
-    }
+    // 关键：detectSessionInUrl 要开（处理 magic link 回跳）
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
 
-    async function initPlayerRows(userId){
-      // requires you already ran your SQL + RLS
-      await supabase.from("wallets").upsert({ user_id: userId }, { onConflict: "user_id" });
-      await supabase.from("weapons").upsert({ user_id: userId }, { onConflict: "user_id" });
-    }
-
-    async function loadPlayerState(){
-      if(isGuest){
-        const s = JSON.parse(localStorage.getItem("jkang_guest")||"{}");
-        wallet.coins = s.coins ?? 120;
-        wallet.gems  = s.gems  ?? 0;
-        weapon.weapon_level = s.wlv ?? 1;
-        weapon.weapon_power = s.wp ?? (10 + (weapon.weapon_level-1)*3);
-        setUIStats();
-        setStatus("Guest 模式：数据保存在本机（localStorage）。");
+    function showUser(user){
+      if(!user){
+        $("me").textContent = "（未登录）";
+        $("status").innerHTML = `<span class="bad">logged out</span>`;
         return;
       }
-
-      await initPlayerRows(sessionUser.id);
-
-      const { data: w, error: we } = await supabase.from("wallets").select("coins,gems").eq("user_id", sessionUser.id).single();
-      if(we){ console.log(we); toast("读取钱包失败"); }
-      wallet.coins = w?.coins ?? 0;
-      wallet.gems  = w?.gems ?? 0;
-
-      const { data: wp, error: wpe } = await supabase.from("weapons").select("weapon_level,weapon_power").eq("user_id", sessionUser.id).single();
-      if(wpe){ console.log(wpe); toast("读取武器失败"); }
-      weapon.weapon_level = wp?.weapon_level ?? 1;
-      weapon.weapon_power = wp?.weapon_power ?? (10 + (weapon.weapon_level-1)*3);
-
-      setUIStats();
-      setStatus("已登录：数据来自 Supabase（wallets / weapons）。");
+      $("me").textContent = JSON.stringify({
+        id: user.id,
+        email: user.email,
+        last_sign_in_at: user.last_sign_in_at
+      }, null, 2);
+      $("status").innerHTML = `<span class="ok">logged in</span>`;
     }
 
-    async function saveGuest(){
-      localStorage.setItem("jkang_guest", JSON.stringify({
-        coins: wallet.coins, gems: wallet.gems, wlv: weapon.weapon_level, wp: weapon.weapon_power
-      }));
-    }
-
-    async function logGame(mode, detail){
-      if(isGuest) return;
-      try{ await supabase.from("game_logs").insert({ user_id: sessionUser.id, mode, detail }); }catch(e){}
-    }
-
-    async function addCoins(amount, mode, detail={}){
-      amount = Math.max(0, Math.floor(amount));
-      wallet.coins += amount;
-      setUIStats();
-      if(isGuest){ await saveGuest(); return; }
-
-      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", sessionUser.id);
-      await logGame(mode, { add: amount, ...detail });
-    }
-
-    async function spendCoins(amount){
-      amount = Math.max(0, Math.floor(amount));
-      if(wallet.coins < amount) return false;
-      wallet.coins -= amount;
-      setUIStats();
-      if(isGuest){ await saveGuest(); return true; }
-
-      await supabase.from("wallets").update({ coins: wallet.coins, updated_at: new Date().toISOString() }).eq("user_id", sessionUser.id);
-      return true;
-    }
-
-    async function upgradeWeapon(){
-      const lvl = weapon.weapon_level || 1;
-      const cost = Math.floor(80 + (lvl-1)*60);
-      if(!(await spendCoins(cost))){
-        toast("金币不足：去 B 挂机或 A 对战赚金币。");
+    async function refreshSession(){
+      const { data, error } = await supabase.auth.getSession();
+      if(error){
+        log("getSession ERROR: " + error.message);
+        showUser(null);
         return;
       }
-      weapon.weapon_level = lvl + 1;
-      weapon.weapon_power = Math.floor(10 + (weapon.weapon_level-1)*4);
-      setUIStats();
-      toast(`武器升级成功！Lv ${weapon.weapon_level}`);
-
-      if(isGuest){ await saveGuest(); return; }
-
-      await supabase.from("weapons").update({
-        weapon_level: weapon.weapon_level,
-        weapon_power: weapon.weapon_power,
-        upgraded_at: new Date().toISOString()
-      }).eq("user_id", sessionUser.id);
-
-      await logGame("C", { action:"upgrade", level: weapon.weapon_level, power: weapon.weapon_power });
+      const user = data?.session?.user || null;
+      showUser(user);
+      log(user ? ("Session OK: " + (user.email || user.id)) : "No session");
     }
 
-    /*********************
-     * Login flow (重点：必有反应 + 必报错)
-     *********************/
-    async function sendLoginLink(){
+    // 监听登录/登出变化（非常重要）
+    supabase.auth.onAuthStateChange((event, session)=>{
+      log("Auth event: " + event);
+      showUser(session?.user || null);
+    });
+
+    $("sendBtn").addEventListener("click", async ()=>{
       const email = $("email").value.trim();
-      if(!email){
-        $("loginMsg").textContent = "请输入邮箱";
-        return;
-      }
+      if(!email){ alert("先输入邮箱"); return; }
 
-      $("otpBtn").disabled = true;
-      $("loginMsg").textContent = "发送中…（请稍等 1-2 秒）";
+      $("sendBtn").disabled = true;
+      log("Sending magic link to: " + email);
 
       try{
-        // ✅ 关键：redirect 用 origin，必须在 Redirect URLs 允许
-        const redirectTo = window.location.origin;
-
+        const redirectTo = window.location.origin; // 你第2步 Redirect URLs 已允许
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: redirectTo }
         });
-
         if(error) throw error;
 
-        $("loginMsg").textContent =
-          "✅ 已发送登录邮件。\n" +
-          "请去邮箱打开登录链接，会自动回到本网站完成登录。\n" +
-          "（如果没收到：检查垃圾邮件 / 或等 1 分钟再试）";
-        toast("已发送登录邮件");
+        log("✅ Sent! 去邮箱点链接回到本站完成登录（看垃圾邮件）");
+        alert("已发送登录邮件，去邮箱点链接回到本站完成登录");
       }catch(e){
-        console.log(e);
-        $("loginMsg").textContent =
-          "❌ 发送失败：\n" + (e?.message || String(e)) + "\n\n" +
-          "你已设置好 Site/Redirect，若还失败：\n" +
-          "1) Supabase Authentication → Providers → Email 是否启用\n" +
-          "2) 是否被 rate limit（等 1 分钟再试）\n" +
-          "3) Console 是否有 CORS/Fetch 报错";
-        toast("发送失败（看登录框提示）");
+        log("❌ signInWithOtp ERROR: " + (e?.message || String(e)));
+        alert("发送失败：\n" + (e?.message || String(e)) + "\n\n打开浏览器 Console 看更详细报错。");
       }finally{
-        $("otpBtn").disabled = false;
+        $("sendBtn").disabled = false;
       }
-    }
-
-    function demoGuest(){
-      isGuest = true;
-      sessionUser = null;
-      setUIUser("Guest");
-      $("login").style.display = "none";
-      loadPlayerState();
-      toast("进入 Guest 模式");
-    }
-
-    async function logout(){
-      isGuest = false;
-      try{ await supabase.auth.signOut(); }catch(e){}
-      sessionUser = null;
-      setUIUser("Guest");
-      $("login").style.display = "flex";
-      setStatus("已退出登录。");
-      endMode();
-    }
-
-    async function tryRestoreSession(){
-      const { data } = await supabase.auth.getSession();
-      if(data?.session?.user){
-        sessionUser = data.session.user;
-        isGuest = false;
-        setUIUser(sessionUser.email || "Player");
-        $("login").style.display = "none";
-        await loadPlayerState();
-      }else{
-        setUIUser("Guest");
-        $("login").style.display = "flex";
-        setStatus("未登录：可用 Demo 试玩，或 Email 登录。");
-      }
-    }
-
-    /*********************
-     * Canvas engine
-     *********************/
-    const fx = $("fx"), fctx = fx.getContext("2d");
-    const game = $("game"), ctx = game.getContext("2d");
-    let W=0,H=0,DPR=1;
-
-    function resize(){
-      DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
-      W = fx.width = game.width = Math.floor(innerWidth*DPR);
-      H = fx.height = game.height = Math.floor(innerHeight*DPR);
-      fx.style.width = game.style.width = innerWidth+"px";
-      fx.style.height = game.style.height = innerHeight+"px";
-    }
-    addEventListener("resize", resize);
-    resize();
-
-    // bg particles
-    const P=[];
-    function seedParticles(){
-      P.length=0;
-      const n = Math.floor((innerWidth*innerHeight)/15000)+90;
-      for(let i=0;i<n;i++){
-        P.push({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.8+.3)*DPR,
-          vx:(Math.random()-.5)*0.12*DPR, vy:(Math.random()-.2)*0.35*DPR, a:Math.random()*0.7+0.15});
-      }
-    }
-    seedParticles();
-
-    function drawFX(){
-      fctx.clearRect(0,0,W,H);
-      const grd=fctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.55);
-      grd.addColorStop(0,"rgba(255,255,255,0.03)");
-      grd.addColorStop(1,"rgba(0,0,0,0)");
-      fctx.fillStyle=grd; fctx.fillRect(0,0,W,H);
-      for(const p of P){
-        p.x+=p.vx; p.y+=p.vy;
-        if(p.y>H+10){p.y=-10;p.x=Math.random()*W;}
-        if(p.x<-10) p.x=W+10;
-        if(p.x>W+10) p.x=-10;
-        fctx.beginPath();
-        fctx.fillStyle=`rgba(180,220,255,${p.a})`;
-        fctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        fctx.fill();
-      }
-    }
-
-    const FXE=[];
-    function boom(x,y,power=1){
-      flashEl.classList.add("on");
-      setTimeout(()=>flashEl.classList.remove("on"),80);
-      document.body.classList.remove("shake"); void document.body.offsetWidth; document.body.classList.add("shake");
-      const n=Math.floor(18+power*12);
-      for(let i=0;i<n;i++){
-        FXE.push({x,y,vx:(Math.random()-.5)*(3.5+power*2)*DPR,vy:(Math.random()-.5)*(3.5+power*2)*DPR,
-          life:34+Math.random()*20,r:(Math.random()*2.2+1.2)*DPR,hue:(Math.random()<0.5)?200:285});
-      }
-    }
-    function drawExplosions(){
-      for(let i=FXE.length-1;i>=0;i--){
-        const e=FXE[i];
-        e.life-=1; e.x+=e.vx; e.y+=e.vy;
-        e.vx*=0.98; e.vy*=0.98; e.vy+=0.04*DPR;
-        const a=Math.max(0,Math.min(1,e.life/40));
-        ctx.beginPath();
-        ctx.fillStyle=`hsla(${e.hue},95%,70%,${a})`;
-        ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
-        ctx.fill();
-        if(e.life<=0) FXE.splice(i,1);
-      }
-    }
-
-    function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-    function rr(a,b){return a+Math.random()*(b-a);}
-
-    // input
-    const keys={};
-    addEventListener("keydown",(e)=>keys[e.key.toLowerCase()]=true);
-    addEventListener("keyup",(e)=>keys[e.key.toLowerCase()]=false);
-
-    // modes
-    let mode="LOBBY", running=false, lastT=0;
-
-    const duel={
-      player:{x:0,y:0,vx:0,hp:100,face:1,cd:0},
-      enemy:{x:0,y:0,vx:0,hp:100,face:-1,cd:0},
-      bullets:[],
-      sparks:[]
-    };
-
-    const afk={t:0,mobHp:40,mobMax:40,dropFX:[]};
-    const rank={rows:[],loading:false};
-
-    function resetArena(){
-      duel.player={x:W*0.30,y:H*0.62,vx:0,hp:100,face:1,cd:0};
-      duel.enemy ={x:W*0.70,y:H*0.62,vx:0,hp:100,face:-1,cd:0};
-      duel.bullets.length=0; duel.sparks.length=0; FXE.length=0;
-    }
-
-    function drawNeonLine(y){
-      ctx.strokeStyle="rgba(255,255,255,0.06)";
-      ctx.lineWidth=2*DPR;
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
-    }
-
-    function drawFighter(f,hue){
-      const r=18*DPR;
-      ctx.save();
-      ctx.shadowBlur=22*DPR;
-      ctx.shadowColor=`hsla(${hue},95%,70%,0.55)`;
-      ctx.fillStyle=`hsla(${hue},95%,65%,0.95)`;
-      ctx.beginPath(); ctx.arc(f.x,f.y,r,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      ctx.fillStyle="rgba(0,0,0,0.35)";
-      ctx.beginPath(); ctx.arc(f.x,f.y,r*0.55,0,Math.PI*2); ctx.fill();
-
-      const w=120*DPR,h=10*DPR;
-      ctx.fillStyle="rgba(255,255,255,0.10)";
-      ctx.fillRect(f.x-w/2,f.y-48*DPR,w,h);
-      ctx.fillStyle=`hsla(${hue},95%,70%,0.85)`;
-      ctx.fillRect(f.x-w/2,f.y-48*DPR,w*(clamp(f.hp,0,100)/100),h);
-    }
-
-    function slash(attacker,victim,power=1){
-      const dist=Math.abs(attacker.x-victim.x);
-      if(dist<90*DPR){
-        victim.hp-=Math.floor((10+(weapon.weapon_level||1)*3)*power);
-        boom(victim.x,victim.y-10*DPR,1.2*power);
-        for(let i=0;i<18;i++){
-          duel.sparks.push({x:victim.x,y:victim.y,vx:(Math.random()-.5)*6*DPR,vy:(Math.random()-.6)*6*DPR,life:22+Math.random()*14});
-        }
-      }else{
-        boom(attacker.x+attacker.face*60*DPR,attacker.y-10*DPR,0.7);
-      }
-    }
-
-    function fire(from,to){
-      const dx=(to.x-from.x), dy=(to.y-from.y);
-      const len=Math.max(1,Math.hypot(dx,dy));
-      const spd=(6.5+(weapon.weapon_level||1)*0.25)*DPR;
-      duel.bullets.push({
-        x:from.x+from.face*22*DPR, y:from.y-6*DPR,
-        vx:(dx/len)*spd, vy:(dy/len)*spd,
-        life:70, who:(from===duel.player)?"P":"E"
-      });
-      boom(from.x+from.face*30*DPR,from.y-10*DPR,0.6);
-    }
-
-    function drawSparks(){
-      for(let i=duel.sparks.length-1;i>=0;i--){
-        const s=duel.sparks[i];
-        s.life-=1; s.x+=s.vx; s.y+=s.vy;
-        s.vx*=0.97; s.vy*=0.97; s.vy+=0.05*DPR;
-        const a=Math.max(0,Math.min(1,s.life/32));
-        ctx.fillStyle=`rgba(255,255,255,${a})`;
-        ctx.fillRect(s.x,s.y,2.2*DPR,2.2*DPR);
-        if(s.life<=0) duel.sparks.splice(i,1);
-      }
-    }
-
-    function updateDuel(dt){
-      const p=duel.player, e=duel.enemy;
-      const left=keys["a"]||keys["arrowleft"];
-      const right=keys["d"]||keys["arrowright"];
-      if(left){p.vx-=0.55*DPR;p.face=-1;}
-      if(right){p.vx+=0.55*DPR;p.face=1;}
-      p.vx*=0.86; p.x=clamp(p.x+p.vx,50*DPR,W-50*DPR);
-
-      p.cd=Math.max(0,p.cd-dt);
-      if(keys["j"]&&p.cd<=0){p.cd=0.35; slash(p,e,1);}
-      if(keys["k"]&&p.cd<=0){p.cd=0.65; e.hp-=Math.floor(16+(weapon.weapon_level||1)*4); boom(e.x,e.y-20*DPR,2.0);}
-      if(keys["l"]&&p.cd<=0){p.cd=0.28; fire(p,e);}
-
-      e.cd=Math.max(0,e.cd-dt);
-      const dir=(p.x<e.x)?-1:1;
-      e.face=dir;
-      e.vx+=dir*0.25*DPR; e.vx*=0.88;
-      e.x=clamp(e.x+e.vx,50*DPR,W-50*DPR);
-
-      if(e.cd<=0){
-        const r=Math.random();
-        if(r<0.45){e.cd=0.55; fire(e,p);}
-        else if(r<0.8){e.cd=0.65; slash(e,p,0.9);}
-        else{e.cd=0.9; boom(p.x+rr(-40,40)*DPR,p.y-rr(10,40)*DPR,1.4); p.hp-=10;}
-      }
-
-      for(let i=duel.bullets.length-1;i>=0;i--){
-        const b=duel.bullets[i];
-        b.life-=1; b.x+=b.vx; b.y+=b.vy;
-
-        ctx.save();
-        ctx.globalAlpha=0.9;
-        ctx.shadowBlur=18*DPR;
-        ctx.shadowColor=(b.who==="P")?"rgba(124,200,255,0.8)":"rgba(255,109,139,0.8)";
-        ctx.fillStyle=(b.who==="P")?"rgba(124,200,255,0.9)":"rgba(255,109,139,0.9)";
-        ctx.beginPath(); ctx.arc(b.x,b.y,3.2*DPR,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-
-        const target=(b.who==="P")?e:p;
-        if(Math.hypot(b.x-target.x,b.y-target.y)<22*DPR){
-          target.hp-=Math.floor(6+(weapon.weapon_level||1)*2);
-          boom(b.x,b.y,1.1);
-          duel.bullets.splice(i,1);
-          continue;
-        }
-        if(b.life<=0||b.x<-50||b.x>W+50||b.y<-50||b.y>H+50) duel.bullets.splice(i,1);
-      }
-
-      if(p.hp<=0){
-        p.hp=0;
-        toast("你被击败了…回大厅再来！");
-        endMode();
-      }
-      if(e.hp<=0){
-        e.hp=0;
-        addCoins(35+(weapon.weapon_level||1)*6,"A",{win:true});
-        toast("胜利！获得金币奖励！");
-        resetArena(); duel.enemy.hp=100;
-      }
-    }
-
-    function drawDuel(){
-      ctx.clearRect(0,0,W,H);
-      drawNeonLine(H*0.70);
-
-      ctx.save();
-      ctx.globalAlpha=0.18;
-      ctx.fillStyle="rgba(124,200,255,1)";
-      ctx.beginPath(); ctx.arc(W*0.25,H*0.72,160*DPR,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="rgba(180,120,255,1)";
-      ctx.beginPath(); ctx.arc(W*0.75,H*0.72,180*DPR,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      drawFighter(duel.player,200);
-      drawFighter(duel.enemy,340);
-      drawSparks();
-      drawExplosions();
-
-      ctx.fillStyle="rgba(255,255,255,0.6)";
-      ctx.font=`${12*DPR}px Arial`;
-      ctx.fillText("A/D 移动  J 攻击  K 技能  L 开火",18*DPR,28*DPR);
-    }
-
-    function updateAFK(dt){
-      afk.t+=dt;
-      if(afk.t>0.6){
-        afk.t=0;
-        const dmg=Math.floor(6+(weapon.weapon_level||1)*2.2);
-        afk.mobHp-=dmg;
-        boom(W*0.60,H*0.55,1.0);
-        if(afk.mobHp<=0){
-          afk.mobHp=afk.mobMax;
-          const reward=Math.floor(8+(weapon.weapon_level||1)*3);
-          addCoins(reward,"B",{mob:"slime"});
-          for(let i=0;i<14;i++){
-            afk.dropFX.push({x:W*0.60+rr(-50,50)*DPR,y:H*0.50+rr(-30,30)*DPR,vy:rr(-2.8,-1.2)*DPR,life:30+Math.random()*18});
-          }
-        }
-      }
-      for(let i=afk.dropFX.length-1;i>=0;i--){
-        const d=afk.dropFX[i];
-        d.life-=1; d.y+=d.vy; d.vy+=0.12*DPR;
-        if(d.life<=0) afk.dropFX.splice(i,1);
-      }
-    }
-
-    function drawAFK(){
-      ctx.clearRect(0,0,W,H);
-      ctx.save();
-      ctx.globalAlpha=0.16;
-      ctx.fillStyle="rgba(124,200,255,1)";
-      ctx.beginPath(); ctx.arc(W*0.40,H*0.55,220*DPR,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="rgba(255,109,139,1)";
-      ctx.beginPath(); ctx.arc(W*0.70,H*0.60,260*DPR,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      const mx=W*0.60,my=H*0.58;
-      ctx.save();
-      ctx.shadowBlur=26*DPR; ctx.shadowColor="rgba(255,109,139,0.55)";
-      ctx.fillStyle="rgba(255,109,139,0.95)";
-      ctx.beginPath(); ctx.arc(mx,my,28*DPR,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      const w=220*DPR,h=12*DPR;
-      ctx.fillStyle="rgba(255,255,255,0.10)";
-      ctx.fillRect(mx-w/2,my-70*DPR,w,h);
-      ctx.fillStyle="rgba(255,109,139,0.85)";
-      ctx.fillRect(mx-w/2,my-70*DPR,w*(afk.mobHp/afk.mobMax),h);
-
-      for(const d of afk.dropFX){
-        const a=Math.max(0,Math.min(1,d.life/40));
-        ctx.save();
-        ctx.globalAlpha=a;
-        ctx.shadowBlur=14*DPR; ctx.shadowColor="rgba(255,210,124,0.7)";
-        ctx.fillStyle="rgba(255,210,124,0.9)";
-        ctx.beginPath(); ctx.arc(d.x,d.y,4.2*DPR,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-      }
-
-      drawExplosions();
-
-      ctx.fillStyle="rgba(255,255,255,0.65)";
-      ctx.font=`${12*DPR}px Arial`;
-      ctx.fillText("挂机中… 自动打怪掉金币",18*DPR,28*DPR);
-    }
-
-    function maskId(id){
-      if(!id) return "unknown";
-      return id.slice(0,4)+"…"+id.slice(-4);
-    }
-
-    async function loadRank(){
-      if(isGuest){ toast("Guest 没有排行榜（请登录）。"); return; }
-      if(rank.loading) return;
-      rank.loading=true;
-      try{
-        const { data, error } = await supabase.from("wallets")
-          .select("user_id, coins").order("coins",{ascending:false}).limit(20);
-        if(error) throw error;
-        rank.rows=data||[];
-      }catch(e){
-        console.log(e);
-        toast("排行榜读取失败（检查 wallets 的 RLS/Policy）");
-      }finally{
-        rank.loading=false;
-      }
-    }
-
-    function roundRect(c,x,y,w,h,r){
-      c.beginPath();
-      c.moveTo(x+r,y);
-      c.arcTo(x+w,y,x+w,y+h,r);
-      c.arcTo(x+w,y+h,x,y+h,r);
-      c.arcTo(x,y+h,x,y,r);
-      c.arcTo(x,y,x+w,y,r);
-      c.closePath();
-    }
-
-    function drawRank(){
-      ctx.clearRect(0,0,W,H);
-      const px=24*DPR, py=62*DPR, pw=Math.min(W-48*DPR,860*DPR), ph=Math.min(H-120*DPR,520*DPR);
-      ctx.save();
-      ctx.fillStyle="rgba(0,0,0,0.35)";
-      ctx.strokeStyle="rgba(255,255,255,0.12)";
-      ctx.lineWidth=2*DPR;
-      roundRect(ctx,px,py,pw,ph,22*DPR);
-      ctx.fill(); ctx.stroke();
-
-      ctx.fillStyle="rgba(255,255,255,0.85)";
-      ctx.font=`${16*DPR}px Arial`;
-      ctx.fillText("Top Coins Leaderboard",px+18*DPR,py+30*DPR);
-
-      ctx.font=`${12*DPR}px Arial`;
-      ctx.fillStyle="rgba(255,255,255,0.60)";
-      ctx.fillText("只展示匿名 user_id + coins。",px+18*DPR,py+52*DPR);
-
-      ctx.font=`${13*DPR}px Arial`;
-      for(let i=0;i<rank.rows.length;i++){
-        const r=rank.rows[i];
-        const y=py+88*DPR+i*20*DPR;
-        if(y>py+ph-24*DPR) break;
-        ctx.fillStyle="rgba(255,255,255,0.78)";
-        ctx.fillText(String(i+1).padStart(2,"0"),px+18*DPR,y);
-        ctx.fillStyle="rgba(124,200,255,0.85)";
-        ctx.fillText(maskId(r.user_id),px+60*DPR,y);
-        ctx.fillStyle="rgba(255,210,124,0.90)";
-        ctx.fillText(fmt(r.coins),px+pw-120*DPR,y);
-      }
-      ctx.restore();
-      ctx.fillStyle="rgba(255,255,255,0.65)";
-      ctx.font=`${12*DPR}px Arial`;
-      ctx.fillText("按 Back 回大厅",18*DPR,28*DPR);
-    }
-
-    /*********************
-     * mode control + loop
-     *********************/
-    const hud=$("hud");
-    const lobby=$("lobby");
-    const actionBtn=$("actionBtn");
-
-    function setHud(title,desc,label){
-      $("hudTitle").textContent=title;
-      $("hudDesc").textContent=desc;
-      actionBtn.textContent=label||"Action";
-    }
-
-    function hudButtonsForMode(m){
-      const box=$("hudBtns");
-      box.innerHTML="";
-
-      if(m==="A"){
-        const b=document.createElement("button");
-        b.className="btn small";
-        b.textContent="Heal (Spend 40)";
-        b.onclick=async ()=>{
-          if(await spendCoins(40)){
-            duel.player.hp=100;
-            boom(duel.player.x,duel.player.y-30*DPR,1.6);
-            toast("回血完成");
-          }else toast("金币不足");
-        };
-        box.appendChild(b);
-      }
-
-      if(m==="C"){
-        const b1=document.createElement("button");
-        b1.className="btn small";
-        b1.textContent="Test Explosion";
-        b1.onclick=()=>boom(W*0.5,H*0.5,2.5);
-        box.appendChild(b1);
-
-        const b2=document.createElement("button");
-        b2.className="btn small";
-        b2.textContent="Earn 30 Coins";
-        b2.onclick=()=>addCoins(30,"C",{debug:true});
-        box.appendChild(b2);
-      }
-    }
-
-    function startMode(m){
-      mode=m; running=true;
-      game.style.display="block";
-      hud.style.display="block";
-      lobby.style.display="none";
-
-      if(m==="A"){
-        resetArena();
-        setHud("A · Duel Arena","A/D 移动，J 近战，K 技能，L 开火。胜利拿金币。","Reset");
-        actionBtn.onclick=()=>{ resetArena(); toast("重置对战"); };
-      }
-      if(m==="B"){
-        afk.t=0; afk.mobHp=afk.mobMax; afk.dropFX.length=0;
-        setHud("B · AFK Dungeon","自动打怪掉金币。武器等级越高越快。","Boost (50)");
-        actionBtn.onclick=async ()=>{
-          if(await spendCoins(50)){
-            boom(W*0.6,H*0.55,2.3);
-            toast("Boost! 掉落更快（短暂）");
-            afk.t=-0.35;
-          }else toast("金币不足");
-        };
-      }
-      if(m==="C"){
-        setHud("C · Weapon Forge","升级武器提升伤害/挂机效率。","Upgrade");
-        actionBtn.onclick=upgradeWeapon;
-      }
-      if(m==="D"){
-        setHud("D · Leaderboard","显示 Coins 前 20（匿名）。","Refresh");
-        actionBtn.onclick=async ()=>{ await loadRank(); toast("已刷新排行榜"); };
-        loadRank();
-      }
-
-      hudButtonsForMode(m);
-      lastT=performance.now();
-      requestAnimationFrame(loop);
-    }
-
-    function endMode(){
-      running=false; mode="LOBBY";
-      game.style.display="none";
-      hud.style.display="none";
-      lobby.style.display="block";
-    }
-
-    $("backBtn").addEventListener("click", endMode);
-
-    document.querySelectorAll(".mode").forEach(el=>{
-      el.addEventListener("click", ()=>startMode(el.getAttribute("data-mode")));
     });
 
-    function loop(t){
-      if(!running) return;
-      const dt=Math.min(0.05,(t-lastT)/1000);
-      lastT=t;
-
-      drawFX();
-
-      if(mode==="A"){ updateDuel(dt); drawDuel(); }
-      else if(mode==="B"){ updateAFK(dt); drawAFK(); }
-      else if(mode==="C"){
-        ctx.clearRect(0,0,W,H);
-        drawExplosions();
-        ctx.fillStyle="rgba(255,255,255,0.65)";
-        ctx.font=`${12*DPR}px Arial`;
-        ctx.fillText("点击 Action 升级武器，或点下面按钮触发特效",18*DPR,28*DPR);
-
-        const cx=W*0.5, cy=H*0.52;
-        ctx.save();
-        ctx.shadowBlur=26*DPR;
-        ctx.shadowColor="rgba(124,200,255,0.55)";
-        ctx.strokeStyle="rgba(124,200,255,0.9)";
-        ctx.lineWidth=6*DPR;
-        ctx.beginPath(); ctx.moveTo(cx-60*DPR,cy+40*DPR); ctx.lineTo(cx+60*DPR,cy-40*DPR); ctx.stroke();
-        ctx.restore();
-
-        ctx.fillStyle="rgba(255,255,255,0.82)";
-        ctx.font=`${16*DPR}px Arial`;
-        ctx.fillText(`Weapon Lv ${weapon.weapon_level}  Power ${weapon.weapon_power}`,cx-160*DPR,cy+90*DPR);
+    $("logoutBtn").addEventListener("click", async ()=>{
+      log("Logout clicked");
+      try{
+        const { error } = await supabase.auth.signOut();
+        if(error) throw error;
+        log("✅ Signed out");
+        await refreshSession();
+      }catch(e){
+        log("❌ signOut ERROR: " + (e?.message || String(e)));
+        alert("退出失败：\n" + (e?.message || String(e)));
       }
-      else if(mode==="D"){ drawRank(); }
+    });
 
-      requestAnimationFrame(loop);
-    }
+    $("clearBtn").addEventListener("click", async ()=>{
+      // 有时旧项目残留 localStorage 会干扰，直接清
+      log("Clearing localStorage/sessionStorage");
+      localStorage.clear();
+      sessionStorage.clear();
+      await refreshSession();
+      alert("已清除本机缓存（local/session storage）");
+    });
 
-    /*********************
-     * bind buttons + boot
-     *********************/
-    function bindUI(){
-      $("otpBtn").addEventListener("click", sendLoginLink);
-      $("demoBtn").addEventListener("click", demoGuest);
-      $("logoutBtn").addEventListener("click", logout);
-      $("topupBtn").addEventListener("click", ()=>window.open(TOPUP_URL,"_blank","noopener"));
-    }
-
+    // boot
     (async ()=>{
-      bindUI();
-      drawFX();
-      setStatus("初始化中…");
-
-      const ok = await initSupabase();
-      if(!ok) return;
-
-      await selfCheck();
-
-      // listen auth changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        if(session?.user){
-          sessionUser=session.user;
-          isGuest=false;
-          setUIUser(sessionUser.email||"Player");
-          $("login").style.display="none";
-          await loadPlayerState();
-          toast("登录成功");
-        }
-      });
-
-      // restore session (also handles magic-link callback)
-      await tryRestoreSession();
-
-      setStatus("就绪：选择 A/B/C/D 开始。");
+      log("Boot…");
+      // 可选：简单连通性检查
+      try{
+        const r = await fetch(SUPABASE_URL + "/rest/v1/", { method:"GET" });
+        log("REST reach: status=" + r.status + " (200/401 都算可达)");
+      }catch(e){
+        log("REST reach FAIL: " + (e?.message || String(e)));
+      }
+      await refreshSession();
+      log("Ready.");
     })();
   </script>
 </body>
