@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>慢慢 ManMan 咖啡厅｜放松 · 美学 · 咖啡文化</title>
-  <meta name="description" content="慢慢 ManMan 咖啡厅：以放松、美学与咖啡文化为核心的小型独立咖啡空间。主打拉花、精品手冲、甜点、咸食与早午餐。" />
+  <meta name="description" content="慢慢 ManMan 咖啡厅：让人停下来的地方，在咖啡香气中恢复生活节奏。主打拉花拿铁、精品手冲、甜点、咸食与早午餐。" />
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,7 +19,8 @@
   <style>
     :root { color-scheme: dark; }
     html, body { background: #000; }
-    /* 玻璃拟态卡片 */
+
+    /* 玻璃拟态卡片（黑金科技区） */
     .glass {
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.06);
@@ -30,6 +31,7 @@
         0 20px 60px rgba(0,0,0,0.35);
       border-radius: 20px;
     }
+
     /* 背景网格 */
     .grid-bg {
       background-image:
@@ -38,7 +40,8 @@
       background-size: 64px 64px;
       background-position: center;
     }
-    /* 光晕 */
+
+    /* 光晕（黑金区） */
     .glow:before, .glow:after{
       content:"";
       position:absolute;
@@ -68,52 +71,44 @@
       opacity: .55;
       pointer-events: none;
     }
+
+    /* ===== Cream theme (content sections) ===== */
+    .cream-wrap{
+      color-scheme: light;
+      background:
+        radial-gradient(ellipse at top, rgba(255, 244, 232, .96), rgba(255, 255, 255, .95) 55%),
+        linear-gradient(to bottom, rgba(255,255,255,.96), rgba(252,247,240,.98));
+      color: #111;
+    }
+    .cream-card{
+      border: 1px solid rgba(17,17,17,0.10);
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow:
+        0 0 0 1px rgba(17,17,17,0.05),
+        0 18px 50px rgba(17,17,17,0.12);
+      border-radius: 20px;
+    }
+    .cream-pill{
+      border: 1px solid rgba(17,17,17,0.10);
+      background: rgba(255,255,255,0.68);
+      color: rgba(17,17,17,0.72);
+    }
+    .cream-icon{
+      border: 1px solid rgba(17,17,17,0.10);
+      background: rgba(255,255,255,0.62);
+      color: rgba(17,17,17,0.82);
+      border-radius: 16px;
+    }
   </style>
 </head>
-
-<style>
-  /* ===== Cream theme (content sections) ===== */
-  .cream-wrap{
-    color-scheme: light;
-    background:
-      radial-gradient(ellipse at top, rgba(255, 244, 232, .92), rgba(255, 255, 255, .92) 55%),
-      linear-gradient(to bottom, rgba(255,255,255,.95), rgba(252,247,240,.96));
-    color: #111;
-  }
-  .cream-wrap .muted{ color: rgba(17,17,17,.62); }
-  .cream-wrap .title{ color: rgba(17,17,17,.92); }
-
-  /* cream card */
-  .cream-card{
-    border: 1px solid rgba(17,17,17,0.10);
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow:
-      0 0 0 1px rgba(17,17,17,0.05),
-      0 18px 50px rgba(17,17,17,0.12);
-    border-radius: 20px;
-  }
-  .cream-pill{
-    border: 1px solid rgba(17,17,17,0.10);
-    background: rgba(255,255,255,0.65);
-    color: rgba(17,17,17,0.72);
-  }
-  .cream-icon{
-    border: 1px solid rgba(17,17,17,0.10);
-    background: rgba(255,255,255,0.60);
-    color: rgba(17,17,17,0.82);
-  }
-
-  /* keep reveal animation ok under cream */
-  .cream-wrap .reveal{ will-change: transform, opacity; }
-</style>
 
 <body class="text-white">
   <!-- 粒子动画 -->
   <canvas id="particles"></canvas>
 
-  <!-- 背景层：网格 + 光晕 + 渐变膜 -->
+  <!-- 背景层：网格 + 光晕 + 渐变膜（只服务首屏黑金感） -->
   <div class="fixed inset-0 -z-40 grid-bg opacity-[0.18] pointer-events-none"></div>
   <div class="fixed inset-0 -z-50 pointer-events-none glow"></div>
   <div class="fixed inset-0 -z-50 pointer-events-none"
@@ -121,7 +116,7 @@
               linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.92));">
   </div>
 
-  <!-- NAV -->
+  <!-- NAV（黑金玻璃） -->
   <header class="sticky top-0 z-50">
     <div class="mx-auto max-w-6xl px-4 py-3">
       <div class="glass px-4 py-3">
@@ -133,12 +128,13 @@
             </div>
             <div class="leading-tight">
               <div class="text-sm font-semibold">慢慢 ManMan</div>
-              <div class="text-xs text-white/60">Cafe · Aesthetic · Slow Living</div>
+              <div class="text-xs text-white/60">Relax · Aesthetic · Coffee Culture</div>
             </div>
           </a>
 
           <nav class="hidden md:flex items-center gap-1">
             <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#about">About</a>
+            <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#brand">Brand</a>
             <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#menu">Menu</a>
             <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#gallery">Gallery</a>
             <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#contact">Contact</a>
@@ -153,7 +149,7 @@
     </div>
   </header>
 
-  <!-- HERO -->
+  <!-- HERO（黑金科技首屏） -->
   <main id="top">
     <section class="relative overflow-hidden">
       <div class="mx-auto max-w-6xl px-4 pt-10 pb-16 md:pt-16 md:pb-24">
@@ -171,19 +167,19 @@
               </div>
             </div>
 
-        <h1 class="mt-6 text-balance text-4xl md:text-6xl font-semibold tracking-tight">
-  <span class="text-white">慢慢 ManMan</span>
-  <span class="text-grad">｜让人停下来的地方</span>
-</h1>
+            <h1 class="mt-6 text-balance text-4xl md:text-6xl font-semibold tracking-tight">
+              <span class="text-white">慢慢 ManMan</span>
+              <span class="text-grad">｜让人停下来的地方</span>
+            </h1>
 
             <p class="mt-5 max-w-xl text-pretty text-base md:text-lg leading-relaxed text-white/70">
-  在咖啡香气中恢复生活节奏。我们以「放松 · 美学 · 咖啡文化」为核心，主打拉花拿铁、精品手冲、
-  甜点、咸食与早午餐，让你不只是“喝咖啡”，而是“慢慢享受生活”。
-</p>
+              在咖啡香气中恢复生活节奏。我们以「放松 · 美学 · 咖啡文化」为核心，
+              主打拉花拿铁、精品手冲、甜点、咸食与早午餐——让你不只是“喝咖啡”，而是“慢慢享受生活”。
+            </p>
 
             <div class="mt-7 flex flex-wrap items-center gap-3">
               <a href="#menu" class="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90">
-                查看菜单亮点
+                看招牌与菜单
                 <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-0.5"></i>
               </a>
               <a href="#gallery" class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-3 text-sm font-semibold hover:bg-white/[0.10]">
@@ -192,13 +188,6 @@
               <div class="flex items-center gap-2 text-sm text-white/60">
                 <i data-lucide="map-pin" class="h-4 w-4"></i> Singapore · 独立咖啡空间
               </div>
-            </div>
-
-            <div class="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/60">
-              <div class="inline-flex items-center gap-2"><i data-lucide="wand-2" class="h-4 w-4"></i> 拉花</div>
-              <div class="inline-flex items-center gap-2"><i data-lucide="droplet" class="h-4 w-4"></i> 精品手冲</div>
-              <div class="inline-flex items-center gap-2"><i data-lucide="cake" class="h-4 w-4"></i> 甜点</div>
-              <div class="inline-flex items-center gap-2"><i data-lucide="sandwich" class="h-4 w-4"></i> 咸食/早午餐</div>
             </div>
           </div>
 
@@ -228,17 +217,17 @@
                     <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
                       <i data-lucide="coffee" class="h-5 w-5 text-white/85"></i>
                       <div class="mt-2 text-xs text-white/60">Coffee</div>
-                      <div class="text-sm font-semibold">Craft</div>
+                      <div class="text-sm font-semibold text-white">Craft</div>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
                       <i data-lucide="sparkles" class="h-5 w-5 text-white/85"></i>
                       <div class="mt-2 text-xs text-white/60">Aesthetic</div>
-                      <div class="text-sm font-semibold">Taste</div>
+                      <div class="text-sm font-semibold text-white">Taste</div>
                     </div>
                     <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
                       <i data-lucide="leaf" class="h-5 w-5 text-white/85"></i>
                       <div class="mt-2 text-xs text-white/60">Slow</div>
-                      <div class="text-sm font-semibold">Living</div>
+                      <div class="text-sm font-semibold text-white">Living</div>
                     </div>
                   </div>
                 </div>
@@ -247,480 +236,445 @@
 
             <!-- Orbit icons -->
             <div class="pointer-events-none absolute -right-6 top-10 hidden md:block">
-              <div id="orbit" class="relative h-40 w-40">
-                <!-- icons will be placed by JS -->
-              </div>
+              <div id="orbit" class="relative h-40 w-40"></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-<div class="cream-wrap">
-  <!-- ABOUT -->
-  <section id="about" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <div class="reveal text-center mx-auto max-w-3xl">
-        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
-          <i data-lucide="sparkles" class="h-4 w-4"></i>
-          <span>About</span>
-        </div>
-        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">我们相信，好的咖啡让时间变慢</h2>
-        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
-          在慢慢 ManMan，你会遇到：温柔的光、舒服的座位、认真对待的每一杯咖啡，以及让人愿意停留的氛围。
-        </p>
-      </div>
-
-      <div class="mt-10 grid gap-4 md:grid-cols-3">
-        <div class="reveal glass p-6">
-          <div class="flex items-start gap-4">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-              <i data-lucide="brush" class="h-6 w-6"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-semibold">美学氛围</h3>
-              <p class="mt-1 text-sm leading-relaxed text-white/70">空间细节、配色与质感，营造“想拍、想坐、想放空”的舒服感。</p>
-            </div>
+    <!-- ===== 奶油自然内容区开始 ===== -->
+    <div class="cream-wrap">
+      <!-- ABOUT -->
+      <section id="about" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div class="reveal text-center mx-auto max-w-3xl">
+          <div class="inline-flex items-center gap-2 rounded-full cream-pill px-4 py-2 text-xs tracking-wide">
+            <i data-lucide="sparkles" class="h-4 w-4"></i>
+            <span>About</span>
           </div>
-        </div>
-
-        <div class="reveal glass p-6">
-          <div class="flex items-start gap-4">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-              <i data-lucide="droplet" class="h-6 w-6"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-semibold">精品手冲</h3>
-              <p class="mt-1 text-sm leading-relaxed text-white/70">用更干净的风味表达豆子，让你喝到层次与香气的变化。</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="reveal glass p-6">
-          <div class="flex items-start gap-4">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-              <i data-lucide="croissant" class="h-6 w-6"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-semibold">甜点与早午餐</h3>
-              <p class="mt-1 text-sm leading-relaxed text-white/70">不只是喝咖啡：甜点、咸食与早午餐，让你的慢慢更完整。</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <section id="brand" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
-  <div class="reveal text-center mx-auto max-w-3xl">
-    <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
-      <i data-lucide="sparkles" class="h-4 w-4"></i>
-      <span>Brand理念</span>
-    </div>
-    <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">慢慢，是一种生活节奏</h2>
-    <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
-      品牌愿景：让人“停下来”的地方，在咖啡香气中恢复生活节奏。
-    </p>
-  </div>
-
-  <div class="mt-10 grid gap-4 md:grid-cols-3">
-    <div class="reveal glass p-6">
-      <div class="flex items-start gap-4">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="tags" class="h-6 w-6"></i>
-        </div>
-        <div>
-          <h3 class="text-base font-semibold">品牌关键词</h3>
-          <p class="mt-1 text-sm leading-relaxed text-white/70">放松 · 拍照 · 社交 · 品味</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="reveal glass p-6">
-      <div class="flex items-start gap-4">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="palette" class="h-6 w-6"></i>
-        </div>
-        <div>
-          <h3 class="text-base font-semibold">空间风格</h3>
-          <p class="mt-1 text-sm leading-relaxed text-white/70">
-            简约自然、奶油色调、绿植与木质感。
+          <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight text-black/90">
+            我们相信，好的咖啡让时间变慢
+          </h2>
+          <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-black/60">
+            在慢慢 ManMan，你会遇到温柔的光、舒服的座位、认真对待的每一杯咖啡，
+            以及让人愿意停留的氛围。
           </p>
         </div>
-      </div>
-    </div>
 
-    <div class="reveal glass p-6">
-      <div class="flex items-start gap-4">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="music-2" class="h-6 w-6"></i>
+        <div class="mt-10 grid gap-4 md:grid-cols-3">
+          <div class="reveal cream-card p-6">
+            <div class="flex items-start gap-4">
+              <div class="cream-icon p-3">
+                <i data-lucide="camera" class="h-6 w-6"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold text-black/90">适合拍照</h3>
+                <p class="mt-1 text-sm leading-relaxed text-black/60">
+                  简约自然、奶油色调、绿植与木质感，让每个角落都好看。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-start gap-4">
+              <div class="cream-icon p-3">
+                <i data-lucide="users" class="h-6 w-6"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold text-black/90">适合社交</h3>
+                <p class="mt-1 text-sm leading-relaxed text-black/60">
+                  音乐以轻爵士与独立流行为主，聊天也舒服，一个人也自在。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-start gap-4">
+              <div class="cream-icon p-3">
+                <i data-lucide="coffee" class="h-6 w-6"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold text-black/90">有品味的咖啡文化</h3>
+                <p class="mt-1 text-sm leading-relaxed text-black/60">
+                  拉花、手冲、甜点与轻食搭配，让“慢慢”成为你的日常仪式感。
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <h3 class="text-base font-semibold">音乐氛围</h3>
-          <p class="mt-1 text-sm leading-relaxed text-white/70">
-            轻爵士与独立流行为主，适合聊天、工作、放空。
+      </section>
+
+      <!-- BRAND -->
+      <section id="brand" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div class="reveal text-center mx-auto max-w-3xl">
+          <div class="inline-flex items-center gap-2 rounded-full cream-pill px-4 py-2 text-xs tracking-wide">
+            <i data-lucide="sparkles" class="h-4 w-4"></i>
+            <span>Brand理念</span>
+          </div>
+          <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight text-black/90">
+            慢慢，是一种生活节奏
+          </h2>
+          <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-black/60">
+            品牌愿景：让人“停下来”的地方，在咖啡香气中恢复生活节奏。
           </p>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-    <!-- MENU -->
-    <section id="menu" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
-  <div class="reveal text-center mx-auto max-w-3xl">
-    <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
-      <i data-lucide="menu" class="h-4 w-4"></i>
-      <span>Menu Highlights</span>
-    </div>
-    <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">菜单亮点</h2>
-    <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
-      慢慢 ManMan 以“放松 · 拍照 · 社交 · 品味”为关键词，做你愿意停下来的那杯咖啡与那一口甜点。
-    </p>
-  </div>
-  
-  <!-- Signature Items -->
-<div class="mt-10 grid gap-4 md:grid-cols-3">
+        <div class="mt-10 grid gap-4 md:grid-cols-3">
+          <div class="reveal cream-card p-6">
+            <div class="flex items-start gap-4">
+              <div class="cream-icon p-3"><i data-lucide="tags" class="h-6 w-6"></i></div>
+              <div>
+                <h3 class="text-base font-semibold text-black/90">品牌关键词</h3>
+                <p class="mt-1 text-sm leading-relaxed text-black/60">放松 · 拍照 · 社交 · 品味</p>
+              </div>
+            </div>
+          </div>
 
-  <!-- ManMan Latte -->
-  <div class="reveal glass p-6 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10"
-         style="background: radial-gradient(circle at 30% 20%, #ffffff, transparent 60%);">
-    </div>
+          <div class="reveal cream-card p-6">
+            <div class="flex items-start gap-4">
+              <div class="cream-icon p-3"><i data-lucide="palette" class="h-6 w-6"></i></div>
+              <div>
+                <h3 class="text-base font-semibold text-black/90">空间风格</h3>
+                <p class="mt-1 text-sm leading-relaxed text-black/60">简约自然、奶油色调、绿植与木质感</p>
+              </div>
+            </div>
+          </div>
 
-    <div class="flex items-center justify-between">
-      <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-        <i data-lucide="coffee" class="h-6 w-6"></i>
-      </div>
-      <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">
-        Signature
-      </div>
-    </div>
-
-    <h3 class="mt-4 text-lg font-semibold">ManMan Latte</h3>
-    <p class="mt-2 text-sm text-white/70 leading-relaxed">
-      柔和奶泡与平衡浓缩的结合。温柔但有力量，是慢慢的第一口。
-    </p>
-  </div>
-
-  <!-- Slow Drip -->
-  <div class="reveal glass p-6 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10"
-         style="background: radial-gradient(circle at 70% 30%, #ffffff, transparent 60%);">
-    </div>
-
-    <div class="flex items-center justify-between">
-      <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-        <i data-lucide="droplet" class="h-6 w-6"></i>
-      </div>
-      <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">
-        Pour-over
-      </div>
-    </div>
-
-    <h3 class="mt-4 text-lg font-semibold">Slow Drip</h3>
-    <p class="mt-2 text-sm text-white/70 leading-relaxed">
-      让时间慢下来的一杯。干净、层次分明、适合独处与思考。
-    </p>
-  </div>
-
-  <!-- Seasonal Matcha -->
-  <div class="reveal glass p-6 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10"
-         style="background: radial-gradient(circle at 50% 80%, #ffffff, transparent 60%);">
-    </div>
-
-    <div class="flex items-center justify-between">
-      <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-        <i data-lucide="leaf" class="h-6 w-6"></i>
-      </div>
-      <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">
-        Seasonal
-      </div>
-    </div>
-
-    <h3 class="mt-4 text-lg font-semibold">Seasonal Matcha</h3>
-    <p class="mt-2 text-sm text-white/70 leading-relaxed">
-      抹茶与奶香的平衡表达。根据季节调整风味，是慢慢的限定惊喜。
-    </p>
-  </div>
-
-</div>
-
-  <!-- Categories -->
-  <div class="mt-10 grid gap-4 md:grid-cols-3">
-    <!-- Coffee -->
-    <div class="reveal glass p-6">
-      <div class="flex items-center justify-between">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="coffee" class="h-6 w-6"></i>
-        </div>
-        <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Coffee</div>
-      </div>
-      <h3 class="mt-4 text-lg font-semibold">☕ 咖啡系列</h3>
-      <ul class="mt-3 space-y-2 text-sm text-white/70">
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>拉花拿铁</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>手冲精品</li>
-      </ul>
-    </div>
-
-    <!-- Dessert -->
-    <div class="reveal glass p-6">
-      <div class="flex items-center justify-between">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="cake" class="h-6 w-6"></i>
-        </div>
-        <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Dessert</div>
-      </div>
-      <h3 class="mt-4 text-lg font-semibold">🍰 甜点系列</h3>
-      <ul class="mt-3 space-y-2 text-sm text-white/70">
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>戚风奶油水果蛋糕</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>磅蛋糕</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>布丁</li>
-      </ul>
-    </div>
-
-    <!-- Savory -->
-    <div class="reveal glass p-6">
-      <div class="flex items-center justify-between">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="sandwich" class="h-6 w-6"></i>
-        </div>
-        <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Savory</div>
-      </div>
-      <h3 class="mt-4 text-lg font-semibold">🥐 咸食系列</h3>
-      <ul class="mt-3 space-y-2 text-sm text-white/70">
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>三明治</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>面类</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>炖饭类</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>可颂</li>
-      </ul>
-    </div>
-
-    <!-- Brunch -->
-    <div class="reveal glass p-6">
-      <div class="flex items-center justify-between">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="utensils" class="h-6 w-6"></i>
-        </div>
-        <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Brunch</div>
-      </div>
-      <h3 class="mt-4 text-lg font-semibold">🍳 早午餐系列</h3>
-      <ul class="mt-3 space-y-2 text-sm text-white/70">
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>吐司</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>沙拉</li>
-      </ul>
-    </div>
-
-    <!-- Special -->
-    <div class="reveal glass p-6">
-      <div class="flex items-center justify-between">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="cup-soda" class="h-6 w-6"></i>
-        </div>
-        <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Special</div>
-      </div>
-      <h3 class="mt-4 text-lg font-semibold">🍹 特调系列</h3>
-      <ul class="mt-3 space-y-2 text-sm text-white/70">
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>冷萃咖啡果汁</li>
-        <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-white/60"></span>抹茶拿铁</li>
-      </ul>
-    </div>
-
-    <!-- Custom cake -->
-    <div class="reveal glass p-6">
-      <div class="flex items-center justify-between">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <i data-lucide="gift" class="h-6 w-6"></i>
-        </div>
-        <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Custom</div>
-      </div>
-      <h3 class="mt-4 text-lg font-semibold">🎂 客制化服务</h3>
-      <p class="mt-3 text-sm text-white/70 leading-relaxed">
-        整颗生日蛋糕出售（建议提前预订）
-      </p>
-    </div>
-  </div>
-
-  <!-- Average spend + CTA -->
-  <div class="reveal mt-6 glass p-6 md:p-8">
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <div class="text-xs text-white/60">AVERAGE SPEND</div>
-        <div class="mt-2 text-xl font-semibold">平均客单价：SGD 13</div>
-        <p class="mt-2 text-sm text-white/70">
-          想要最新完整菜单与价格？点击 WhatsApp，我们直接发你。
-        </p>
-      </div>
-      <a
-        href="https://wa.me/6594450736?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%83%B3%E8%A6%81%E6%85%A2%E6%85%A2%20ManMan%20%E7%9A%84%E6%9C%80%E6%96%B0%E5%AE%8C%E6%95%B4%E8%8F%9C%E5%8D%95%E4%B8%8E%E4%BB%B7%E6%A0%BC%EF%BC%8C%E8%B0%A2%E8%B0%A2%EF%BC%81"
-        target="_blank" rel="noopener"
-        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90"
-      >
-        <i data-lucide="phone" class="h-4 w-4"></i>
-        WhatsApp 获取菜单
-      </a>
-    </div>
-  </div>
-</section>
-
-    <!-- GALLERY -->
-    <section id="gallery" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <div class="reveal text-center mx-auto max-w-3xl">
-        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
-          <i data-lucide="image" class="h-4 w-4"></i>
-          <span>Gallery</span>
-        </div>
-        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">风格图片画廊</h2>
-        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
-          先用高质感占位图。你把店内照片/咖啡拉花/甜点图给我，我能帮你替换并做成更统一的品牌视觉。
-        </p>
-      </div>
-
-      <div class="mt-10 grid gap-4 md:grid-cols-2">
-        <div class="reveal glass overflow-hidden">
-          <div class="relative aspect-[16/10]">
-            <img class="absolute inset-0 h-full w-full object-cover"
-                 src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=1600&q=80" alt="coffee latte art" />
-            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-base font-semibold">Latte Art · 温柔但专业</div>
-                  <div class="mt-1 text-sm text-white/70">主打拉花与口感平衡</div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="wand-2" class="h-6 w-6"></i></div>
+          <div class="reveal cream-card p-6">
+            <div class="flex items-start gap-4">
+              <div class="cream-icon p-3"><i data-lucide="music-2" class="h-6 w-6"></i></div>
+              <div>
+                <h3 class="text-base font-semibold text-black/90">音乐氛围</h3>
+                <p class="mt-1 text-sm leading-relaxed text-black/60">轻爵士与独立流行为主</p>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="reveal glass overflow-hidden">
-          <div class="relative aspect-[16/10]">
-            <img class="absolute inset-0 h-full w-full object-cover"
-                 src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80" alt="pour over" />
-            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-base font-semibold">Pour-over · 让时间慢下来</div>
-                  <div class="mt-1 text-sm text-white/70">香气与层次的变化</div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="droplet" class="h-6 w-6"></i></div>
-              </div>
+      <!-- MENU -->
+      <section id="menu" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div class="reveal text-center mx-auto max-w-3xl">
+          <div class="inline-flex items-center gap-2 rounded-full cream-pill px-4 py-2 text-xs tracking-wide">
+            <i data-lucide="menu" class="h-4 w-4"></i>
+            <span>Menu Highlights</span>
+          </div>
+          <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight text-black/90">
+            招牌与菜单亮点
+          </h2>
+          <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-black/60">
+            慢慢 ManMan 以“放松 · 拍照 · 社交 · 品味”为关键词，做你愿意停下来的那杯咖啡与那一口甜点。
+          </p>
+        </div>
+
+        <!-- Signature Items -->
+        <div class="mt-10 grid gap-4 md:grid-cols-3">
+          <div class="reveal cream-card p-6 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10"
+                 style="background: radial-gradient(circle at 30% 20%, #111111, transparent 60%);"></div>
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="coffee" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Signature</div>
             </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">ManMan Latte</h3>
+            <p class="mt-2 text-sm text-black/60 leading-relaxed">
+              柔和奶泡与平衡浓缩的结合。温柔但有力量，是慢慢的第一口。
+            </p>
+          </div>
+
+          <div class="reveal cream-card p-6 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10"
+                 style="background: radial-gradient(circle at 70% 30%, #111111, transparent 60%);"></div>
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="droplet" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Pour-over</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">Slow Drip</h3>
+            <p class="mt-2 text-sm text-black/60 leading-relaxed">
+              让时间慢下来的一杯。干净、层次分明、适合独处与思考。
+            </p>
+          </div>
+
+          <div class="reveal cream-card p-6 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10"
+                 style="background: radial-gradient(circle at 50% 80%, #111111, transparent 60%);"></div>
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="leaf" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Seasonal</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">Seasonal Matcha</h3>
+            <p class="mt-2 text-sm text-black/60 leading-relaxed">
+              抹茶与奶香的平衡表达。根据季节调整风味，是慢慢的限定惊喜。
+            </p>
           </div>
         </div>
 
-        <div class="reveal glass overflow-hidden">
-          <div class="relative aspect-[16/10]">
-            <img class="absolute inset-0 h-full w-full object-cover"
-                 src="https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=1600&q=80" alt="dessert" />
-            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-base font-semibold">Dessert · 甜点与幸福感</div>
-                  <div class="mt-1 text-sm text-white/70">搭配咖啡刚刚好</div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="cake" class="h-6 w-6"></i></div>
-              </div>
+        <!-- Categories -->
+        <div class="mt-4 grid gap-4 md:grid-cols-3">
+          <div class="reveal cream-card p-6">
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="coffee" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Coffee</div>
             </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">☕ 咖啡系列</h3>
+            <ul class="mt-3 space-y-2 text-sm text-black/60">
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>拉花拿铁</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>手冲精品</li>
+            </ul>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="cake" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Dessert</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">🍰 甜点系列</h3>
+            <ul class="mt-3 space-y-2 text-sm text-black/60">
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>戚风奶油水果蛋糕</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>磅蛋糕</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>布丁</li>
+            </ul>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="sandwich" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Savory</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">🥐 咸食系列</h3>
+            <ul class="mt-3 space-y-2 text-sm text-black/60">
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>三明治</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>面类</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>炖饭类</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>可颂</li>
+            </ul>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="utensils" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Brunch</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">🍳 早午餐系列</h3>
+            <ul class="mt-3 space-y-2 text-sm text-black/60">
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>吐司</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>沙拉</li>
+            </ul>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="cup-soda" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Special</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">🍹 特调系列</h3>
+            <ul class="mt-3 space-y-2 text-sm text-black/60">
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>冷萃咖啡果汁</li>
+              <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-black/40"></span>抹茶拿铁</li>
+            </ul>
+          </div>
+
+          <div class="reveal cream-card p-6">
+            <div class="flex items-center justify-between">
+              <div class="cream-icon p-3"><i data-lucide="gift" class="h-6 w-6"></i></div>
+              <div class="rounded-full cream-pill px-3 py-1 text-xs">Custom</div>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-black/90">🎂 客制化服务</h3>
+            <p class="mt-3 text-sm text-black/60 leading-relaxed">
+              整颗生日蛋糕出售（建议提前预订）
+            </p>
           </div>
         </div>
 
-        <div class="reveal glass overflow-hidden">
-          <div class="relative aspect-[16/10]">
-            <img class="absolute inset-0 h-full w-full object-cover"
-                 src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1600&q=80" alt="brunch" />
-            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-base font-semibold">Brunch · 慢慢的日常</div>
-                  <div class="mt-1 text-sm text-white/70">咸食与早午餐</div>
-                </div>
-                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="sandwich" class="h-6 w-6"></i></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="mx-auto max-w-6xl px-4 pt-8 pb-20 md:pb-28">
-      <div class="reveal text-center mx-auto max-w-3xl">
-        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
-          <i data-lucide="message-circle" class="h-4 w-4"></i>
-          <span>Contact</span>
-        </div>
-        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">欢迎来慢慢坐一坐</h2>
-        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
-          合作 / 询问 / 预订：直接联系我就好。
-        </p>
-      </div>
-
-      <div class="mt-10 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
-        <div class="reveal glass p-6 md:p-8">
-          <div class="flex items-start justify-between gap-4">
+        <!-- Average spend + CTA -->
+        <div class="reveal mt-6 cream-card p-6 md:p-8">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <div class="text-xs text-white/60">EMAIL</div>
-              <div class="mt-2 text-lg font-semibold">junkang1999@live.com</div>
-              <p class="mt-2 text-sm text-white/70">点击按钮直接发邮件，或使用 WhatsApp 快速联系。</p>
+              <div class="text-xs text-black/50">AVERAGE SPEND</div>
+              <div class="mt-2 text-xl font-semibold text-black/90">平均客单价：SGD 13</div>
+              <p class="mt-2 text-sm text-black/60">
+                想要最新完整菜单与价格？点击 WhatsApp，我们直接发你。
+              </p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-              <i data-lucide="mail" class="h-6 w-6"></i>
-            </div>
-          </div>
-
-          <div class="mt-6 grid gap-3 md:grid-cols-2">
-            <a href="mailto:junkang1999@live.com"
-               class="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black hover:opacity-90">
-              发邮件
-              <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-0.5"></i>
-            </a>
-            <a href="https://wa.me/6594450736" target="_blank" rel="noopener"
-               class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-3 text-sm font-semibold hover:bg-white/[0.10]">
-              <i data-lucide="phone" class="h-4 w-4"></i> WhatsApp：9445 0736
+            <a
+              href="https://wa.me/6594450736?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%83%B3%E8%A6%81%E6%85%A2%E6%85%A2%20ManMan%20%E7%9A%84%E6%9C%80%E6%96%B0%E5%AE%8C%E6%95%B4%E8%8F%9C%E5%8D%95%E4%B8%8E%E4%BB%B7%E6%A0%BC%EF%BC%8C%E8%B0%A2%E8%B0%A2%EF%BC%81"
+              target="_blank" rel="noopener"
+              class="inline-flex items-center justify-center gap-2 rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+            >
+              <i data-lucide="phone" class="h-4 w-4"></i>
+              WhatsApp 获取菜单
             </a>
           </div>
         </div>
+      </section>
 
-        <div class="reveal glass h-full p-6 md:p-8">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-xs text-white/60">SOCIAL</div>
-              <div class="mt-2 text-lg font-semibold">Instagram</div>
-            </div>
-            <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-              <i data-lucide="instagram" class="h-6 w-6"></i>
-            </div>
+      <!-- GALLERY -->
+      <section id="gallery" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div class="reveal text-center mx-auto max-w-3xl">
+          <div class="inline-flex items-center gap-2 rounded-full cream-pill px-4 py-2 text-xs tracking-wide">
+            <i data-lucide="image" class="h-4 w-4"></i>
+            <span>Gallery</span>
           </div>
+          <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight text-black/90">风格图片画廊</h2>
+          <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-black/60">
+            先用高质感占位图。你把店内照片/拉花/甜点图给我，我能帮你替换并做成更统一的品牌视觉。
+          </p>
+        </div>
 
-          <div class="mt-6 space-y-2">
-            <a href="https://instagram.com/jknlk_" target="_blank" rel="noopener"
-               class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/80 hover:bg-white/[0.08]">
-              <div class="flex items-center gap-3">
-                <i data-lucide="instagram" class="h-5 w-5 text-white/80"></i>
-                <span>@jknlk_</span>
+        <div class="mt-10 grid gap-4 md:grid-cols-2">
+          <div class="reveal cream-card overflow-hidden">
+            <div class="relative aspect-[16/10]">
+              <img class="absolute inset-0 h-full w-full object-cover"
+                   src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=1600&q=80" alt="coffee latte art" />
+              <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.55), transparent 55%);"></div>
+              <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-base font-semibold">Latte Art · 温柔但专业</div>
+                    <div class="mt-1 text-sm text-white/80">主打拉花与口感平衡</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/20 bg-white/10 p-3"><i data-lucide="wand-2" class="h-6 w-6"></i></div>
+                </div>
               </div>
-              <i data-lucide="arrow-right" class="h-4 w-4 text-white/60"></i>
-            </a>
+            </div>
           </div>
 
-          <div class="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-xs text-white/60">
-            想加更多社媒（Google Maps / TikTok / 小红书 / Telegram）告诉我，我帮你排版成同一风格。
+          <div class="reveal cream-card overflow-hidden">
+            <div class="relative aspect-[16/10]">
+              <img class="absolute inset-0 h-full w-full object-cover"
+                   src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80" alt="pour over" />
+              <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.55), transparent 55%);"></div>
+              <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-base font-semibold">Pour-over · 让时间慢下来</div>
+                    <div class="mt-1 text-sm text-white/80">香气与层次的变化</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/20 bg-white/10 p-3"><i data-lucide="droplet" class="h-6 w-6"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal cream-card overflow-hidden">
+            <div class="relative aspect-[16/10]">
+              <img class="absolute inset-0 h-full w-full object-cover"
+                   src="https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=1600&q=80" alt="dessert" />
+              <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.55), transparent 55%);"></div>
+              <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-base font-semibold">Dessert · 甜点与幸福感</div>
+                    <div class="mt-1 text-sm text-white/80">搭配咖啡刚刚好</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/20 bg-white/10 p-3"><i data-lucide="cake" class="h-6 w-6"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal cream-card overflow-hidden">
+            <div class="relative aspect-[16/10]">
+              <img class="absolute inset-0 h-full w-full object-cover"
+                   src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1600&q=80" alt="brunch" />
+              <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.55), transparent 55%);"></div>
+              <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-base font-semibold">Brunch · 慢慢的日常</div>
+                    <div class="mt-1 text-sm text-white/80">咸食与早午餐</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/20 bg-white/10 p-3"><i data-lucide="sandwich" class="h-6 w-6"></i></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="reveal mt-10 text-center text-xs text-white/50">
-        © <span id="year"></span> 慢慢 ManMan 咖啡厅 · Crafted with care
-      </div><!-- end creamwrap -->
-    </section>
+      <!-- CONTACT -->
+      <section id="contact" class="mx-auto max-w-6xl px-4 pt-8 pb-20 md:pb-28">
+        <div class="reveal text-center mx-auto max-w-3xl">
+          <div class="inline-flex items-center gap-2 rounded-full cream-pill px-4 py-2 text-xs tracking-wide">
+            <i data-lucide="message-circle" class="h-4 w-4"></i>
+            <span>Contact</span>
+          </div>
+          <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight text-black/90">
+            欢迎来慢慢坐一坐
+          </h2>
+          <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-black/60">
+            合作 / 询问 / 预订：直接联系我就好。
+          </p>
+        </div>
 
-    <!-- Floating top button -->
+        <div class="mt-10 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+          <div class="reveal cream-card p-6 md:p-8">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="text-xs text-black/50">EMAIL</div>
+                <div class="mt-2 text-lg font-semibold text-black/90">junkang1999@live.com</div>
+                <p class="mt-2 text-sm text-black/60">
+                  点击按钮直接发邮件，或使用 WhatsApp 快速联系。
+                </p>
+              </div>
+              <div class="cream-icon p-3">
+                <i data-lucide="mail" class="h-6 w-6"></i>
+              </div>
+            </div>
+
+            <div class="mt-6 grid gap-3 md:grid-cols-2">
+              <a href="mailto:junkang1999@live.com"
+                 class="group inline-flex items-center justify-center gap-2 rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white hover:opacity-90">
+                发邮件
+                <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-0.5"></i>
+              </a>
+              <a href="https://wa.me/6594450736" target="_blank" rel="noopener"
+                 class="inline-flex items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm font-semibold text-black hover:bg-white">
+                <i data-lucide="phone" class="h-4 w-4"></i> WhatsApp：9445 0736
+              </a>
+            </div>
+          </div>
+
+          <div class="reveal cream-card h-full p-6 md:p-8">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs text-black/50">SOCIAL</div>
+                <div class="mt-2 text-lg font-semibold text-black/90">Instagram</div>
+              </div>
+              <div class="cream-icon p-3">
+                <i data-lucide="instagram" class="h-6 w-6"></i>
+              </div>
+            </div>
+
+            <div class="mt-6 space-y-2">
+              <a href="https://instagram.com/jknlk_" target="_blank" rel="noopener"
+                 class="flex items-center justify-between rounded-2xl border border-black/10 bg-white/60 px-4 py-3 text-sm text-black/80 hover:bg-white">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="instagram" class="h-5 w-5"></i>
+                  <span>@jknlk_</span>
+                </div>
+                <i data-lucide="arrow-right" class="h-4 w-4 text-black/50"></i>
+              </a>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-black/10 bg-white/60 p-4 text-xs text-black/60">
+              想加更多社媒（Google Maps / TikTok / 小红书等）告诉我，我帮你排版成同一风格。
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal mt-10 text-center text-xs text-black/50">
+          © <span id="year"></span> 慢慢 ManMan 咖啡厅 · Crafted with care
+        </div>
+      </section>
+    </div>
+    <!-- ===== 奶油自然内容区结束 ===== -->
+
+    <!-- Floating top button（保持黑金玻璃） -->
     <a href="#top"
-       class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-3 text-sm font-semibold shadow-lg backdrop-blur hover:bg-white/[0.12]">
+       class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-3 text-sm font-semibold text-white shadow-lg backdrop-blur hover:bg-white/[0.12]">
       <i data-lucide="arrow-up" class="h-4 w-4"></i> 顶部
     </a>
   </main>
@@ -773,7 +727,6 @@
       canvas.style.width = innerWidth + 'px';
       canvas.style.height = innerHeight + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return dpr;
     }
     setupCanvas();
     addEventListener('resize', setupCanvas);
@@ -786,7 +739,7 @@
       vx: rand(-0.25, 0.25),
       vy: rand(-0.25, 0.25),
       r: rand(0.6, 1.8),
-      a: rand(0.25, 0.85),
+      a: rand(0.22, 0.75),
     }));
 
     function loop() {
@@ -813,7 +766,7 @@
           const dx = a.x - b.x, dy = a.y - b.y;
           const dist = Math.sqrt(dx*dx + dy*dy);
           if (dist < 120) {
-            const alpha = (1 - dist/120) * 0.18;
+            const alpha = (1 - dist/120) * 0.16;
             ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
