@@ -1,130 +1,570 @@
-/*
-  Next.js (App Router) 单文件页面示例：放到 app/page.tsx
-  - Tailwind 已开启（Vercel 常见模板默认）
-  - 依赖：framer-motion、lucide-react、next
-  安装：
-    npm i framer-motion lucide-react
-*/
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>慢慢 ManMan 咖啡厅｜放松 · 美学 · 咖啡文化</title>
+  <meta name="description" content="慢慢 ManMan 咖啡厅：以放松、美学与咖啡文化为核心的小型独立咖啡空间。主打拉花、精品手冲、甜点、咸食与早午餐。" />
 
-'use client';
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import {
-  ArrowRight,
-  BadgeCheck,
-  BriefcaseBusiness,
-  Building2,
-  Coffee,
-  Cpu,
-  Crown,
-  Github,
-  Globe,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Rocket,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Terminal,
-  TrendingUp,
-  Trophy,
-  Twitter,
-  Workflow,
-  Zap,
-} from 'lucide-react';
+  <!-- GSAP (动画) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
-// -----------------------------
-// Utils
-// -----------------------------
-function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(' ');
-}
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-};
+  <style>
+    :root { color-scheme: dark; }
+    html, body { background: #000; }
+    /* 玻璃拟态卡片 */
+    .glass {
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 20px 60px rgba(0,0,0,0.35);
+      border-radius: 20px;
+    }
+    /* 背景网格 */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 64px 64px;
+      background-position: center;
+    }
+    /* 光晕 */
+    .glow:before, .glow:after{
+      content:"";
+      position:absolute;
+      width:34rem; height:34rem;
+      border-radius:9999px;
+      filter: blur(60px);
+      opacity: .32;
+      background: rgba(255,255,255,.18);
+      pointer-events:none;
+    }
+    .glow:before{ left:-6rem; top:2.5rem; }
+    .glow:after{ right:-6rem; top:10rem; }
 
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
-};
+    /* 文字渐变 */
+    .text-grad{
+      background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,.86), rgba(255,255,255,.65));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+    }
 
-// -----------------------------
-// Background Particles (轻量酷炫动画)
-// -----------------------------
-function ParticleField() {
-  const ref = useRef<HTMLCanvasElement | null>(null);
+    /* 粒子 Canvas */
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: -30;
+      opacity: .55;
+      pointer-events: none;
+    }
+  </style>
+</head>
 
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
+<body class="text-white">
+  <!-- 粒子动画 -->
+  <canvas id="particles"></canvas>
+
+  <!-- 背景层：网格 + 光晕 + 渐变膜 -->
+  <div class="fixed inset-0 -z-40 grid-bg opacity-[0.18] pointer-events-none"></div>
+  <div class="fixed inset-0 -z-50 pointer-events-none glow"></div>
+  <div class="fixed inset-0 -z-50 pointer-events-none"
+       style="background: radial-gradient(ellipse at top, rgba(255,255,255,0.14), transparent 55%),
+              linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.92));">
+  </div>
+
+  <!-- NAV -->
+  <header class="sticky top-0 z-50">
+    <div class="mx-auto max-w-6xl px-4 py-3">
+      <div class="glass px-4 py-3">
+        <div class="flex items-center justify-between gap-3">
+          <a href="#top" class="flex items-center gap-3">
+            <div class="relative h-10 w-10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.06]">
+              <div class="absolute inset-0" style="background:radial-gradient(circle at 20% 20%, rgba(255,255,255,.35), transparent 60%);"></div>
+              <div class="absolute inset-0" style="background:radial-gradient(circle at 80% 60%, rgba(255,255,255,.20), transparent 60%);"></div>
+            </div>
+            <div class="leading-tight">
+              <div class="text-sm font-semibold">慢慢 ManMan</div>
+              <div class="text-xs text-white/60">Cafe · Aesthetic · Slow Living</div>
+            </div>
+          </a>
+
+          <nav class="hidden md:flex items-center gap-1">
+            <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#about">About</a>
+            <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#menu">Menu</a>
+            <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#gallery">Gallery</a>
+            <a class="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white" href="#contact">Contact</a>
+          </nav>
+
+          <a href="#contact" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm hover:bg-white/[0.10]">
+            <i data-lucide="mail" class="h-4 w-4"></i>
+            <span>联系 / 预订</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="top">
+    <section class="relative overflow-hidden">
+      <div class="mx-auto max-w-6xl px-4 pt-10 pb-16 md:pt-16 md:pb-24">
+        <div class="grid items-center gap-10 md:grid-cols-[1.1fr_0.9fr]">
+          <div class="reveal">
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/90">
+                <i data-lucide="coffee" class="h-4 w-4 text-white/80"></i> 放松
+              </div>
+              <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/90">
+                <i data-lucide="sparkles" class="h-4 w-4 text-white/80"></i> 美学
+              </div>
+              <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/90">
+                <i data-lucide="cup-soda" class="h-4 w-4 text-white/80"></i> 咖啡文化
+              </div>
+            </div>
+
+            <h1 class="mt-6 text-balance text-4xl md:text-6xl font-semibold tracking-tight">
+              <span class="text-white">慢慢喝，</span>
+              <span class="text-grad">慢慢享受生活</span>
+            </h1>
+
+            <p class="mt-5 max-w-xl text-pretty text-base md:text-lg leading-relaxed text-white/70">
+              慢慢 ManMan 咖啡厅旨在打造一个以「放松、美学与咖啡文化」为核心的小型独立咖啡空间。
+              我们主打咖啡拉花、精品手冲、甜点、咸食与早午餐，让客人不仅仅“喝咖啡”，而是“慢慢享受生活”。
+            </p>
+
+            <div class="mt-7 flex flex-wrap items-center gap-3">
+              <a href="#menu" class="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90">
+                查看菜单亮点
+                <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-0.5"></i>
+              </a>
+              <a href="#gallery" class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-3 text-sm font-semibold hover:bg-white/[0.10]">
+                <i data-lucide="image" class="h-4 w-4"></i> 风格画廊
+              </a>
+              <div class="flex items-center gap-2 text-sm text-white/60">
+                <i data-lucide="map-pin" class="h-4 w-4"></i> Singapore · 独立咖啡空间
+              </div>
+            </div>
+
+            <div class="mt-8 flex flex-wrap items-center gap-4 text-sm text-white/60">
+              <div class="inline-flex items-center gap-2"><i data-lucide="wand-2" class="h-4 w-4"></i> 拉花</div>
+              <div class="inline-flex items-center gap-2"><i data-lucide="droplet" class="h-4 w-4"></i> 精品手冲</div>
+              <div class="inline-flex items-center gap-2"><i data-lucide="cake" class="h-4 w-4"></i> 甜点</div>
+              <div class="inline-flex items-center gap-2"><i data-lucide="sandwich" class="h-4 w-4"></i> 咸食/早午餐</div>
+            </div>
+          </div>
+
+          <!-- HERO CARD -->
+          <div class="reveal relative">
+            <div class="glass overflow-hidden">
+              <div class="relative aspect-[4/5] w-full">
+                <img
+                  src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1400&q=80"
+                  alt="ManMan cafe mood"
+                  class="absolute inset-0 h-full w-full object-cover"
+                />
+                <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,0,0,0.88), transparent 55%);"></div>
+
+                <div class="absolute bottom-0 left-0 right-0 p-6">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-xs text-white/70">MANMAN CAFE</div>
+                      <div class="mt-1 text-lg font-semibold">Relax · Aesthetic · Coffee Culture</div>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3">
+                      <i data-lucide="zap" class="h-6 w-6"></i>
+                    </div>
+                  </div>
+
+                  <div class="mt-5 grid grid-cols-3 gap-2">
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
+                      <i data-lucide="coffee" class="h-5 w-5 text-white/85"></i>
+                      <div class="mt-2 text-xs text-white/60">Coffee</div>
+                      <div class="text-sm font-semibold">Craft</div>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
+                      <i data-lucide="sparkles" class="h-5 w-5 text-white/85"></i>
+                      <div class="mt-2 text-xs text-white/60">Aesthetic</div>
+                      <div class="text-sm font-semibold">Taste</div>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
+                      <i data-lucide="leaf" class="h-5 w-5 text-white/85"></i>
+                      <div class="mt-2 text-xs text-white/60">Slow</div>
+                      <div class="text-sm font-semibold">Living</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Orbit icons -->
+            <div class="pointer-events-none absolute -right-6 top-10 hidden md:block">
+              <div id="orbit" class="relative h-40 w-40">
+                <!-- icons will be placed by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+      <div class="reveal text-center mx-auto max-w-3xl">
+        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
+          <i data-lucide="sparkles" class="h-4 w-4"></i>
+          <span>About</span>
+        </div>
+        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">我们相信，好的咖啡让时间变慢</h2>
+        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
+          在慢慢 ManMan，你会遇到：温柔的光、舒服的座位、认真对待的每一杯咖啡，以及让人愿意停留的氛围。
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
+        <div class="reveal glass p-6">
+          <div class="flex items-start gap-4">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
+              <i data-lucide="brush" class="h-6 w-6"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold">美学氛围</h3>
+              <p class="mt-1 text-sm leading-relaxed text-white/70">空间细节、配色与质感，营造“想拍、想坐、想放空”的舒服感。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal glass p-6">
+          <div class="flex items-start gap-4">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
+              <i data-lucide="droplet" class="h-6 w-6"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold">精品手冲</h3>
+              <p class="mt-1 text-sm leading-relaxed text-white/70">用更干净的风味表达豆子，让你喝到层次与香气的变化。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal glass p-6">
+          <div class="flex items-start gap-4">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
+              <i data-lucide="croissant" class="h-6 w-6"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold">甜点与早午餐</h3>
+              <p class="mt-1 text-sm leading-relaxed text-white/70">不只是喝咖啡：甜点、咸食与早午餐，让你的慢慢更完整。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section id="menu" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+      <div class="reveal text-center mx-auto max-w-3xl">
+        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
+          <i data-lucide="menu" class="h-4 w-4"></i>
+          <span>Menu Highlights</span>
+        </div>
+        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">菜单亮点</h2>
+        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
+          这里先放“品类展示”。等你给我真实菜单与价格，我可以帮你做成更像 Apple 官网那种高级菜单页。
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
+        <div class="reveal glass p-6">
+          <div class="flex items-center justify-between">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3"><i data-lucide="coffee" class="h-6 w-6"></i></div>
+            <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Signature</div>
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">拉花咖啡</h3>
+          <p class="mt-2 text-sm text-white/70 leading-relaxed">奶泡细腻、口感平衡，让每一杯都有“慢慢”的温柔手感。</p>
+        </div>
+
+        <div class="reveal glass p-6">
+          <div class="flex items-center justify-between">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3"><i data-lucide="droplet" class="h-6 w-6"></i></div>
+            <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Pour-over</div>
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">精品手冲</h3>
+          <p class="mt-2 text-sm text-white/70 leading-relaxed">清爽干净、层次分明，适合想静静坐下来的你。</p>
+        </div>
+
+        <div class="reveal glass p-6">
+          <div class="flex items-center justify-between">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.07] p-3"><i data-lucide="sandwich" class="h-6 w-6"></i></div>
+            <div class="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">Brunch</div>
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">咸食与早午餐</h3>
+          <p class="mt-2 text-sm text-white/70 leading-relaxed">让“慢慢”不只是咖啡，更是一顿舒服的日常。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" class="mx-auto max-w-6xl px-4 py-16 md:py-24">
+      <div class="reveal text-center mx-auto max-w-3xl">
+        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
+          <i data-lucide="image" class="h-4 w-4"></i>
+          <span>Gallery</span>
+        </div>
+        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">风格图片画廊</h2>
+        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
+          先用高质感占位图。你把店内照片/咖啡拉花/甜点图给我，我能帮你替换并做成更统一的品牌视觉。
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-2">
+        <div class="reveal glass overflow-hidden">
+          <div class="relative aspect-[16/10]">
+            <img class="absolute inset-0 h-full w-full object-cover"
+                 src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=1600&q=80" alt="coffee latte art" />
+            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-base font-semibold">Latte Art · 温柔但专业</div>
+                  <div class="mt-1 text-sm text-white/70">主打拉花与口感平衡</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="wand-2" class="h-6 w-6"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal glass overflow-hidden">
+          <div class="relative aspect-[16/10]">
+            <img class="absolute inset-0 h-full w-full object-cover"
+                 src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80" alt="pour over" />
+            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-base font-semibold">Pour-over · 让时间慢下来</div>
+                  <div class="mt-1 text-sm text-white/70">香气与层次的变化</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="droplet" class="h-6 w-6"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal glass overflow-hidden">
+          <div class="relative aspect-[16/10]">
+            <img class="absolute inset-0 h-full w-full object-cover"
+                 src="https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=1600&q=80" alt="dessert" />
+            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-base font-semibold">Dessert · 甜点与幸福感</div>
+                  <div class="mt-1 text-sm text-white/70">搭配咖啡刚刚好</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="cake" class="h-6 w-6"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal glass overflow-hidden">
+          <div class="relative aspect-[16/10]">
+            <img class="absolute inset-0 h-full w-full object-cover"
+                 src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1600&q=80" alt="brunch" />
+            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,0.9), transparent 55%);"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-base font-semibold">Brunch · 慢慢的日常</div>
+                  <div class="mt-1 text-sm text-white/70">咸食与早午餐</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.08] p-3"><i data-lucide="sandwich" class="h-6 w-6"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="mx-auto max-w-6xl px-4 pt-8 pb-20 md:pb-28">
+      <div class="reveal text-center mx-auto max-w-3xl">
+        <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
+          <i data-lucide="message-circle" class="h-4 w-4"></i>
+          <span>Contact</span>
+        </div>
+        <h2 class="mt-4 text-balance text-3xl md:text-4xl font-semibold tracking-tight">欢迎来慢慢坐一坐</h2>
+        <p class="mt-3 text-pretty text-base md:text-lg leading-relaxed text-white/70">
+          合作 / 询问 / 预订：直接联系我就好。
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+        <div class="reveal glass p-6 md:p-8">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs text-white/60">EMAIL</div>
+              <div class="mt-2 text-lg font-semibold">junkang1999@live.com</div>
+              <p class="mt-2 text-sm text-white/70">点击按钮直接发邮件，或使用 WhatsApp 快速联系。</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
+              <i data-lucide="mail" class="h-6 w-6"></i>
+            </div>
+          </div>
+
+          <div class="mt-6 grid gap-3 md:grid-cols-2">
+            <a href="mailto:junkang1999@live.com"
+               class="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black hover:opacity-90">
+              发邮件
+              <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-0.5"></i>
+            </a>
+            <a href="https://wa.me/6594450736" target="_blank" rel="noopener"
+               class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-3 text-sm font-semibold hover:bg-white/[0.10]">
+              <i data-lucide="phone" class="h-4 w-4"></i> WhatsApp：9445 0736
+            </a>
+          </div>
+        </div>
+
+        <div class="reveal glass h-full p-6 md:p-8">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-white/60">SOCIAL</div>
+              <div class="mt-2 text-lg font-semibold">Instagram</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
+              <i data-lucide="instagram" class="h-6 w-6"></i>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-2">
+            <a href="https://instagram.com/jknlk_" target="_blank" rel="noopener"
+               class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/80 hover:bg-white/[0.08]">
+              <div class="flex items-center gap-3">
+                <i data-lucide="instagram" class="h-5 w-5 text-white/80"></i>
+                <span>@jknlk_</span>
+              </div>
+              <i data-lucide="arrow-right" class="h-4 w-4 text-white/60"></i>
+            </a>
+          </div>
+
+          <div class="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-xs text-white/60">
+            想加更多社媒（Google Maps / TikTok / 小红书 / Telegram）告诉我，我帮你排版成同一风格。
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal mt-10 text-center text-xs text-white/50">
+        © <span id="year"></span> 慢慢 ManMan 咖啡厅 · Crafted with care
+      </div>
+    </section>
+
+    <!-- Floating top button -->
+    <a href="#top"
+       class="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-3 text-sm font-semibold shadow-lg backdrop-blur hover:bg-white/[0.12]">
+      <i data-lucide="arrow-up" class="h-4 w-4"></i> 顶部
+    </a>
+  </main>
+
+  <script>
+    // Icons
+    lucide.createIcons();
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Orbit icons
+    const orbit = document.getElementById('orbit');
+    const orbitIcons = ['coffee','sparkles','droplet','wand-2'];
+    orbitIcons.forEach((name, idx) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'absolute left-1/2 top-1/2';
+      const deg = idx * 90;
+      wrap.style.transform = `translate(-50%, -50%) rotate(${deg}deg) translate(72px) rotate(-${deg}deg)`;
+      wrap.innerHTML = `
+        <div class="rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur">
+          <i data-lucide="${name}" class="h-5 w-5 text-white/85"></i>
+        </div>
+      `;
+      orbit.appendChild(wrap);
+    });
+    lucide.createIcons();
+    gsap.to('#orbit', { rotate: 360, duration: 18, repeat: -1, ease: 'linear' });
+
+    // Reveal animations
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach((el) => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 18 },
+        {
+          opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 85%' }
+        }
+      );
+    });
+
+    // Particle field (轻量粒子连线)
+    const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    let raf = 0;
-    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-
-    const resize = () => {
-      const { innerWidth: w, innerHeight: h } = window;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
+    function setupCanvas() {
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      canvas.width = Math.floor(innerWidth * dpr);
+      canvas.height = Math.floor(innerHeight * dpr);
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
+      return dpr;
+    }
+    setupCanvas();
+    addEventListener('resize', setupCanvas);
 
-    resize();
-    window.addEventListener('resize', resize);
-
-    const rand = (a: number, b: number) => a + Math.random() * (b - a);
-    const count = Math.min(120, Math.floor(window.innerWidth / 12));
-
-    const pts = Array.from({ length: count }).map(() => ({
-      x: rand(0, window.innerWidth),
-      y: rand(0, window.innerHeight),
+    const rand = (a,b) => a + Math.random() * (b-a);
+    const count = Math.min(120, Math.floor(innerWidth / 12));
+    const pts = Array.from({length: count}).map(() => ({
+      x: rand(0, innerWidth),
+      y: rand(0, innerHeight),
       vx: rand(-0.25, 0.25),
       vy: rand(-0.25, 0.25),
       r: rand(0.6, 1.8),
       a: rand(0.25, 0.85),
     }));
 
-    const draw = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-
-      ctx.clearRect(0, 0, w, h);
+    function loop() {
+      ctx.clearRect(0,0,innerWidth,innerHeight);
 
       // dots
       for (const p of pts) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < -10) p.x = w + 10;
-        if (p.x > w + 10) p.x = -10;
-        if (p.y < -10) p.y = h + 10;
-        if (p.y > h + 10) p.y = -10;
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < -10) p.x = innerWidth + 10;
+        if (p.x > innerWidth + 10) p.x = -10;
+        if (p.y < -10) p.y = innerHeight + 10;
+        if (p.y > innerHeight + 10) p.y = -10;
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
         ctx.fillStyle = `rgba(255,255,255,${p.a})`;
         ctx.fill();
       }
 
       // connections
-      for (let i = 0; i < pts.length; i++) {
-        for (let j = i + 1; j < pts.length; j++) {
-          const a = pts[i];
-          const b = pts[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+      for (let i=0; i<pts.length; i++) {
+        for (let j=i+1; j<pts.length; j++) {
+          const a = pts[i], b = pts[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
           if (dist < 120) {
-            const alpha = (1 - dist / 120) * 0.18;
+            const alpha = (1 - dist/120) * 0.18;
             ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -134,767 +574,9 @@ function ParticleField() {
           }
         }
       }
-
-      raf = requestAnimationFrame(draw);
-    };
-
-    raf = requestAnimationFrame(draw);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', resize);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={ref}
-      className="pointer-events-none fixed inset-0 -z-20 opacity-60"
-      aria-hidden="true"
-    />
-  );
-}
-
-// -----------------------------
-// Components
-// -----------------------------
-function GlassCard({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        'rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl',
-        'shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_20px_60px_rgba(0,0,0,0.35)]',
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-function Pill({ icon: Icon, label }: { icon: any; label: string }) {
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-white/90">
-      <Icon className="h-4 w-4 text-white/80" />
-      <span>{label}</span>
-    </div>
-  );
-}
-
-function SectionTitle({
-  eyebrow,
-  title,
-  desc,
-}: {
-  eyebrow: string;
-  title: string;
-  desc?: string;
-}) {
-  return (
-    <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
-      <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs tracking-wide text-white/80">
-        <Sparkles className="h-4 w-4" />
-        <span>{eyebrow}</span>
-      </div>
-      <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight text-white md:text-4xl">
-        {title}
-      </h2>
-      {desc ? (
-        <p className="mt-3 text-pretty text-base leading-relaxed text-white/70 md:text-lg">
-          {desc}
-        </p>
-      ) : null}
-    </motion.div>
-  );
-}
-
-function IconBadge({ icon: Icon, title, text }: { icon: any; title: string; text: string }) {
-  return (
-    <GlassCard className="p-6">
-      <div className="flex items-start gap-4">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-          <Icon className="h-6 w-6 text-white" />
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold text-white">{title}</h3>
-            <Star className="h-4 w-4 text-white/60" />
-          </div>
-          <p className="mt-1 text-sm leading-relaxed text-white/70">{text}</p>
-        </div>
-      </div>
-    </GlassCard>
-  );
-}
-
-function Nav() {
-  const items = [
-    { href: '#about', label: 'About' },
-    { href: '#pillars', label: 'Pillars' },
-    { href: '#work', label: 'Work' },
-    { href: '#gallery', label: 'Gallery' },
-    { href: '#contact', label: 'Contact' },
-  ];
-
-  return (
-    <div className="sticky top-0 z-50">
-      <div className="mx-auto max-w-6xl px-4 py-3">
-        <GlassCard className="px-4 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <Link href="#top" className="flex items-center gap-2">
-              <div className="relative h-9 w-9 overflow-hidden rounded-xl border border-white/10 bg-white/[0.06]">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.35),transparent_60%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,rgba(255,255,255,0.2),transparent_60%)]" />
-              </div>
-              <div className="leading-tight">
-                <div className="text-sm font-semibold text-white">JKang</div>
-                <div className="text-xs text-white/60">jkang.vercel.app</div>
-              </div>
-            </Link>
-
-            <div className="hidden items-center gap-1 md:flex">
-              {items.map((it) => (
-                <a
-                  key={it.href}
-                  href={it.href}
-                  className="rounded-full px-3 py-2 text-sm text-white/70 hover:bg-white/[0.06] hover:text-white"
-                >
-                  {it.label}
-                </a>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm text-white hover:bg-white/[0.10]"
-              >
-                <Mail className="h-4 w-4" />
-                <span>合作 / 联系</span>
-              </a>
-            </div>
-          </div>
-        </GlassCard>
-      </div>
-    </div>
-  );
-}
-
-function Hero() {
-  // mouse parallax
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 120, damping: 18, mass: 0.4 });
-  const sy = useSpring(my, { stiffness: 120, damping: 18, mass: 0.4 });
-  const tX = useTransform(sx, (v) => `${v}px`);
-  const tY = useTransform(sy, (v) => `${v}px`);
-
-  return (
-    <section
-      id="top"
-      className="relative overflow-hidden"
-      onMouseMove={(e) => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 20;
-        const y = (e.clientY / window.innerHeight - 0.5) * 20;
-        mx.set(x);
-        my.set(y);
-      }}
-    >
-      {/* Gradient + glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.14),transparent_55%)]" />
-        <div className="absolute -left-24 top-10 h-[34rem] w-[34rem] rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -right-24 top-40 h-[34rem] w-[34rem] rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.92))]" />
-      </div>
-
-      <div className="mx-auto max-w-6xl px-4 pb-16 pt-10 md:pb-24 md:pt-16">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="grid items-center gap-10 md:grid-cols-[1.1fr_0.9fr]"
-        >
-          <motion.div variants={fadeUp}>
-            <div className="flex flex-wrap items-center gap-2">
-              <Pill icon={Crown} label="科技 CEO 风" />
-              <Pill icon={Coffee} label="创业咖啡风" />
-              <Pill icon={BriefcaseBusiness} label="个人品牌风" />
-            </div>
-
-            <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight text-white md:text-6xl">
-              让技术更有温度，
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
-                  用一杯咖啡连接世界
-                </span>
-                <span className="pointer-events-none absolute -bottom-1 left-0 right-0 h-px bg-white/30" />
-              </span>
-            </h1>
-
-            <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/70 md:text-lg">
-              我是 <span className="font-semibold text-white">JKang</span>。我打造产品、优化系统、经营品牌——
-              用科技的效率与咖啡的松弛感，把想法变成可持续的业务。
-            </p>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <a
-                href="#work"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90"
-              >
-                看我在做什么
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
-              <a
-                href="#gallery"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.10]"
-              >
-                <Globe className="h-4 w-4" />
-                风格画廊
-              </a>
-              <div className="flex items-center gap-2 text-sm text-white/60">
-                <MapPin className="h-4 w-4" />
-                Singapore · SEA
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-white/60">
-              <div className="inline-flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4" />
-                运营增长
-              </div>
-              <div className="inline-flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4" />
-                流程与系统
-              </div>
-              <div className="inline-flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                品牌与体验
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeUp} className="relative">
-            {/* floating device card */}
-            <motion.div
-              style={{ x: tX, y: tY }}
-              className="relative"
-            >
-              <GlassCard className="overflow-hidden">
-                <div className="relative aspect-[4/5] w-full">
-                  {/* 你可以替换成你自己的头像/写真 */}
-                  <Image
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
-                    alt="Portrait placeholder"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.85),transparent_55%)]" />
-
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-xs text-white/70">PERSONAL BRAND</div>
-                        <div className="mt-1 text-lg font-semibold text-white">Operator · Builder · Barista Mindset</div>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-3">
-                        <Zap className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-
-                    <div className="mt-5 grid grid-cols-3 gap-2">
-                      {[
-                        { icon: Cpu, k: 'Tech', v: 'Systems' },
-                        { icon: Coffee, k: 'Cafe', v: 'Vibes' },
-                        { icon: Rocket, k: 'Growth', v: 'Scale' },
-                      ].map((it) => (
-                        <div key={it.k} className="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-                          <it.icon className="h-5 w-5 text-white/85" />
-                          <div className="mt-2 text-xs text-white/60">{it.k}</div>
-                          <div className="text-sm font-semibold text-white">{it.v}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </GlassCard>
-
-              {/* orbiting icons */}
-              <motion.div
-                className="pointer-events-none absolute -right-6 top-10 hidden md:block"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-              >
-                <div className="relative h-40 w-40">
-                  {[Terminal, Workflow, Trophy, Building2].map((Ico, idx) => (
-                    <div
-                      key={idx}
-                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                      style={{
-                        transform: `translate(-50%, -50%) rotate(${idx * 90}deg) translate(72px) rotate(-${idx * 90}deg)`,
-                      }}
-                    >
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur">
-                        <Ico className="h-5 w-5 text-white/85" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section id="about" className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={stagger}
-      >
-        <SectionTitle
-          eyebrow="Identity"
-          title="我把三种气质揉在一起"
-          desc="科技 CEO 的决策力 × 创业咖啡馆的松弛氛围 × 个人品牌的表达力。你看到的是风格，背后是方法论。"
-        />
-
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          <motion.div variants={fadeUp}>
-            <IconBadge
-              icon={Cpu}
-              title="Tech CEO 风"
-              text="用数据、系统与战略，把复杂问题变成可执行路线图。"
-            />
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <IconBadge
-              icon={Coffee}
-              title="创业咖啡风"
-              text="以体验为中心：空间、节奏、服务与细节，让人愿意停留。"
-            />
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <IconBadge
-              icon={BriefcaseBusiness}
-              title="个人品牌风"
-              text="表达清晰、风格统一：内容、视觉与口碑，持续积累信任。"
-            />
-          </motion.div>
-        </div>
-
-        <motion.div variants={fadeUp} className="mt-10">
-          <GlassCard className="p-6 md:p-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="text-xs tracking-wide text-white/60">CURRENT FOCUS</div>
-                <div className="mt-2 text-xl font-semibold text-white md:text-2xl">
-                  运营增长 · 门店体验 · 数字化流程
-                </div>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
-                  适合我合作的方向：品牌升级、门店运营体系、会员增长、服务与流程优化、产品与内容共创。
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { icon: Rocket, label: 'Scale-ready' },
-                  { icon: Workflow, label: 'Ops System' },
-                  { icon: Sparkles, label: 'Brand Aesthetic' },
-                ].map((p) => (
-                  <Pill key={p.label} icon={p.icon} label={p.label} />
-                ))}
-              </div>
-            </div>
-          </GlassCard>
-        </motion.div>
-      </motion.div>
-    </section>
-  );
-}
-
-function Pillars() {
-  const pillars = [
-    {
-      icon: Terminal,
-      title: '系统化经营',
-      points: ['SOP 与培训', '数据看板', '效率与成本优化'],
-    },
-    {
-      icon: Coffee,
-      title: '体验驱动增长',
-      points: ['动线与排队', '服务节奏', '复购与口碑'],
-    },
-    {
-      icon: Crown,
-      title: 'CEO 级表达',
-      points: ['决策框架', '叙事与定位', '个人 IP 内容'],
-    },
-  ];
-
-  return (
-    <section id="pillars" className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={stagger}
-      >
-        <SectionTitle
-          eyebrow="Playbook"
-          title="我的三大支柱"
-          desc="把想法做成产品，把产品做成品牌，把品牌做成长期资产。"
-        />
-
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {pillars.map((p) => (
-            <motion.div key={p.title} variants={fadeUp}>
-              <GlassCard className="h-full p-6">
-                <div className="flex items-center justify-between">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-                    <p.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="text-xs text-white/60">PILLAR</div>
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">{p.title}</h3>
-                <ul className="mt-4 space-y-2 text-sm text-white/70">
-                  {p.points.map((t) => (
-                    <li key={t} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    </section>
-  );
-}
-
-function Work() {
-  const cards = [
-    {
-      icon: Building2,
-      title: '运营系统 & 门店增长',
-      tag: 'Ops + Growth',
-      desc: '把门店运营变成可复制的系统：排队、出餐、会员、评价、培训与排班。',
-    },
-    {
-      icon: Rocket,
-      title: '从 0 到 1 的落地执行',
-      tag: 'Execution',
-      desc: '以“能跑起来”为第一原则：MVP、流程、指标、迭代节奏。',
-    },
-    {
-      icon: Sparkles,
-      title: '个人品牌内容与视觉',
-      tag: 'Brand',
-      desc: '统一风格与表达：主页、海报、贴纸、短文案、内容栏目。',
-    },
-  ];
-
-  return (
-    <section id="work" className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={stagger}
-      >
-        <SectionTitle
-          eyebrow="What I do"
-          title="我在做的事"
-          desc="你可以把我当成：懂运营的产品人，懂体验的系统派，懂增长的品牌控。"
-        />
-
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {cards.map((c) => (
-            <motion.div key={c.title} variants={fadeUp}>
-              <GlassCard className="h-full p-6">
-                <div className="flex items-center justify-between">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-3">
-                    <c.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/70">
-                    {c.tag}
-                  </div>
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">{c.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/70">{c.desc}</p>
-                <div className="mt-5 flex items-center gap-2 text-sm text-white/70">
-                  <Zap className="h-4 w-4" />
-                  <span>可提供：诊断 · 方案 · 落地 · 复盘</span>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div variants={fadeUp} className="mt-10">
-          <GlassCard className="p-6 md:p-8">
-            <div className="grid gap-6 md:grid-cols-3">
-              {[
-                { icon: Trophy, k: 'Impact', v: '可量化结果' },
-                { icon: Workflow, k: 'System', v: '可复制流程' },
-                { icon: Star, k: 'Taste', v: '高级审美' },
-              ].map((s) => (
-                <div key={s.k} className="flex items-center gap-4">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-                    <s.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-white/60">{s.k}</div>
-                    <div className="text-base font-semibold text-white">{s.v}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-        </motion.div>
-      </motion.div>
-    </section>
-  );
-}
-
-function Gallery() {
-  const items = useMemo(
-    () => [
-      {
-        title: 'CEO Desk · Tech Minimal',
-        note: '科技 CEO 风 / 冷静、干净、强对比',
-        img: 'https://images.unsplash.com/photo-1526378722484-bd91ca387e72?auto=format&fit=crop&w=1600&q=80',
-        icon: Terminal,
-      },
-      {
-        title: 'Cafe Mood · Warm & Cozy',
-        note: '创业咖啡风 / 温暖、松弛、有人味',
-        img: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1600&q=80',
-        icon: Coffee,
-      },
-      {
-        title: 'Personal Brand · Editorial',
-        note: '个人品牌风 / 高级杂志感',
-        img: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1600&q=80',
-        icon: Sparkles,
-      },
-      {
-        title: 'Growth · Motion & Neon',
-        note: '增长氛围 / 霓虹、速度、动感',
-        img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80',
-        icon: Rocket,
-      },
-    ],
-    []
-  );
-
-  return (
-    <section id="gallery" className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={stagger}
-      >
-        <SectionTitle
-          eyebrow="Visual"
-          title="风格图片画廊"
-          desc="先用这些做占位图。你把自己的照片/品牌素材给我，我可以帮你替换成更贴合你的版本。"
-        />
-
-        <div className="mt-10 grid gap-4 md:grid-cols-2">
-          {items.map((it) => (
-            <motion.div key={it.title} variants={fadeUp}>
-              <GlassCard className="overflow-hidden">
-                <div className="relative aspect-[16/10]">
-                  <Image
-                    src={it.img}
-                    alt={it.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.9),transparent_55%)]" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <div className="text-base font-semibold text-white">{it.title}</div>
-                        <div className="mt-1 text-sm text-white/70">{it.note}</div>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-3">
-                        <it.icon className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    </section>
-  );
-}
-
-function Contact() {
-  const socials = [
-    { icon: Linkedin, label: 'LinkedIn', href: '#' },
-    { icon: Instagram, label: 'Instagram', href: '#' },
-    { icon: Github, label: 'GitHub', href: '#' },
-    { icon: Twitter, label: 'X', href: '#' },
-  ];
-
-  return (
-    <section id="contact" className="mx-auto max-w-6xl px-4 pb-20 pt-8 md:pb-28">
-      <motion.div
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-80px' }}
-        variants={stagger}
-      >
-        <SectionTitle
-          eyebrow="Let’s build"
-          title="如果你也喜欢「科技 × 咖啡 × 品牌」"
-          desc="给我一个目标，我用系统和审美把它做成现实。"
-        />
-
-        <div className="mt-10 grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
-          <motion.div variants={fadeUp}>
-            <GlassCard className="p-6 md:p-8">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-xs text-white/60">EMAIL</div>
-                  <div className="mt-2 text-lg font-semibold text-white">your@email.com</div>
-                  <p className="mt-2 text-sm text-white/70">
-                    （把邮箱换成你的）也可以在下方社媒链接找到我。
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-                  <Mail className="h-6 w-6 text-white" />
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-3 md:grid-cols-2">
-                <a
-                  href="mailto:your@email.com"
-                  className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-black hover:opacity-90"
-                >
-                  发邮件给我
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </a>
-                <a
-                  href="#work"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-4 py-3 text-sm font-semibold text-white hover:bg-white/[0.10]"
-                >
-                  <BriefcaseBusiness className="h-4 w-4" />
-                  看合作方向
-                </a>
-              </div>
-            </GlassCard>
-          </motion.div>
-
-          <motion.div variants={fadeUp}>
-            <GlassCard className="h-full p-6 md:p-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs text-white/60">SOCIAL</div>
-                  <div className="mt-2 text-lg font-semibold text-white">Follow</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-                  <Globe className="h-6 w-6 text-white" />
-                </div>
-              </div>
-
-              <div className="mt-6 space-y-2">
-                {socials.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/80 hover:bg-white/[0.08]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <s.icon className="h-5 w-5 text-white/80" />
-                      <span>{s.label}</span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-white/60" />
-                  </a>
-                ))}
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-xs text-white/60">
-                小提示：把上面的 href="#" 换成你的真实链接（LinkedIn/IG/GitHub/小红书等）。
-              </div>
-            </GlassCard>
-          </motion.div>
-        </div>
-
-        <motion.div variants={fadeUp} className="mt-10 text-center text-xs text-white/50">
-          © {new Date().getFullYear()} JKang · Built with Next.js · Vercel
-        </motion.div>
-      </motion.div>
-    </section>
-  );
-}
-
-export default function Page() {
-  return (
-    <main className="min-h-screen bg-black text-white">
-      <ParticleField />
-
-      {/* subtle grid */}
-      <div
-        className="pointer-events-none fixed inset-0 -z-30 opacity-[0.18]"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
-          backgroundPosition: 'center',
-        }}
-      />
-
-      {/* moving gradient film */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-40"
-        animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
-        transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.10), transparent 55%), radial-gradient(circle at 80% 40%, rgba(255,255,255,0.08), transparent 55%), radial-gradient(circle at 40% 90%, rgba(255,255,255,0.06), transparent 60%)',
-          backgroundSize: '140% 140%',
-        }}
-      />
-
-      <Nav />
-      <Hero />
-      <About />
-      <Pillars />
-      <Work />
-      <Gallery />
-      <Contact />
-
-      {/* Floating action button */}
-      <a
-        href="#top"
-        className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-4 py-3 text-sm font-semibold text-white shadow-lg backdrop-blur hover:bg-white/[0.12]"
-      >
-        <ArrowRight className="h-4 w-4 rotate-[-90deg]" />
-        顶部
-      </a>
-    </main>
-  );
-}
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>
